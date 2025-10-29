@@ -1,0 +1,10 @@
+/* This style for some reason keeps all survey text at the center of the screen and not on the top */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }

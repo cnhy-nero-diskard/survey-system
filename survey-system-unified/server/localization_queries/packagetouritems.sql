@@ -1,0 +1,96 @@
+INSERT INTO localization00 (key, language_code, textcontent, component) VALUES
+-- Korean (ko)
+('packageTourItemsTitle', 'ko', '패키지 투어에 포함된 항목은 무엇인가요?', 'PackageTourItems'),
+('packageTourItemsAccommodation', 'ko', '숙박', 'PackageTourItems'),
+('packageTourItemsEstablishment', 'ko', '시설', 'PackageTourItems'),
+('packageTourItemsFoodBeverages', 'ko', '음식 및 음료', 'PackageTourItems'),
+('packageTourItemsShopping', 'ko', '쇼핑', 'PackageTourItems'),
+('packageTourItemsLocalTransport', 'ko', '현지 교통', 'PackageTourItems'),
+('packageTourItemsTourismActivities', 'ko', '관광 활동', 'PackageTourItems'),
+('packageTourItemsEntertainment', 'ko', '엔터테인먼트', 'PackageTourItems'),
+('packageTourItemsMiscellaneous', 'ko', '기타', 'PackageTourItems'),
+('packageTourItemsNextButton', 'ko', '다음', 'PackageTourItems'),
+
+-- Chinese (zh)
+('packageTourItemsTitle', 'zh', '您的套餐游包含哪些项目？', 'PackageTourItems'),
+('packageTourItemsAccommodation', 'zh', '住宿', 'PackageTourItems'),
+('packageTourItemsEstablishment', 'zh', '设施', 'PackageTourItems'),
+('packageTourItemsFoodBeverages', 'zh', '餐饮', 'PackageTourItems'),
+('packageTourItemsShopping', 'zh', '购物', 'PackageTourItems'),
+('packageTourItemsLocalTransport', 'zh', '当地交通', 'PackageTourItems'),
+('packageTourItemsTourismActivities', 'zh', '旅游活动', 'PackageTourItems'),
+('packageTourItemsEntertainment', 'zh', '娱乐', 'PackageTourItems'),
+('packageTourItemsMiscellaneous', 'zh', '其他', 'PackageTourItems'),
+('packageTourItemsNextButton', 'zh', '下一步', 'PackageTourItems'),
+
+-- Japanese (ja)
+('packageTourItemsTitle', 'ja', 'パッケージツアーに含まれる項目は何ですか？', 'PackageTourItems'),
+('packageTourItemsAccommodation', 'ja', '宿泊', 'PackageTourItems'),
+('packageTourItemsEstablishment', 'ja', '施設', 'PackageTourItems'),
+('packageTourItemsFoodBeverages', 'ja', '飲食', 'PackageTourItems'),
+('packageTourItemsShopping', 'ja', 'ショッピング', 'PackageTourItems'),
+('packageTourItemsLocalTransport', 'ja', '現地交通', 'PackageTourItems'),
+('packageTourItemsTourismActivities', 'ja', '観光活動', 'PackageTourItems'),
+('packageTourItemsEntertainment', 'ja', '娯楽', 'PackageTourItems'),
+('packageTourItemsMiscellaneous', 'ja', 'その他', 'PackageTourItems'),
+('packageTourItemsNextButton', 'ja', '次へ', 'PackageTourItems'),
+
+-- Spanish (es)
+('packageTourItemsTitle', 'es', '¿Qué elementos están incluidos en su paquete turístico?', 'PackageTourItems'),
+('packageTourItemsAccommodation', 'es', 'Alojamiento', 'PackageTourItems'),
+('packageTourItemsEstablishment', 'es', 'Establecimiento', 'PackageTourItems'),
+('packageTourItemsFoodBeverages', 'es', 'Comida y bebidas', 'PackageTourItems'),
+('packageTourItemsShopping', 'es', 'Compras', 'PackageTourItems'),
+('packageTourItemsLocalTransport', 'es', 'Transporte local', 'PackageTourItems'),
+('packageTourItemsTourismActivities', 'es', 'Actividades turísticas', 'PackageTourItems'),
+('packageTourItemsEntertainment', 'es', 'Entretenimiento', 'PackageTourItems'),
+('packageTourItemsMiscellaneous', 'es', 'Misceláneos', 'PackageTourItems'),
+('packageTourItemsNextButton', 'es', 'Siguiente', 'PackageTourItems'),
+
+-- French (fr)
+('packageTourItemsTitle', 'fr', 'Quels éléments sont inclus dans votre forfait touristique ?', 'PackageTourItems'),
+('packageTourItemsAccommodation', 'fr', 'Hébergement', 'PackageTourItems'),
+('packageTourItemsEstablishment', 'fr', 'Établissement', 'PackageTourItems'),
+('packageTourItemsFoodBeverages', 'fr', 'Restauration', 'PackageTourItems'),
+('packageTourItemsShopping', 'fr', 'Shopping', 'PackageTourItems'),
+('packageTourItemsLocalTransport', 'fr', 'Transport local', 'PackageTourItems'),
+('packageTourItemsTourismActivities', 'fr', 'Activités touristiques', 'PackageTourItems'),
+('packageTourItemsEntertainment', 'fr', 'Divertissement', 'PackageTourItems'),
+('packageTourItemsMiscellaneous', 'fr', 'Divers', 'PackageTourItems'),
+('packageTourItemsNextButton', 'fr', 'Suivant', 'PackageTourItems'),
+
+-- Hindi (hi)
+('packageTourItemsTitle', 'hi', 'आपकी पैकेज टूर में कौन-कौन सी चीज़ें शामिल हैं?', 'PackageTourItems'),
+('packageTourItemsAccommodation', 'hi', 'आवास', 'PackageTourItems'),
+('packageTourItemsEstablishment', 'hi', 'प्रतिष्ठान', 'PackageTourItems'),
+('packageTourItemsFoodBeverages', 'hi', 'खाना और पेय', 'PackageTourItems'),
+('packageTourItemsShopping', 'hi', 'खरीदारी', 'PackageTourItems'),
+('packageTourItemsLocalTransport', 'hi', 'स्थानीय परिवहन', 'PackageTourItems'),
+('packageTourItemsTourismActivities', 'hi', 'पर्यटन गतिविधियाँ', 'PackageTourItems'),
+('packageTourItemsEntertainment', 'hi', 'मनोरंजन', 'PackageTourItems'),
+('packageTourItemsMiscellaneous', 'hi', 'विविध', 'PackageTourItems'),
+('packageTourItemsNextButton', 'hi', 'आगे', 'PackageTourItems'),
+
+-- Russian (ru)
+('packageTourItemsTitle', 'ru', 'Какие элементы включены в ваш турпакет?', 'PackageTourItems'),
+('packageTourItemsAccommodation', 'ru', 'Проживание', 'PackageTourItems'),
+('packageTourItemsEstablishment', 'ru', 'Учреждение', 'PackageTourItems'),
+('packageTourItemsFoodBeverages', 'ru', 'Еда и напитки', 'PackageTourItems'),
+('packageTourItemsShopping', 'ru', 'Покупки', 'PackageTourItems'),
+('packageTourItemsLocalTransport', 'ru', 'Местный транспорт', 'PackageTourItems'),
+('packageTourItemsTourismActivities', 'ru', 'Туристические мероприятия', 'PackageTourItems'),
+('packageTourItemsEntertainment', 'ru', 'Развлечения', 'PackageTourItems'),
+('packageTourItemsMiscellaneous', 'ru', 'Разное', 'PackageTourItems'),
+('packageTourItemsNextButton', 'ru', 'Далее', 'PackageTourItems');
+
+INSERT INTO localization00 (key, language_code, textcontent, component) VALUES
+('packageTourItemsTitle', 'en', 'What items are included in your Package Tour?', 'PackageTourItems'),
+('packageTourItemsAccommodation', 'en', 'Accommodation', 'PackageTourItems'),
+('packageTourItemsEstablishment', 'en', 'Establishment', 'PackageTourItems'),
+('packageTourItemsFoodBeverages', 'en', 'Food & Beverages', 'PackageTourItems'),
+('packageTourItemsShopping', 'en', 'Shopping', 'PackageTourItems'),
+('packageTourItemsLocalTransport', 'en', 'Local Transport', 'PackageTourItems'),
+('packageTourItemsTourismActivities', 'en', 'Tourism Activities', 'PackageTourItems'),
+('packageTourItemsEntertainment', 'en', 'Entertainment', 'PackageTourItems'),
+('packageTourItemsMiscellaneous', 'en', 'Miscellaneous', 'PackageTourItems'),
+('packageTourItemsNextButton', 'en', 'Next', 'PackageTourItems');

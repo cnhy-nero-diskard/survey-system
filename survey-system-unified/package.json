@@ -1,0 +1,39 @@
+{
+  "name": "survey-system-unified",
+  "version": "1.0.0",
+  "description": "Unified survey system with React frontend and Node.js backend",
+  "main": "server/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm start",
+    "build": "npm run client:build && npm run server:install",
+    "client:build": "cd client && npm run build",
+    "client:install": "cd client && npm install",
+    "client:dev": "cd client && npm start",
+    "server:install": "cd server && npm install",
+    "server:dev": "cd server && npm run dev",
+    "server:start": "cd server && npm start",
+    "start": "npm run server:start",
+    "install:all": "npm run client:install && npm run server:install",
+    "test": "cd server && npm test",
+    "docker:build": "docker build -t survey-system-unified .",
+    "docker:run": "docker run -p 5000:5000 --env-file .env survey-system-unified"
+  },
+  "keywords": [
+    "survey",
+    "react",
+    "nodejs",
+    "express",
+    "postgresql"
+  ],
+  "author": "Survey System Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

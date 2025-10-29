@@ -1,0 +1,5 @@
+ALTER TABLE admin_table
+ADD COLUMN last_login TIMESTAMP,
+ADD COLUMN last_logout TIMESTAMP,
+ADD COLUMN session_duration INT,
+ADD COLUMN is_logged_in BOOLEAN DEFAULT FALSE;

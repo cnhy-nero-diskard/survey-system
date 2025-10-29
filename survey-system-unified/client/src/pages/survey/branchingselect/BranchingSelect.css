@@ -1,0 +1,22 @@
+/* src/components/BranchingSelect.css */
+.branching-select {
+    text-align: center;
+    padding: 20px;
+    
+    border-radius: 10px;
+    border: none;
+  }
+  
+  .branching-select h2 {
+    margin-bottom: 20px;
+    color: white;
+  }
+  
+  .selected-option {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: rgb(18, 177, 31);
+    color: white;
+    border-radius: 5px;
+    border: none
+  }

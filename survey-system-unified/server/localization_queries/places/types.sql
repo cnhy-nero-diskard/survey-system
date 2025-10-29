@@ -1,0 +1,21 @@
+INSERT INTO types (type_name)
+VALUES
+    ('Accommodation'),
+    ('Dive Shop'),
+    ('Restaurant'),
+    ('Vessel / Pumpboat Operator'),
+    ('House For Rent'),
+    ('Laundry'),
+    ('Resto Bar'),
+    ('Rooms For Rent'),
+    ('Spa'),
+    ('Bar & Restaurant'),
+    ('Hotels'),
+    ('Other Services'),
+    ('Souvenir Trading'),
+    ('Tourist Inn'),
+    ('Bars & Restaurant'),
+    ('Bars / Restaurants'),
+    ('Boarding House'),
+    ('Bakery'),
+    ('Office Machine, Equipment & Services');

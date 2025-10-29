@@ -1,0 +1,96 @@
+INSERT INTO localization00 (key, language_code, textcontent, component) VALUES
+('surveyVenueTitle', 'en', 'Specific Type of Venue where Survey is Conducted or Received:', 'SurveyVenue'),
+('surveyVenueAccommodationEstablishment', 'en', 'Accommodation Establishment', 'SurveyVenue'),
+('surveyVenueTouristAttraction', 'en', 'Tourist Attraction', 'SurveyVenue'),
+('surveyVenueMICEFacility', 'en', 'MICE Facility', 'SurveyVenue'),
+('surveyVenueEmailedSurvey', 'en', 'Emailed Survey', 'SurveyVenue'),
+('surveyVenuePortTransportationFacility', 'en', 'Port/Transportation Facility for Exit/Entry to the Province', 'SurveyVenue'),
+('surveyVenueOthersSpecify', 'en', 'Others (specify)', 'SurveyVenue'),
+('surveyVenuePopupTitle', 'en', 'Specify the Venue:', 'SurveyVenue'),
+('surveyVenuePopupPlaceholder', 'en', 'Enter venue name', 'SurveyVenue'),
+('surveyVenuePopupButton', 'en', 'Submit', 'SurveyVenue');
+
+INSERT INTO localization00 (key, language_code, textcontent, component) VALUES
+-- Korean (ko)
+('surveyVenueTitle', 'ko', '조사가 수행되거나 받은 특정 장소 유형:', 'SurveyVenue'),
+('surveyVenueAccommodationEstablishment', 'ko', '숙박 시설', 'SurveyVenue'),
+('surveyVenueTouristAttraction', 'ko', '관광 명소', 'SurveyVenue'),
+('surveyVenueMICEFacility', 'ko', 'MICE 시설', 'SurveyVenue'),
+('surveyVenueEmailedSurvey', 'ko', '이메일 설문 조사', 'SurveyVenue'),
+('surveyVenuePortTransportationFacility', 'ko', '출입구/교통 시설', 'SurveyVenue'),
+('surveyVenueOthersSpecify', 'ko', '기타 (명시)', 'SurveyVenue'),
+('surveyVenuePopupTitle', 'ko', '장소를 명시하세요:', 'SurveyVenue'),
+('surveyVenuePopupPlaceholder', 'ko', '장소 이름 입력', 'SurveyVenue'),
+('surveyVenuePopupButton', 'ko', '제출', 'SurveyVenue'),
+
+-- Chinese (zh)
+('surveyVenueTitle', 'zh', '调查进行或收到的特定场所类型:', 'SurveyVenue'),
+('surveyVenueAccommodationEstablishment', 'zh', '住宿设施', 'SurveyVenue'),
+('surveyVenueTouristAttraction', 'zh', '旅游景点', 'SurveyVenue'),
+('surveyVenueMICEFacility', 'zh', 'MICE 设施', 'SurveyVenue'),
+('surveyVenueEmailedSurvey', 'zh', '电子邮件调查', 'SurveyVenue'),
+('surveyVenuePortTransportationFacility', 'zh', '省入口/出口的港口/交通设施', 'SurveyVenue'),
+('surveyVenueOthersSpecify', 'zh', '其他（请注明）', 'SurveyVenue'),
+('surveyVenuePopupTitle', 'zh', '请指定场所:', 'SurveyVenue'),
+('surveyVenuePopupPlaceholder', 'zh', '输入场所名称', 'SurveyVenue'),
+('surveyVenuePopupButton', 'zh', '提交', 'SurveyVenue'),
+
+-- Japanese (ja)
+('surveyVenueTitle', 'ja', '調査が実施または受け取られた特定の会場の種類:', 'SurveyVenue'),
+('surveyVenueAccommodationEstablishment', 'ja', '宿泊施設', 'SurveyVenue'),
+('surveyVenueTouristAttraction', 'ja', '観光名所', 'SurveyVenue'),
+('surveyVenueMICEFacility', 'ja', 'MICE施設', 'SurveyVenue'),
+('surveyVenueEmailedSurvey', 'ja', '電子メール調査', 'SurveyVenue'),
+('surveyVenuePortTransportationFacility', 'ja', '県への出入の港/交通施設', 'SurveyVenue'),
+('surveyVenueOthersSpecify', 'ja', 'その他（具体的に記入）', 'SurveyVenue'),
+('surveyVenuePopupTitle', 'ja', '会場を指定してください:', 'SurveyVenue'),
+('surveyVenuePopupPlaceholder', 'ja', '会場名を入力', 'SurveyVenue'),
+('surveyVenuePopupButton', 'ja', '送信', 'SurveyVenue'),
+
+-- Spanish (es)
+('surveyVenueTitle', 'es', 'Tipo específico de lugar donde se realiza o recibe la encuesta:', 'SurveyVenue'),
+('surveyVenueAccommodationEstablishment', 'es', 'Establecimiento de alojamiento', 'SurveyVenue'),
+('surveyVenueTouristAttraction', 'es', 'Atracción turística', 'SurveyVenue'),
+('surveyVenueMICEFacility', 'es', 'Instalación MICE', 'SurveyVenue'),
+('surveyVenueEmailedSurvey', 'es', 'Encuesta enviada por correo electrónico', 'SurveyVenue'),
+('surveyVenuePortTransportationFacility', 'es', 'Instalación de transporte/puerto para la entrada/salida a la provincia', 'SurveyVenue'),
+('surveyVenueOthersSpecify', 'es', 'Otros (especificar)', 'SurveyVenue'),
+('surveyVenuePopupTitle', 'es', 'Especificar el lugar:', 'SurveyVenue'),
+('surveyVenuePopupPlaceholder', 'es', 'Ingrese el nombre del lugar', 'SurveyVenue'),
+('surveyVenuePopupButton', 'es', 'Enviar', 'SurveyVenue'),
+
+-- French (fr)
+('surveyVenueTitle', 'fr', 'Type spécifique de lieu où l’enquête est réalisée ou reçue:', 'SurveyVenue'),
+('surveyVenueAccommodationEstablishment', 'fr', 'Établissement d’hébergement', 'SurveyVenue'),
+('surveyVenueTouristAttraction', 'fr', 'Attraction touristique', 'SurveyVenue'),
+('surveyVenueMICEFacility', 'fr', 'Installations MICE', 'SurveyVenue'),
+('surveyVenueEmailedSurvey', 'fr', 'Enquête envoyée par email', 'SurveyVenue'),
+('surveyVenuePortTransportationFacility', 'fr', 'Installation de port/transport pour l’entrée/sortie dans la province', 'SurveyVenue'),
+('surveyVenueOthersSpecify', 'fr', 'Autres (préciser)', 'SurveyVenue'),
+('surveyVenuePopupTitle', 'fr', 'Précisez le lieu:', 'SurveyVenue'),
+('surveyVenuePopupPlaceholder', 'fr', 'Entrez le nom du lieu', 'SurveyVenue'),
+('surveyVenuePopupButton', 'fr', 'Soumettre', 'SurveyVenue'),
+
+-- Hindi (hi)
+('surveyVenueTitle', 'hi', 'सर्वेक्षण किया गया या प्राप्त किया गया विशिष्ट प्रकार का स्थान:', 'SurveyVenue'),
+('surveyVenueAccommodationEstablishment', 'hi', 'आवास प्रतिष्ठान', 'SurveyVenue'),
+('surveyVenueTouristAttraction', 'hi', 'पर्यटक आकर्षण', 'SurveyVenue'),
+('surveyVenueMICEFacility', 'hi', 'MICE सुविधा', 'SurveyVenue'),
+('surveyVenueEmailedSurvey', 'hi', 'ईमेल द्वारा सर्वेक्षण', 'SurveyVenue'),
+('surveyVenuePortTransportationFacility', 'hi', 'प्रांत में प्रवेश/निकासी के लिए बंदरगाह/परिवहन सुविधा', 'SurveyVenue'),
+('surveyVenueOthersSpecify', 'hi', 'अन्य (निर्दिष्ट करें)', 'SurveyVenue'),
+('surveyVenuePopupTitle', 'hi', 'स्थान निर्दिष्ट करें:', 'SurveyVenue'),
+('surveyVenuePopupPlaceholder', 'hi', 'स्थान का नाम दर्ज करें', 'SurveyVenue'),
+('surveyVenuePopupButton', 'hi', 'प्रस्तुत करें', 'SurveyVenue'),
+
+-- Russian (ru)
+('surveyVenueTitle', 'ru', 'Тип конкретного места, где проводится или получено исследование:', 'SurveyVenue'),
+('surveyVenueAccommodationEstablishment', 'ru', 'Место размещения', 'SurveyVenue'),
+('surveyVenueTouristAttraction', 'ru', 'Туристическая достопримечательность', 'SurveyVenue'),
+('surveyVenueMICEFacility', 'ru', 'Конференц-зал/объект MICE', 'SurveyVenue'),
+('surveyVenueEmailedSurvey', 'ru', 'Опрос по электронной почте', 'SurveyVenue'),
+('surveyVenuePortTransportationFacility', 'ru', 'Транспортное/портовое сооружение для въезда/выезда из региона', 'SurveyVenue'),
+('surveyVenueOthersSpecify', 'ru', 'Другое (укажите)', 'SurveyVenue'),
+('surveyVenuePopupTitle', 'ru', 'Укажите место:', 'SurveyVenue'),
+('surveyVenuePopupPlaceholder', 'ru', 'Введите название места', 'SurveyVenue'),
+('surveyVenuePopupButton', 'ru', 'Отправить', 'SurveyVenue');
