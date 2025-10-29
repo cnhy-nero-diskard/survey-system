@@ -91,9 +91,18 @@ app.use(errorHandler);
 //authentication routes
 app.use(authRoutes);
 
-
-
-app.use(helmet());
+// Security middleware (helmet) - configured after CORS
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false
+}));
 
 //rate limiting
 const limiter = rateLimit({
