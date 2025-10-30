@@ -38,7 +38,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
+    "dev": "npm nodemon server.js",
     "test": "jest"
   }
 }

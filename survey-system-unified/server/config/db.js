@@ -4,7 +4,15 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 import logger from '../middleware/logger.js';
 import fs from 'fs';
-dotenv.config();
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables from parent directory
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const requiredEnvVars = ['PG_USER', 'PG_HOST', 'PG_DATABASE', 'PG_PASSWORD', 'PG_PORT', 'JWT_SECRET'];
 
