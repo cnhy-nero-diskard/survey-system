@@ -18,12 +18,12 @@ router.get('/api/admin/data', authenticate, getAdminData);
 // router.delete('/api/admin/delete/:id', authenticate, deleteTourismAttractionController);
 // router.put('/api/admin/update/:id', authenticate, updateTourismAttractionController);
 
-router.post('/api/admin/add', validateTourismAttraction, addTourismAttractionController);
+router.post('/api/admin/add', authenticate, validateTourismAttraction, addTourismAttractionController);
 router.post('/api/survey/submit', validateSurveyResponse, submitSurveyResponseController);
 router.get('/api/admin/session-data', authenticate, getAdminSessionData);
 router.get('/metrics', getMetrics);
-router.get('/api/admin/establishments', getEstablishmentEnglishNamesController);
-router.get('/api/admin/survey-responses/open-ended', getOpenEndedSurveyResponses);
+router.get('/api/admin/establishments', authenticate, getEstablishmentEnglishNamesController);
+router.get('/api/admin/survey-responses/open-ended', authenticate, getOpenEndedSurveyResponses);
 
 router.post('/api/hf-tokens', posthftokens);
 router.get('/api/hf-tokens', authenticate, gethftokens);
@@ -31,65 +31,65 @@ router.post('/api/analyzesentiment', analyzeSentiment);
 router.post('/api/analyzetopics', analyzeTopics);
 router.post('/api/storetopics', insertTopicDataController);
 
-router.post('/api/admin/localization', createLocalization);
-router.get('/api/admin/localization',  fetchLocalization);
-router.put('/api/admin/localization', updateLocalization);
-router.delete('/api/admin/localization', deleteLocalization);
+router.post('/api/admin/localization', authenticate, createLocalization);
+router.get('/api/admin/localization', authenticate, fetchLocalization);
+router.put('/api/admin/localization', authenticate, updateLocalization);
+router.delete('/api/admin/localization', authenticate, deleteLocalization);
 
-router.post('/api/admin/establishment', createEstablishment);
-router.get('/api/admin/establishment',  fetchEstablishments);
-router.put('/api/admin/establishment', updateEstablishment);
-router.delete('/api/admin/establishment', deleteEstablishment);
+router.post('/api/admin/establishment', authenticate, createEstablishment);
+router.get('/api/admin/establishment', authenticate, fetchEstablishments);
+router.put('/api/admin/establishment', authenticate, updateEstablishment);
+router.delete('/api/admin/establishment', authenticate, deleteEstablishment);
 
-router.post('/api/admin/touattraction', createTourismAttractionController);
-router.get('/api/admin/touattraction',  fetchTourismAttractionController);
-router.put('/api/admin/touattraction', updateTourismAttractionController);
-router.delete('/api/admin/touattraction', deleteTourismAttractionController);
+router.post('/api/admin/touattraction', authenticate, createTourismAttractionController);
+router.get('/api/admin/touattraction', authenticate, fetchTourismAttractionController);
+router.put('/api/admin/touattraction', authenticate, updateTourismAttractionController);
+router.delete('/api/admin/touattraction', authenticate, deleteTourismAttractionController);
 
-router.post ('/api/admin/survey-responses', createSurveyResponseController);
-router.get ('/api/admin/survey-responses', fetchSurveyResponsesController);
-router.put ('/api/admin/survey-responses', updateSurveyResponseController);
-router.delete ('/api/admin/survey-responses', deleteSurveyResponseController);
-router.delete ('/api/admin/deletesurveyuser', deleteSurveyResponseController);
+router.post ('/api/admin/survey-responses', authenticate, createSurveyResponseController);
+router.get ('/api/admin/survey-responses', authenticate, fetchSurveyResponsesController);
+router.put ('/api/admin/survey-responses', authenticate, updateSurveyResponseController);
+router.delete ('/api/admin/survey-responses', authenticate, deleteSurveyResponseController);
+router.delete ('/api/admin/deletesurveyuser', authenticate, deleteSurveyResponseController);
 
 
-router.post('/api/admin/sentiment_results', createSentimentAnalysisController);
-router.get('/api/admin/sentiment_results', fetchSentimentAnalysisController);
-router.put('/api/admin/sentiment_results', updateSentimentAnalysisController);
-router.delete('/api/admin/sentiment_results', deleteSentimentAnalysisController);
+router.post('/api/admin/sentiment_results', authenticate, createSentimentAnalysisController);
+router.get('/api/admin/sentiment_results', authenticate, fetchSentimentAnalysisController);
+router.put('/api/admin/sentiment_results', authenticate, updateSentimentAnalysisController);
+router.delete('/api/admin/sentiment_results', authenticate, deleteSentimentAnalysisController);
 
 // router.post('/api/admin/survey-feedback', createSurveyFeedbackController);
-router.get('/api/admin/survey-feedback', fetchSurveyFeedbackController);
-router.put('/api/admin/survey-feedback/:id', updateSurveyFeedbackController);
-router.delete('/api/admin/survey-feedback/:id', deleteSurveyFeedbackController);
+router.get('/api/admin/survey-feedback', authenticate, fetchSurveyFeedbackController);
+router.put('/api/admin/survey-feedback/:id', authenticate, updateSurveyFeedbackController);
+router.delete('/api/admin/survey-feedback/:id', authenticate, deleteSurveyFeedbackController);
 
 
-router.get('/api/admin/survey-questions', fetchSurveyQuestionsController);
+router.get('/api/admin/survey-questions', authenticate, fetchSurveyQuestionsController);
 
-router.get('/api/admin/anonymous-users', fetchAnonymousUsersController);
-router.delete('/api/admin/all-anonymous-users', purgeAnonymousUsers);
+router.get('/api/admin/anonymous-users', authenticate, fetchAnonymousUsersController);
+router.delete('/api/admin/all-anonymous-users', authenticate, purgeAnonymousUsers);
 
 router.get('/api/surveytouchpoints', fetchAllTouchpointsController);
 router.post('/api/touchpointlocal', fetchTranslatedTouchpointController);
 
-router.get('/api/admin/getsurveymetrics', getSurveyMetricsAnalyticsController);
-router.get('/api/admin/getEntityMetrics',getSurveyFeedbackController )
-router.get('/api/admin/getAllByTally', getAllByTallyController); //every single line in tpms
+router.get('/api/admin/getsurveymetrics', authenticate, getSurveyMetricsAnalyticsController);
+router.get('/api/admin/getEntityMetrics', authenticate, getSurveyFeedbackController )
+router.get('/api/admin/getAllByTally', authenticate, getAllByTallyController); //every single line in tpms
 
-router.get('/api/admin/getsentimenttable', getSentimentAnalysisController);
-router.post('/api/admin/getsentimenttableforlocation', getSentimentLocationController);
+router.get('/api/admin/getsentimenttable', authenticate, getSentimentAnalysisController);
+router.post('/api/admin/getsentimenttableforlocation', authenticate, getSentimentLocationController);
 
-router.get('/api/admin/surveytopics', getSurveyByTopicController);
+router.get('/api/admin/surveytopics', authenticate, getSurveyByTopicController);
 
-router.get('/api/admin/automateclassification', autoClassifyRelevanceController)
-router.get('/api/admin/automatesentiment', autoAnalyzeSentimentController);
+router.get('/api/admin/automateclassification', authenticate, autoClassifyRelevanceController)
+router.get('/api/admin/automatesentiment', authenticate, autoAnalyzeSentimentController);
 
-router.get('/api/admin/spam-anonymous-users', obtainSpamAnonymousUsersController);
-router.get('/api/admin/locations', fetchLocationsWithFilterController);
-router.get('/api/admin/estabtypes', fetchEstTypesController);
+router.get('/api/admin/spam-anonymous-users', authenticate, obtainSpamAnonymousUsersController);
+router.get('/api/admin/locations', authenticate, fetchLocationsWithFilterController);
+router.get('/api/admin/estabtypes', authenticate, fetchEstTypesController);
 
 //TESTING ENDPOINT
-router.get('/api/admin/test', async (req, res) => {
+router.get('/api/admin/test', authenticate, async (req, res) => {
     //
     try {
         // Insert test function here
