@@ -4,9 +4,13 @@ import pool from '../config/db.js';
 import logger from './logger.js';
 
 export const handleAnonymousUser = async (req, res, next) => {
-  if (req.path === '/api/log-stream') {
+  // Skip anonymous user handling for admin routes, auth routes, and log-stream
+  if (req.path === '/api/log-stream' || 
+      req.path.startsWith('/api/admin') || 
+      req.path.startsWith('/api/auth')) {
     return next();
   }
+  
   try {
     // Check if the session already has an anonymous user ID
     if (!req.session.anonymousUserId) {
