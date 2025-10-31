@@ -524,6 +524,10 @@ export const fetchEntityinSurveyFeedbackService = async (year = null, quarter = 
             
             dateFilter = `WHERE created_at >= $1 AND created_at <= $2`;
             queryParams.push(startDate, endDateStr);
+            
+            logger.info(`fetchEntityinSurveyFeedbackService: Applying date filter - Year: ${year}, Quarter: Q${quarter} (${startDate} to ${endDateStr})`);
+        } else {
+            logger.info('fetchEntityinSurveyFeedbackService: No date filter applied - fetching all data');
         }
         
         // Query to group by entity (short_id) and count ratings, languages, and touchpoints
@@ -690,6 +694,14 @@ export const fetchEntityinSurveyFeedbackService = async (year = null, quarter = 
             };
         });
 
+        // Log summary statistics
+        const touchpointCounts = transformedResult.reduce((acc, item) => {
+            acc[item.touchpoint] = (acc[item.touchpoint] || 0) + parseInt(item.total_responses);
+            return acc;
+        }, {});
+        
+        logger.info(`fetchEntityinSurveyFeedbackService: Returning ${transformedResult.length} entities with ${Object.entries(touchpointCounts).map(([tp, count]) => `${tp}: ${count}`).join(', ')} responses`);
+
         return transformedResult;
 
     } catch (error) {
@@ -752,6 +764,10 @@ export const getSentimentAnalysis = async (year = null, quarter = null) => {
             
             dateFilter = `AND sf.created_at >= $1 AND sf.created_at <= $2`;
             queryParams.push(startDate, endDateStr);
+            
+            logger.info(`getSentimentAnalysis: Applying date filter - Year: ${year}, Quarter: Q${quarter} (${startDate} to ${endDateStr})`);
+        } else {
+            logger.info('getSentimentAnalysis: No date filter applied - fetching all data');
         }
 
         // Count the positive, neutral, and negative rows with date filter
@@ -813,6 +829,8 @@ export const getSentimentAnalysis = async (year = null, quarter = null) => {
             neutral: neutralResult.rows.map(row => row.response_value),
             negative: negativeResult.rows.map(row => row.response_value),
         };
+
+        logger.info(`getSentimentAnalysis: Returning ${Object.values(counts).reduce((a, b) => parseInt(a) + parseInt(b), 0)} total sentiment records (Positive: ${counts.positive}, Neutral: ${counts.neutral}, Negative: ${counts.negative})`);
 
         return result;
     } finally {
@@ -903,6 +921,10 @@ export const getSurveyResponseByTopic = async (year = null, quarter = null) => {
             
             dateFilter = `AND sr.created_at >= $1 AND sr.created_at <= $2`;
             queryParams.push(startDate, endDateStr);
+            
+            logger.info(`getSurveyResponseByTopic: Applying date filter - Year: ${year}, Quarter: Q${quarter} (${startDate} to ${endDateStr})`);
+        } else {
+            logger.info('getSurveyResponseByTopic: No date filter applied - fetching all data');
         }
         
         // Step 1: Fetch data from the database, excluding rows with blank response_value
@@ -959,6 +981,15 @@ export const getSurveyResponseByTopic = async (year = null, quarter = null) => {
             }
           }
         });
+    
+        // Calculate totals for logging
+        const totals = Object.entries(result).reduce((acc, [topic, ratings]) => {
+          const topicTotal = Object.values(ratings).reduce((sum, val) => sum + val, 0);
+          acc[topic] = topicTotal;
+          return acc;
+        }, {});
+        
+        logger.info(`getSurveyResponseByTopic: Returning data - ACCOMODATION: ${totals.ACCOMODATION}, TRANSPORTATION: ${totals.TRANSPORTATION}, ATTRACTION: ${totals.ATTRACTION}, SERVICES: ${totals.SERVICES}`);
     
         // Step 4: Return the formatted result
         return result;
