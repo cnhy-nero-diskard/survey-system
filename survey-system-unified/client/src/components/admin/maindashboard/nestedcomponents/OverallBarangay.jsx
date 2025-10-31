@@ -5,12 +5,12 @@ import { sentimentColors } from '../../../../config/sentimentConfig';
 import { MainContent, ChartContainer } from '../../shared/styledComponents';
 import { fetchEntityMetrics } from '../../../utils/getSurveyFeedbackApi';
 
-const OverallSurveyTopic = () => {
+const OverallSurveyTopic = ({ year, quarter }) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     const loadData = async () => {
-      const metrics = await fetchEntityMetrics();
+      const metrics = await fetchEntityMetrics(year, quarter);
       console.log('Fetched Data:', metrics); // Debug: Log fetched data
       const filteredData = Array.isArray(metrics) // Ensure metrics is an array
         ? metrics
@@ -33,7 +33,7 @@ const OverallSurveyTopic = () => {
     };
 
     loadData();
-  }, []);
+  }, [year, quarter]);
 
   const truncateLabel = (label, maxLength = 10) => {
     return label.length > maxLength ? `${label.substring(0, maxLength)}...` : label;

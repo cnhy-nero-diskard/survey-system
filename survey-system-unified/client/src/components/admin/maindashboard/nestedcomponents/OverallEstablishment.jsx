@@ -14,12 +14,12 @@ const StatBox = styled(Box)`
   margin-top: ${({ mt }) => (mt ? '16px' : '0')};
 `;
 
-const OverallOneBarangay = () => {
+const OverallOneBarangay = ({ year, quarter }) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const metrics = await fetchEntityMetrics();
+      const metrics = await fetchEntityMetrics(year, quarter);
       const filteredData = Array.isArray(metrics) // Ensure metrics is an array
        ? metrics
         .filter(metric => metric.touchpoint === "establishments")
@@ -36,7 +36,7 @@ const OverallOneBarangay = () => {
     };
 
     fetchData();
-  }, []);
+  }, [year, quarter]);
 
   const truncateLabel = (label, maxLength = 20) => {
     return label.length > maxLength ? `${label.substring(0, maxLength)}...` : label;

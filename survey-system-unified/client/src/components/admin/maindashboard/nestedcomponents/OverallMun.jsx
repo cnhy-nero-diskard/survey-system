@@ -4,32 +4,42 @@ import { Typography } from "@mui/material";
 import { ChartContainer, MainContent, ChartContainer as PieChartContainer } from '../../shared/styledComponents';
 import axios from "axios";
 
-const OverallMun = () => {
+const OverallMun = ({ year, quarter }) => {
   const [pieData, setPieData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Create cache key that includes year and quarter
+        const cacheKey = `sentimentData_${year}_${quarter}`;
+        const timestampKey = `sentimentDataTimestamp_${year}_${quarter}`;
+        
         // Check if cached data exists in localStorage
-        const cachedData = localStorage.getItem("sentimentData");
-        const cachedTimestamp = localStorage.getItem("sentimentDataTimestamp");
+        const cachedData = localStorage.getItem(cacheKey);
+        const cachedTimestamp = localStorage.getItem(timestampKey);
 
         // If cached data exists and is less than 5 minutes old, use it
-        if (cachedData && cachedTimestamp && Date.now() - cachedTimestamp < 30000) { // 300000ms = 5 minutes
+        if (cachedData && cachedTimestamp && Date.now() - cachedTimestamp < 30000) { // 30000ms = 30 seconds
           const { counts, positive, neutral, negative } = JSON.parse(cachedData);
           processData(counts, positive, neutral, negative);
           setLoading(false);
           return;
         }
 
-        // Fetch new data from the API
-        const sentimentResponse = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/getsentimenttable`);
+        // Fetch new data from the API with year and quarter parameters
+        const params = new URLSearchParams();
+        if (year) params.append('year', year);
+        if (quarter) params.append('quarter', quarter);
+        
+        const sentimentResponse = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/api/admin/getsentimenttable?${params.toString()}`
+        );
         const { counts, positive, neutral, negative } = sentimentResponse.data;
 
         // Cache the new data in localStorage
-        localStorage.setItem("sentimentData", JSON.stringify(sentimentResponse.data));
-        localStorage.setItem("sentimentDataTimestamp", Date.now());
+        localStorage.setItem(cacheKey, JSON.stringify(sentimentResponse.data));
+        localStorage.setItem(timestampKey, Date.now());
 
         // Process the data for the pie chart
         processData(counts, positive, neutral, negative);
@@ -72,7 +82,7 @@ const OverallMun = () => {
     };
 
     fetchData();
-  }, []);
+  }, [year, quarter]);
 
   if (loading) {
     return <Typography>Loading...</Typography>;

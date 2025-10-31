@@ -119,13 +119,11 @@ const Dashboard = () => {
   // Handle year change
   const handleYearChange = (event) => {
     setYear(event.target.value);
-    // TODO: Make API request with new year and quarter
   };
 
   // Handle quarter change
   const handleQuarterChange = (event) => {
     setQuarter(event.target.value);
-    // TODO: Make API request with new year and quarter
   };
 
   return (
@@ -198,7 +196,7 @@ const Dashboard = () => {
                 Overall Municipality
               </Typography>
               <ContentBox>
-                <OverallMun />
+                <OverallMun year={year} quarter={quarter} />
               </ContentBox>
             </CardContainer>
           </Grid>
@@ -217,7 +215,7 @@ const Dashboard = () => {
                 Barangay Data
               </Typography>
               <ContentBox>
-                <OverallBarangay />
+                <OverallBarangay year={year} quarter={quarter} />
               </ContentBox>
             </CardContainer>
           </Grid>
@@ -238,7 +236,7 @@ const Dashboard = () => {
                 Overall Topic
               </Typography>
               <ContentBox>
-                <OverallSurveyTopic />
+                <OverallSurveyTopic year={year} quarter={quarter} />
               </ContentBox>
             </CardContainer>
           </Grid>
@@ -257,7 +255,7 @@ const Dashboard = () => {
                 Overall Establishment
               </Typography>
               <ContentBox>
-                <OverallEstablishment />
+                <OverallEstablishment year={year} quarter={quarter} />
               </ContentBox>
             </CardContainer>
           </Grid>

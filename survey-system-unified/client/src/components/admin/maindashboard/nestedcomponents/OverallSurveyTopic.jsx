@@ -5,13 +5,20 @@ import { sentimentColors } from '../../../../config/sentimentConfig';
 import { MainContent, ChartContainer } from '../../shared/styledComponents';
 import { Grid } from '@mui/material';
 
-const OverallSurveyTopic = () => {
+const OverallSurveyTopic = ({ year, quarter }) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/surveytopics`);
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (year) params.append('year', year);
+        if (quarter) params.append('quarter', quarter);
+        
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/api/admin/surveytopics?${params.toString()}`
+        );
         const transformedData = transformData(response.data);
         setData(transformedData);
       } catch (error) {
@@ -20,7 +27,7 @@ const OverallSurveyTopic = () => {
     };
 
     fetchData();
-  }, []);
+  }, [year, quarter]);
 
   const transformData = (apiData) => {
     return Object.keys(apiData).map((key) => {

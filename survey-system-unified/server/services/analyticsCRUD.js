@@ -509,8 +509,23 @@ export const fetchByGender = async () => {
     }
 }
 
-export const fetchEntityinSurveyFeedbackService = async () => {
+export const fetchEntityinSurveyFeedbackService = async (year = null, quarter = null) => {
     try {
+        // Build date range filter if year and quarter are provided
+        let dateFilter = '';
+        const queryParams = [];
+        
+        if (year && quarter) {
+            const startMonth = (quarter - 1) * 3 + 1;
+            const endMonth = quarter * 3;
+            const startDate = `${year}-${startMonth.toString().padStart(2, '0')}-01`;
+            const endDate = new Date(year, endMonth, 0); // Last day of quarter
+            const endDateStr = `${year}-${endMonth.toString().padStart(2, '0')}-${endDate.getDate()}`;
+            
+            dateFilter = `WHERE created_at >= $1 AND created_at <= $2`;
+            queryParams.push(startDate, endDateStr);
+        }
+        
         // Query to group by entity (short_id) and count ratings, languages, and touchpoints
         const feedbackQuery = `
             SELECT
@@ -531,6 +546,7 @@ export const fetchEntityinSurveyFeedbackService = async () => {
                     COUNT(*) AS language_count
                 FROM
                     public.survey_feedback
+                ${dateFilter}
                 GROUP BY
                     entity, touchpoint, rating, language
             ) AS sf
@@ -538,7 +554,9 @@ export const fetchEntityinSurveyFeedbackService = async () => {
                 sf.entity, sf.touchpoint;
         `;
 
-        const feedbackResult = await pool.query(feedbackQuery);
+        const feedbackResult = queryParams.length > 0
+            ? await pool.query(feedbackQuery, queryParams)
+            : await pool.query(feedbackQuery);
 
         // Query to get entity details from establishments, tourismattractions, tourismactivities, and locations using short_id
         const entityDetailsQuery = `
@@ -716,19 +734,38 @@ export const getAllSurveyTally = async () => {
         client.release();
     }
 };
-export const getSentimentAnalysis = async () => {
+export const getSentimentAnalysis = async (year = null, quarter = null) => {
 
     const client = await pool.connect();
 
     try {
-        // Count the positive, neutral, and negative rows
+        // Build date range filter if year and quarter are provided
+        let dateFilter = '';
+        const queryParams = [];
+        
+        if (year && quarter) {
+            const startMonth = (quarter - 1) * 3 + 1;
+            const endMonth = quarter * 3;
+            const startDate = `${year}-${startMonth.toString().padStart(2, '0')}-01`;
+            const endDate = new Date(year, endMonth, 0); // Last day of quarter
+            const endDateStr = `${year}-${endMonth.toString().padStart(2, '0')}-${endDate.getDate()}`;
+            
+            dateFilter = `AND sf.created_at >= $1 AND sf.created_at <= $2`;
+            queryParams.push(startDate, endDateStr);
+        }
+
+        // Count the positive, neutral, and negative rows with date filter
         const countQuery = `
-        SELECT sentiment, COUNT(*) 
-        FROM sentiment_analysis 
-        GROUP BY sentiment;
+        SELECT sa.sentiment, COUNT(*) 
+        FROM sentiment_analysis sa
+        JOIN survey_feedback sf ON sa.response_id = sf.response_id
+        WHERE 1=1 ${dateFilter}
+        GROUP BY sa.sentiment;
       `;
 
-        const countResult = await client.query(countQuery);
+        const countResult = queryParams.length > 0 
+            ? await client.query(countQuery, queryParams)
+            : await client.query(countQuery);
 
         // Extract counts
         const counts = {
@@ -741,32 +778,32 @@ export const getSentimentAnalysis = async () => {
             counts[row.sentiment] = row.count;
         });
 
-        // Fetch response_values for each sentiment
+        // Fetch response_values for each sentiment with date filter
         const positiveQuery = `
         SELECT sf.response_value 
         FROM survey_feedback sf
         JOIN sentiment_analysis sa ON sf.response_id = sa.response_id
-        WHERE sa.sentiment = 'positive' AND sf.relevance = 'RELEVANT';
+        WHERE sa.sentiment = 'positive' AND sf.relevance = 'RELEVANT' ${dateFilter};
       `;
 
         const neutralQuery = `
         SELECT sf.response_value 
         FROM survey_feedback sf
         JOIN sentiment_analysis sa ON sf.response_id = sa.response_id
-        WHERE sa.sentiment = 'neutral' AND sf.relevance = 'RELEVANT';
+        WHERE sa.sentiment = 'neutral' AND sf.relevance = 'RELEVANT' ${dateFilter};
       `;
 
         const negativeQuery = `
         SELECT sf.response_value 
         FROM survey_feedback sf
         JOIN sentiment_analysis sa ON sf.response_id = sa.response_id
-        WHERE sa.sentiment = 'negative' AND sf.relevance = 'RELEVANT';
+        WHERE sa.sentiment = 'negative' AND sf.relevance = 'RELEVANT' ${dateFilter};
       `;
 
         const [positiveResult, neutralResult, negativeResult] = await Promise.all([
-            client.query(positiveQuery),
-            client.query(neutralQuery),
-            client.query(negativeQuery),
+            queryParams.length > 0 ? client.query(positiveQuery, queryParams) : client.query(positiveQuery),
+            queryParams.length > 0 ? client.query(neutralQuery, queryParams) : client.query(neutralQuery),
+            queryParams.length > 0 ? client.query(negativeQuery, queryParams) : client.query(negativeQuery),
         ]);
 
         // Prepare the final result
@@ -851,8 +888,23 @@ export const getSentimentLocation = async (filter) => {
         client.release();
     }
 };
-export const getSurveyResponseByTopic = async () => {
+export const getSurveyResponseByTopic = async (year = null, quarter = null) => {
     try {
+        // Build date range filter if year and quarter are provided
+        let dateFilter = '';
+        const queryParams = [];
+        
+        if (year && quarter) {
+            const startMonth = (quarter - 1) * 3 + 1;
+            const endMonth = quarter * 3;
+            const startDate = `${year}-${startMonth.toString().padStart(2, '0')}-01`;
+            const endDate = new Date(year, endMonth, 0); // Last day of quarter
+            const endDateStr = `${year}-${endMonth.toString().padStart(2, '0')}-${endDate.getDate()}`;
+            
+            dateFilter = `AND sr.created_at >= $1 AND sr.created_at <= $2`;
+            queryParams.push(startDate, endDateStr);
+        }
+        
         // Step 1: Fetch data from the database, excluding rows with blank response_value
         const query = `
           SELECT 
@@ -869,13 +921,16 @@ export const getSurveyResponseByTopic = async () => {
             sq.questiontype = 'RATINGSCALE'
             AND sr.response_value IS NOT NULL
             AND sr.response_value <> ''
+            ${dateFilter}
           GROUP BY 
             sq.surveytopic, sr.response_value
           ORDER BY 
             sq.surveytopic, sr.response_value;
         `;
     
-        const { rows } = await pool.query(query);
+        const { rows } = queryParams.length > 0 
+            ? await pool.query(query, queryParams)
+            : await pool.query(query);
     
         // Step 2: Initialize the result object
         const result = {

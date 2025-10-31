@@ -921,7 +921,14 @@ export const getSurveyMetricsAnalyticsController = async (req, res, next) => {
 
 export const getSurveyFeedbackController = async (req, res) => {
   try {
-      const result = await fetchEntityinSurveyFeedbackService();
+      // Extract year and quarter from query parameters
+      const { year, quarter } = req.query;
+      
+      // Parse to integers if provided, otherwise pass null
+      const yearParam = year ? parseInt(year, 10) : null;
+      const quarterParam = quarter ? parseInt(quarter, 10) : null;
+      
+      const result = await fetchEntityinSurveyFeedbackService(yearParam, quarterParam);
       
       if (result.length === 0) {
           return res.status(204).json({ message: 'No content found' });
@@ -947,8 +954,15 @@ export const getAllByTallyController = async (req, res) => {
 };
 export const getSentimentAnalysisController = async (req, res) => {
   try {
+    // Extract year and quarter from query parameters
+    const { year, quarter } = req.query;
+    
+    // Parse to integers if provided, otherwise pass null
+    const yearParam = year ? parseInt(year, 10) : null;
+    const quarterParam = quarter ? parseInt(quarter, 10) : null;
+    
     // Call the service function to get sentiment analysis data
-    const sentimentAnalysisData = await getSentimentAnalysis();
+    const sentimentAnalysisData = await getSentimentAnalysis(yearParam, quarterParam);
 
     // Send the response as JSON
     res.status(200).json(sentimentAnalysisData);
@@ -972,8 +986,15 @@ export const getSentimentLocationController = async (req, res) => {
 };
 export const getSurveyByTopicController = async (req, res) => {
   try {
+    // Extract year and quarter from query parameters
+    const { year, quarter } = req.query;
+    
+    // Parse to integers if provided, otherwise pass null
+    const yearParam = year ? parseInt(year, 10) : null;
+    const quarterParam = quarter ? parseInt(quarter, 10) : null;
+    
     // Call the service function to get the survey stats
-    const stats = await getSurveyResponseByTopic();
+    const stats = await getSurveyResponseByTopic(yearParam, quarterParam);
 
     // Return the stats as a JSON response
     res.status(200).json(stats);
