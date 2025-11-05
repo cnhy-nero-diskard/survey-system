@@ -95,13 +95,14 @@ const SidebarHeader = styled(Box).withConfig({
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: ${({ collapsed }) => collapsed ? '16px 8px' : '24px 16px'};
+  padding: ${({ collapsed }) => collapsed ? '12px 8px 16px 8px' : '24px 16px'};
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-family: "Poppins", sans-serif;
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: ${({ collapsed }) => collapsed ? '80px' : 'auto'};
 
   &::before {
     content: '';
@@ -179,7 +180,7 @@ const SectionTitle = styled(Typography)`
 `;
 
 const StyledListItem = styled(ListItem)`
-  margin: 2px 8px;
+  margin: ${({ collapsed }) => collapsed ? '2px 0' : '2px 8px'};
   border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -195,6 +196,7 @@ const StyledListItem = styled(ListItem)`
     background: linear-gradient(135deg, #667eea, #764ba2);
     transform: scaleX(0);
     transition: transform 0.3s ease;
+    display: ${({ collapsed }) => collapsed ? 'none' : 'block'};
   }
 
   &.active {
@@ -213,7 +215,7 @@ const StyledListItem = styled(ListItem)`
 
   &:hover {
     background: rgba(102, 126, 234, 0.06);
-    transform: translateX(4px);
+    transform: ${({ collapsed }) => collapsed ? 'none' : 'translateX(4px)'};
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 
     &::before {
@@ -231,19 +233,41 @@ const StyledListItem = styled(ListItem)`
   }
 `;
 
-const CollapseButton = styled(IconButton)`
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(255, 255, 255, 0.2);
+const CollapseButton = styled(IconButton).withConfig({
+  shouldForwardProp: (prop) => !['collapsed'].includes(prop),
+})`
+  position: ${({ collapsed }) => collapsed ? 'relative' : 'absolute'};
+  top: ${({ collapsed }) => collapsed ? '0' : '12px'};
+  left: ${({ collapsed }) => collapsed ? 'auto' : 'auto'};
+  right: ${({ collapsed }) => collapsed ? 'auto' : '12px'};
+  transform: none;
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.14);
   color: white;
-  width: 40px;
-  height: 40px;
-  transition: all 0.3s ease;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  padding: 6px;
+  transition: all 0.18s ease;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+  cursor: pointer;
+  margin: ${({ collapsed }) => collapsed ? '0 auto 16px auto' : '0'};
+  display: ${({ collapsed }) => collapsed ? 'block' : 'block'};
 
+  /* More subtle, less 'materializing' shadow on hover */
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 6px 14px rgba(2,6,23,0.08);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.45);
+    outline-offset: 2px;
   }
 `;
 
@@ -437,16 +461,19 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
       <Toolbar />
       
       <SidebarHeader collapsed={collapsed}>
-        <CollapseButton 
-          onClick={handleToggleCollapse}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <MenuIcon /> : <MenuOpenIcon />}
-        </CollapseButton>
+        {!collapsed && (
+          <CollapseButton 
+            collapsed={collapsed}
+            onClick={handleToggleCollapse}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <MenuIcon /> : <MenuOpenIcon />}
+          </CollapseButton>
+        )}
         
         {!collapsed && (
           <>
-            <CustomTypography variant="h6" align="center" fontWeight="bold" sx={{ fontSize: '14px', mb: 1 }}>
+            <CustomTypography variant="h6" align="center" fontWeight="bold" sx={{ fontSize: '14px', mb: 1, mt: 2 }}>
               MULTILINGUAL SURVEY SYSTEM
             </CustomTypography>
             <CustomTypography variant="subtitle2" align="center" sx={{ fontSize: '12px', opacity: 0.9 }}>
@@ -456,11 +483,28 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
         )}
         
         {collapsed && (
-          <Tooltip title="Panglao Tourism Office" placement="right">
-            <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 32, height: 32 }}>
-              <AdminIcon sx={{ fontSize: 18 }} />
-            </Avatar>
-          </Tooltip>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            width: '100%',
+            gap: 2
+          }}>
+            <CollapseButton 
+              collapsed={collapsed}
+              onClick={handleToggleCollapse}
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {collapsed ? <MenuIcon /> : <MenuOpenIcon />}
+            </CollapseButton>
+            
+            <Tooltip title="Panglao Tourism Office" placement="right">
+              <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 32, height: 32 }}>
+                <AdminIcon sx={{ fontSize: 18 }} />
+              </Avatar>
+            </Tooltip>
+          </Box>
         )}
       </SidebarHeader>
 
@@ -512,7 +556,17 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
                 <IconButton 
                   size="small" 
                   onClick={() => handleSectionToggle(section.title)}
-                  sx={{ opacity: 0.7 }}
+                  sx={{ 
+                    opacity: 0.9, 
+                    width: 36, 
+                    height: 36, 
+                    ml: 1,
+                    borderRadius: 1,
+                    '&:hover': { bgcolor: 'rgba(99,102,241,0.06)' },
+                    '&:focus-visible': { outline: '2px solid rgba(99,102,241,0.18)', outlineOffset: 2 }
+                  }}
+                  aria-expanded={!!expandedSections[section.title]}
+                  aria-controls={`section-${sectionIndex}`}
                 >
                   {expandedSections[section.title] ? <ExpandLess /> : <ExpandMore />}
                 </IconButton>
@@ -534,11 +588,12 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
                         button
                         component={Link}
                         to={item.to}
+                        collapsed={collapsed}
                         className={isActiveRoute(item.to) ? 'active' : ''}
                         sx={{ 
                           minHeight: 48,
                           justifyContent: collapsed ? 'center' : 'flex-start',
-                          px: collapsed ? 2 : 3,
+                          px: collapsed ? 0 : 3,
                         }}
                       >
                         <ListItemIcon
