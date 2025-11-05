@@ -68,18 +68,26 @@ const LoadingSubtitle = styled(Typography)`
   max-width: 400px;
 `;
 
-
-
 const EstablishmentsDashboard = () => {
   const [metrics, setMetrics] = useState([]);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [quarter, setQuarter] = useState(Math.floor((new Date().getMonth() + 3) / 3));
+
+  const handleYearChange = (event) => {
+    setYear(event.target.value);
+  };
+
+  const handleQuarterChange = (event) => {
+    setQuarter(event.target.value);
+  };
 
   useEffect(() => {
     const getMetrics = async () => {
       setIsLoading(true);
       try {
-        const data = await fetchEntityMetrics();
+        const data = await fetchEntityMetrics(year, quarter);
         const filteredData = Array.isArray(data)
           ? data.filter(item => item.touchpoint === "establishments")
           : [];        
@@ -107,7 +115,7 @@ const EstablishmentsDashboard = () => {
       }
     };
     getMetrics();
-  }, []);
+  }, [year, quarter]); // Add year and quarter as dependencies
 
   // Transform metrics into the structure expected by DataDashboard
   const transformMetricsToDashboardData = (metrics) => {
@@ -190,12 +198,17 @@ const EstablishmentsDashboard = () => {
 
   return (
     <Fade in={!isLoading} timeout={800}>
-      <Box>
+      <Box sx={{ p: 0 }}>
         <DataDashboard
           data={dashboardData}
           entities={entities}
           entityLabel="Establishment"
-          entityKey={entities[0]?.key} // Default to the first entity
+          entityKey={entities[0]?.key}
+          showDateFilters={true}
+          year={year}
+          quarter={quarter}
+          onYearChange={handleYearChange}
+          onQuarterChange={handleQuarterChange}
         />
       </Box>
     </Fade>

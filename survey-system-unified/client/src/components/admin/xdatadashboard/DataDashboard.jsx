@@ -28,6 +28,10 @@ import {
   Skeleton,
   Fade,
   Chip,
+  Select,
+  FormControl,
+  InputLabel,
+  MenuItem,
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import styled, { keyframes } from 'styled-components';
@@ -39,6 +43,7 @@ import {
   PieChart as PieChartIcon,
   Language as LanguageIcon,
   Analytics as AnalyticsIcon,
+  CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
 
 // Modern color palette for charts
@@ -190,6 +195,47 @@ const StyledAutocomplete = styled(Autocomplete)`
     color: rgba(0, 0, 0, 0.7);
     font-family: ${fontFamily};
     font-weight: 500;
+  }
+`;
+
+const StyledFormControl = styled(FormControl)`
+  min-width: 120px;
+  
+  & .MuiOutlinedInput-root {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+    
+    &.Mui-focused {
+      background-color: rgba(255, 255, 255, 1);
+    }
+  }
+  
+  & .MuiInputLabel-root {
+    color: rgba(0, 0, 0, 0.7);
+    font-family: ${fontFamily};
+    font-weight: 500;
+  }
+  
+  & .MuiSelect-select {
+    font-family: ${fontFamily};
+    font-weight: 500;
+  }
+`;
+
+const FilterContainer = styled(Box)`
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 16px;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 12px;
   }
 `;
 
@@ -370,13 +416,36 @@ const modalStyle = {
  * @param {string} props.entityLabel - The label for the entity selector.
  * @param {string} props.entityKey - The default entity key to display data for.
  */
-const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
+const DataDashboard = ({ 
+  data, 
+  entities, 
+  entityLabel, 
+  entityKey,
+  // Date filter props
+  showDateFilters = false,
+  year,
+  quarter,
+  onYearChange,
+  onQuarterChange
+}) => {
   // State to hold the currently selected entity key
   const [selectedEntity, setSelectedEntity] = useState(entityKey);
   const [isLoading, setIsLoading] = useState(true);
 
   // State to control modal visibility
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Date filter utility functions
+  const generateYears = () => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 6 }, (_, i) => currentYear - i);
+  };
+
+  const getCurrentDate = () => {
+    const date = new Date();
+    const options = { year: 'numeric', month: 'long', day: '2-digit' };
+    return date.toLocaleDateString('en-US', options);
+  };
 
   // Calculate the sum of all responses across all entities
   const totalResponsesAll = entities.reduce((acc, entity) => {
@@ -468,11 +537,11 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
                       marginTop: '4px'
                     }}
                   >
-                    Comprehensive survey data analysis and insights
+                    {showDateFilters ? `${getCurrentDate()} • ` : ''}Comprehensive survey data analysis and insights
                   </Typography>
                 </Box>
                 
-                <Box>
+                <Box display="flex" flexDirection="column" alignItems="flex-end" gap={2}>
                   <Chip 
                     label={`${entities.length} ${entityLabel.toLowerCase()}s available`}
                     sx={{
@@ -483,6 +552,39 @@ const DataDashboard = ({ data, entities, entityLabel, entityKey }) => {
                     }}
                     size="small"
                   />
+                  
+                  {showDateFilters && (
+                    <FilterContainer>
+                      <StyledFormControl size="small" variant="outlined">
+                        <InputLabel id="dashboard-year-label">Year</InputLabel>
+                        <Select
+                          labelId="dashboard-year-label"
+                          value={year}
+                          onChange={onYearChange}
+                          label="Year"
+                        >
+                          {generateYears().map((yr) => (
+                            <MenuItem key={yr} value={yr}>{yr}</MenuItem>
+                          ))}
+                        </Select>
+                      </StyledFormControl>
+                      
+                      <StyledFormControl size="small" variant="outlined">
+                        <InputLabel id="dashboard-quarter-label">Quarter</InputLabel>
+                        <Select
+                          labelId="dashboard-quarter-label"
+                          value={quarter}
+                          onChange={onQuarterChange}
+                          label="Quarter"
+                        >
+                          <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
+                          <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
+                          <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>
+                          <MenuItem value={4}>Q4 (Oct-Dec)</MenuItem>
+                        </Select>
+                      </StyledFormControl>
+                    </FilterContainer>
+                  )}
                 </Box>
               </HeaderContent>
             </HeaderContainer>
