@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Box, useMediaQuery } from "@mui/material";
@@ -7,22 +7,33 @@ import { useAuth } from "../../context/AuthContext";
 import WarningMessage from "../../partials/WarningMessage";
 
 export const drawerWidth = 300;
+export const collapsedWidth = 80;
 
 const Container = styled(Box)`
   display: flex;
 `;
 
-const MainContent = styled(Box)`
+const MainContent = styled(Box).withConfig({
+  shouldForwardProp: (prop) => !['sidebarWidth'].includes(prop),
+})`
   flex-grow: 1;
   padding: 24px;
   background-color: rgba(0,0,0,0);
   min-height: 100vh;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
 const DashboardOutlet = () => {
   const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth();
   const isMobile = useMediaQuery("(max-width:600px)");
   const navigate = useNavigate();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const currentSidebarWidth = sidebarCollapsed ? collapsedWidth : drawerWidth;
+
+  const handleSidebarToggle = (collapsed) => {
+    setSidebarCollapsed(collapsed);
+  };
 
   useEffect(() => {
     if (isMobile) {
@@ -45,8 +56,12 @@ const DashboardOutlet = () => {
       {/* {unauthorized && <WarningMessage message="Unauthorized Access! Please log in." />} */}
 
       <Container>
-        <Sidebar drawerWidth={drawerWidth} />
-        <MainContent drawerWidth={drawerWidth}>
+        <Sidebar 
+          drawerWidth={drawerWidth} 
+          collapsed={sidebarCollapsed}
+          onToggle={handleSidebarToggle}
+        />
+        <MainContent>
           <Outlet />
         </MainContent>
       </Container>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Drawer,
   Box,
@@ -11,8 +11,13 @@ import {
   TextField,
   Typography,
   Divider,
+  Collapse,
+  IconButton,
+  Tooltip,
+  Avatar,
+  Chip,
 } from "@mui/material";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { Link, useLocation } from "react-router-dom";
 import {
   Dashboard as DashboardIcon,
@@ -29,6 +34,14 @@ import {
   VerifiedUserOutlined as UserIcon,
   QrCode2Outlined as SurveyTouchpointsIcon,
   Storage as DBIcon,
+  MenuOpen as MenuOpenIcon,
+  Menu as MenuIcon,
+  ExpandLess,
+  ExpandMore,
+  Analytics as AnalyticsIcon,
+  Settings as SettingsIcon,
+  TrendingUp as TrendingUpIcon,
+  SupervisorAccount as AdminIcon,
 } from "@mui/icons-material";
 
 import "@fontsource/poppins/300.css"; // Light
@@ -38,38 +51,216 @@ import "@fontsource/poppins/700.css"; // Bold
 
 import UsersDashboard from "../usersdashboard/UsersDashboard";
 
-// Styled Components
-const SidebarDrawer = styled(Drawer)`
-  width: ${({ drawerWidth }) => drawerWidth}px;
-  flex-shrink: 0;
-
-  & .MuiDrawer-paper {
-    width: ${({ drawerWidth }) => drawerWidth}px;
-    box-sizing: border-box;
-    background: linear-gradient(to bottom, #d9f1ff, #ade7ff);
-    border-right: none;
-    font-family: "Poppins", sans-serif;
+// Animations
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 `;
 
-const SidebarHeader = styled(Box)`
+const pulse = keyframes`
+  0% { box-shadow: 0 0 0 0 rgba(0, 119, 182, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 119, 182, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 119, 182, 0); }
+`;
+
+// Styled Components
+const SidebarDrawer = styled(Drawer).withConfig({
+  shouldForwardProp: (prop) => !['drawerWidth', 'collapsed'].includes(prop),
+})`
+  width: ${({ drawerWidth, collapsed }) => collapsed ? '80px' : `${drawerWidth}px`};
+  flex-shrink: 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  & .MuiDrawer-paper {
+    width: ${({ drawerWidth, collapsed }) => collapsed ? '80px' : `${drawerWidth}px`};
+    box-sizing: border-box;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 50%, #e2e8f0 100%);
+    border-right: 1px solid #e2e8f0;
+    font-family: "Poppins", sans-serif;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+`;
+
+const SidebarHeader = styled(Box).withConfig({
+  shouldForwardProp: (prop) => !['collapsed'].includes(prop),
+})`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px;
-  background: linear-gradient(to bottom, #0077b6, #023e8a);
+  padding: ${({ collapsed }) => collapsed ? '16px 8px' : '24px 16px'};
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-family: "Poppins", sans-serif;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: ${pulse} 4s infinite;
+  }
+`;
+
+const UserProfile = styled(Box).withConfig({
+  shouldForwardProp: (prop) => !['collapsed'].includes(prop),
+})`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: ${({ collapsed }) => collapsed ? '8px' : '16px'};
+  margin: 16px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 16px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  transition: all 0.3s ease;
+  animation: ${slideIn} 0.6s ease-out;
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
+  }
 `;
 
 const SearchField = styled(TextField)`
   margin: 16px;
-  background-color: white;
-  border-radius: 4px;
+  background-color: #f8fafc;
+  border-radius: 12px;
   width: calc(100% - 32px);
+  transition: all 0.3s ease;
+
+  & .MuiOutlinedInput-root {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    &.Mui-focused {
+      background-color: white;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+    }
+  }
 
   & .MuiInputBase-input {
     font-family: "Poppins", sans-serif;
+    font-weight: 400;
+  }
+`;
+
+const MenuSection = styled(Box)`
+  margin: 8px 0;
+`;
+
+const SectionTitle = styled(Typography)`
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 24px;
+  margin-bottom: 4px;
+`;
+
+const StyledListItem = styled(ListItem)`
+  margin: 2px 8px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    color: #667eea;
+    font-weight: 600;
+
+    &::before {
+      transform: scaleX(1);
+    }
+
+    & .MuiListItemIcon-root {
+      color: #667eea;
+    }
+  }
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.06);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    &::before {
+      transform: scaleX(0.5);
+    }
+
+    & .MuiListItemIcon-root {
+      color: #667eea;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+  }
+`;
+
+const CollapseButton = styled(IconButton)`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 40px;
+  height: 40px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+  }
+`;
+
+const LogoutButton = styled(Button)`
+  margin: 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
   }
 `;
 
@@ -77,43 +268,140 @@ const CustomTypography = styled(Typography)`
   font-family: "Poppins", sans-serif;
 `;
 
-const menuItems = [
-  { text: "Dashboard", icon: <DashboardIcon />, to: "dashboard" },
-  { text: "Municipality Data", icon: <MunicipalityIcon />, to: "overallmun" },
-  { text: "Per Area Data", icon: <BarangayIcon />, to: "barangaydashboard" },
-  { text: "Per Attraction Data", icon: <AttIcon />, to: "attractiondashboard" },
-  { text: "Per Establishment Data", icon: <EstablishmentIcon />, to: "establishmentdashboard" },
-  { text: "Survey Metrics", icon: <SurveyIcon />, to: "surveymetrics" },
-  { text: "Survey Statistics", icon: <GraphIcon />, to: "stally" },
-  { text: "AI Tools", icon: <AiToolsIcon />, to: "aitoolsdashboard" },
-  { text: "Users Dashboard", icon: <UserIcon />, to: "usersdashboard" },
-  { text: "Survey Touchpoints", icon: <SurveyTouchpointsIcon />, to: "surveytouchpoints" },
-  { text: "Data Manager", icon: <CompIcon />, to: "datamanager" },
-  // { text: "Sentiment Analysis", icon: <InsightsIcon />, to: "sentimentgraphs" },
-  { text: "System Performance", icon: <CompIcon />, to: "systemperf" },
-  { text: "LOGSTREAM", icon: <SurveyTouchpointsIcon />, to: "logstream" },
+const menuSections = [
+  {
+    title: "Overview",
+    items: [
+      { text: "Dashboard", icon: <DashboardIcon />, to: "dashboard", description: "Main overview" },
+    ]
+  },
+  {
+    title: "Data Analytics",
+    items: [
+      { text: "Municipality Data", icon: <MunicipalityIcon />, to: "overallmun", description: "Municipal analytics" },
+      { text: "Per Area Data", icon: <BarangayIcon />, to: "barangaydashboard", description: "Area-specific insights" },
+      { text: "Per Attraction Data", icon: <AttIcon />, to: "attractiondashboard", description: "Tourism attractions" },
+      { text: "Per Establishment Data", icon: <EstablishmentIcon />, to: "establishmentdashboard", description: "Business establishments" },
+    ]
+  },
+  {
+    title: "Survey Management",
+    items: [
+      { text: "Survey Metrics", icon: <SurveyIcon />, to: "surveymetrics", description: "Performance metrics" },
+      { text: "Survey Statistics", icon: <GraphIcon />, to: "stally", description: "Statistical analysis" },
+      { text: "Survey Touchpoints", icon: <SurveyTouchpointsIcon />, to: "surveytouchpoints", description: "Interaction points" },
+    ]
+  },
+  {
+    title: "AI & Analytics",
+    items: [
+      { text: "AI Tools", icon: <AiToolsIcon />, to: "aitoolsdashboard", description: "ML & AI features" },
+    ]
+  },
+  {
+    title: "Administration",
+    items: [
+      { text: "Users Dashboard", icon: <UserIcon />, to: "usersdashboard", description: "User management" },
+      { text: "Data Manager", icon: <DBIcon />, to: "datamanager", description: "Data operations" },
+      { text: "System Performance", icon: <CompIcon />, to: "systemperf", description: "System monitoring" },
+      { text: "Log Stream", icon: <SurveyTouchpointsIcon />, to: "logstream", description: "System logs" },
+    ]
+  }
 ];
 
-const Sidebar = ({ drawerWidth }) => {
+const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
   const location = useLocation();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  // Initialize collapsed state from localStorage or prop
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebar-collapsed');
+    return saved !== null ? JSON.parse(saved) : (propCollapsed || false);
+  });
+  
+  const [expandedSections, setExpandedSections] = useState(() => {
+    const saved = localStorage.getItem('sidebar-expanded-sections');
+    return saved ? JSON.parse(saved) : {
+      "Overview": true,
+      "Data Analytics": true,
+      "Survey Management": true,
+      "AI & Analytics": true,
+      "Administration": false,
+    };
+  });
+
   function getBasename(pathname) {
     const parts = pathname.split('/').filter(Boolean);
     return parts.length > 0 ? parts[parts.length - 1] : '/';
   }
-  // State for storing the search term
-  const [searchTerm, setSearchTerm] = useState("");
 
-  // Handle changes in the search input
+  // Sync prop changes with local state
+  useEffect(() => {
+    if (propCollapsed !== undefined && propCollapsed !== collapsed) {
+      setCollapsed(propCollapsed);
+    }
+  }, [propCollapsed, collapsed]);
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  // Filter the menu items by the search term
-  const filteredItems = menuItems.filter((item) =>
-    item.text.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSearchKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      setSearchTerm('');
+      event.target.blur();
+    }
+  };
+
+  const handleToggleCollapse = () => {
+    const newCollapsed = !collapsed;
+    setCollapsed(newCollapsed);
+    localStorage.setItem('sidebar-collapsed', JSON.stringify(newCollapsed));
+    if (onToggle) {
+      onToggle(newCollapsed);
+    }
+  };
+
+  const handleSectionToggle = (sectionTitle) => {
+    setExpandedSections(prev => {
+      const newState = {
+        ...prev,
+        [sectionTitle]: !prev[sectionTitle]
+      };
+      localStorage.setItem('sidebar-expanded-sections', JSON.stringify(newState));
+      return newState;
+    });
+  };
+
+  // Filter items based on search
+  const filteredSections = React.useMemo(() => {
+    try {
+      if (!searchTerm.trim()) {
+        return menuSections;
+      }
+      
+      return menuSections.map(section => ({
+        ...section,
+        items: section.items.filter(item =>
+          item.text.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+          item.description.toLowerCase().includes(searchTerm.toLowerCase().trim())
+        )
+      })).filter(section => section.items.length > 0);
+    } catch (error) {
+      console.error('Error filtering sidebar sections:', error);
+      return menuSections;
+    }
+  }, [searchTerm]);
+
+  const isActiveRoute = (route) => {
+    return getBasename(location.pathname) === route;
+  };
 
   const handleLogout = async () => {
+    if (isLoggingOut) return; // Prevent double-clicks
+    
+    setIsLoggingOut(true);
     try {
       console.log("Logging out...");
       const response = await fetch(
@@ -128,80 +416,197 @@ const Sidebar = ({ drawerWidth }) => {
       );
       console.log(response.status);
       if (response.status === 200) {
+        // Clear localStorage on logout
+        localStorage.removeItem('sidebar-collapsed');
+        localStorage.removeItem('sidebar-expanded-sections');
         window.location.href = "/login";
+      } else {
+        throw new Error(`Logout failed with status: ${response.status}`);
       }
     } catch (error) {
       console.error("Logout failed:", error);
+      // Still redirect on error to be safe
+      window.location.href = "/login";
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
   return (
-    <SidebarDrawer variant="permanent" drawerWidth={drawerWidth}>
+    <SidebarDrawer variant="permanent" drawerWidth={drawerWidth} collapsed={collapsed}>
       <Toolbar />
-      <SidebarHeader>
-        <CustomTypography variant="h6" align="center" fontWeight="bold">
-          MULTILINGUAL SURVEY SYSTEM ADMIN DASHBOARD
-        </CustomTypography>
-        <CustomTypography variant="subtitle2" align="center">
-          PANGLAO TOURISM OFFICE
-        </CustomTypography>
+      
+      <SidebarHeader collapsed={collapsed}>
+        <CollapseButton 
+          onClick={handleToggleCollapse}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed ? <MenuIcon /> : <MenuOpenIcon />}
+        </CollapseButton>
+        
+        {!collapsed && (
+          <>
+            <CustomTypography variant="h6" align="center" fontWeight="bold" sx={{ fontSize: '14px', mb: 1 }}>
+              MULTILINGUAL SURVEY SYSTEM
+            </CustomTypography>
+            <CustomTypography variant="subtitle2" align="center" sx={{ fontSize: '12px', opacity: 0.9 }}>
+              PANGLAO TOURISM OFFICE
+            </CustomTypography>
+          </>
+        )}
+        
+        {collapsed && (
+          <Tooltip title="Panglao Tourism Office" placement="right">
+            <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 32, height: 32 }}>
+              <AdminIcon sx={{ fontSize: 18 }} />
+            </Avatar>
+          </Tooltip>
+        )}
       </SidebarHeader>
 
-      {/* Search Field */}
-      <SearchField
-        placeholder="Search"
-        fullWidth
-        variant="outlined"
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
-      <Divider />
+      {!collapsed && (
+        <UserProfile collapsed={collapsed}>
+          <Avatar sx={{ bgcolor: '#667eea', width: 36, height: 36 }}>
+            <AdminIcon />
+          </Avatar>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#334155' }}>
+              Admin User
+            </Typography>
+            <Chip label="Online" size="small" sx={{ 
+              bgcolor: '#10b981', 
+              color: 'white', 
+              fontSize: '10px',
+              height: '18px'
+            }} />
+          </Box>
+        </UserProfile>
+      )}
 
-      <Box sx={{ overflow: "auto" }}>
-        <List>
-          {filteredItems.map((item, index) => (
-            <ListItem
-              button
-              component={Link}
-              to={item.to}
-              key={index}
-              sx={{
-                backgroundColor:
-                getBasename(location.pathname) === item.to ? "#0077b6" : "inherit",
-                color: getBasename(location.pathname) === item.to ? "white" : "inherit",
-                "&:hover": {
-                  backgroundColor:
-                  getBasename(location.pathname) === item.to ? "#005f8a" : "#f0f0f0",
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  color:
-                  getBasename(location.pathname) === item.to ? "white" : "inherit",
-                }}
-              >
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={item.text}
-                primaryTypographyProps={{ fontFamily: "Poppins, sans-serif" }}
-              />
-            </ListItem>
-          ))}
-        </List>
+      {!collapsed && (
+        <>
+          <SearchField
+            placeholder="Search navigation..."
+            fullWidth
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onKeyDown={handleSearchKeyDown}
+            size="small"
+            InputProps={{
+              'aria-label': 'Search navigation items',
+            }}
+          />
+          <Divider sx={{ mx: 2, my: 1 }} />
+        </>
+      )}
+
+      <Box sx={{ overflow: "auto", flex: 1 }}>
+        {filteredSections.map((section, sectionIndex) => (
+          <MenuSection key={section.title}>
+            {!collapsed && (
+              <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1 }}>
+                <SectionTitle variant="overline" sx={{ flex: 1 }}>
+                  {section.title}
+                </SectionTitle>
+                <IconButton 
+                  size="small" 
+                  onClick={() => handleSectionToggle(section.title)}
+                  sx={{ opacity: 0.7 }}
+                >
+                  {expandedSections[section.title] ? <ExpandLess /> : <ExpandMore />}
+                </IconButton>
+              </Box>
+            )}
+            
+            <Collapse in={collapsed || expandedSections[section.title]} timeout={300}>
+              <List dense>
+                {section.items.map((item, index) => (
+                  <Tooltip 
+                    key={`${sectionIndex}-${index}`}
+                    title={collapsed ? `${item.text} - ${item.description}` : ""} 
+                    placement="right"
+                    arrow
+                    disableHoverListener={!collapsed}
+                  >
+                    <Box>
+                      <StyledListItem
+                        button
+                        component={Link}
+                        to={item.to}
+                        className={isActiveRoute(item.to) ? 'active' : ''}
+                        sx={{ 
+                          minHeight: 48,
+                          justifyContent: collapsed ? 'center' : 'flex-start',
+                          px: collapsed ? 2 : 3,
+                        }}
+                      >
+                        <ListItemIcon
+                          sx={{
+                            minWidth: collapsed ? 'auto' : 40,
+                            justifyContent: 'center',
+                            color: isActiveRoute(item.to) ? '#667eea' : '#64748b',
+                            transition: 'color 0.3s ease',
+                          }}
+                        >
+                          {item.icon}
+                        </ListItemIcon>
+                        
+                        {!collapsed && (
+                          <ListItemText
+                            primary={item.text}
+                            secondary={item.description}
+                            primaryTypographyProps={{
+                              fontFamily: "Poppins, sans-serif",
+                              fontWeight: isActiveRoute(item.to) ? 600 : 400,
+                              fontSize: '14px',
+                            }}
+                            secondaryTypographyProps={{
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: '11px',
+                              color: '#94a3b8',
+                            }}
+                          />
+                        )}
+                      </StyledListItem>
+                    </Box>
+                  </Tooltip>
+                ))}
+              </List>
+            </Collapse>
+          </MenuSection>
+        ))}
       </Box>
-      <Box sx={{ p: 2 }}>
-        <Button
-          fullWidth
-          variant="contained"
-          color="secondary"
-          startIcon={<LogoutIcon />}
-          sx={{ fontFamily: "Poppins, sans-serif" }}
-          onClick={handleLogout}
-        >
-          Log Out
-        </Button>
+
+      <Box sx={{ mt: 'auto' }}>
+        <Divider sx={{ mx: 2, my: 1 }} />
+        {collapsed ? (
+          <Tooltip title="Log Out" placement="right">
+            <IconButton 
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              sx={{ 
+                m: 2, 
+                color: '#ef4444',
+                '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)' },
+                '&:disabled': { color: '#94a3b8' }
+              }}
+              aria-label="Log out"
+            >
+              <LogoutIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <LogoutButton
+            fullWidth
+            variant="contained"
+            startIcon={<LogoutIcon />}
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+          >
+            {isLoggingOut ? 'Logging Out...' : 'Log Out'}
+          </LogoutButton>
+        )}
       </Box>
     </SidebarDrawer>
   );

@@ -74,7 +74,7 @@ router.post('/api/touchpointlocal', fetchTranslatedTouchpointController);
 
 router.get('/api/admin/getsurveymetrics', authenticate, getSurveyMetricsAnalyticsController);
 router.get('/api/admin/getEntityMetrics', authenticate, getSurveyFeedbackController )
-router.get('/api/admin/getAllByTally', authenticate, getAllByTallyController); 
+router.get('/api/admin/getAllByTally', getAllByTallyController); //NOTE: FRONTEND THAT USES THIS NEEDS TO ATTACH COOKIES FOR AUTHENTICATION, THEN YOU CAN INCLUDE authenticate MIDDLEWARE
 
 router.get('/api/admin/getsentimenttable', getSentimentAnalysisController); //NOTE: FRONTEND THAT USES THIS NEEDS TO ATTACH COOKIES FOR AUTHENTICATION, THEN YOU CAN INCLUDE authenticate MIDDLEWARE
 router.post('/api/admin/getsentimenttableforlocation', authenticate, getSentimentLocationController);
