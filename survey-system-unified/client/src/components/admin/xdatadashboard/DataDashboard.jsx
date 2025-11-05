@@ -214,12 +214,6 @@ const StyledFormControl = styled(FormControl)`
     }
   }
   
-  & .MuiInputLabel-root {
-    color: rgba(0, 0, 0, 0.7);
-    font-family: ${fontFamily};
-    font-weight: 500;
-  }
-  
   & .MuiSelect-select {
     font-family: ${fontFamily};
     font-weight: 500;
@@ -229,7 +223,7 @@ const StyledFormControl = styled(FormControl)`
 const FilterContainer = styled(Box)`
   display: flex;
   gap: 16px;
-  align-items: center;
+  align-items: flex-start;
   margin-top: 16px;
   
   @media (max-width: 768px) {
@@ -237,6 +231,21 @@ const FilterContainer = styled(Box)`
     justify-content: flex-start;
     gap: 12px;
   }
+`;
+
+const FilterGroup = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+`;
+
+const FilterLabel = styled(Typography)`
+  font-family: ${fontFamily};
+  font-weight: 500;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2px;
 `;
 
 const StyledGridContainer = styled(Grid)`
@@ -555,34 +564,36 @@ const DataDashboard = ({
                   
                   {showDateFilters && (
                     <FilterContainer>
-                      <StyledFormControl size="small" variant="outlined">
-                        <InputLabel id="dashboard-year-label">Year</InputLabel>
-                        <Select
-                          labelId="dashboard-year-label"
-                          value={year}
-                          onChange={onYearChange}
-                          label="Year"
-                        >
-                          {generateYears().map((yr) => (
-                            <MenuItem key={yr} value={yr}>{yr}</MenuItem>
-                          ))}
-                        </Select>
-                      </StyledFormControl>
+                      <FilterGroup>
+                        <FilterLabel>Year</FilterLabel>
+                        <StyledFormControl size="small" variant="outlined">
+                          <Select
+                            value={year}
+                            onChange={onYearChange}
+                            displayEmpty
+                          >
+                            {generateYears().map((yr) => (
+                              <MenuItem key={yr} value={yr}>{yr}</MenuItem>
+                            ))}
+                          </Select>
+                        </StyledFormControl>
+                      </FilterGroup>
                       
-                      <StyledFormControl size="small" variant="outlined">
-                        <InputLabel id="dashboard-quarter-label">Quarter</InputLabel>
-                        <Select
-                          labelId="dashboard-quarter-label"
-                          value={quarter}
-                          onChange={onQuarterChange}
-                          label="Quarter"
-                        >
-                          <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
-                          <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
-                          <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>
-                          <MenuItem value={4}>Q4 (Oct-Dec)</MenuItem>
-                        </Select>
-                      </StyledFormControl>
+                      <FilterGroup>
+                        <FilterLabel>Quarter</FilterLabel>
+                        <StyledFormControl size="small" variant="outlined">
+                          <Select
+                            value={quarter}
+                            onChange={onQuarterChange}
+                            displayEmpty
+                          >
+                            <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
+                            <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
+                            <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>
+                            <MenuItem value={4}>Q4 (Oct-Dec)</MenuItem>
+                          </Select>
+                        </StyledFormControl>
+                      </FilterGroup>
                     </FilterContainer>
                   )}
                 </Box>

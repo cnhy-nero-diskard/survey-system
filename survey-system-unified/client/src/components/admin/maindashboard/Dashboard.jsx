@@ -123,12 +123,27 @@ const HeaderTitle = styled(Typography)`
 const FilterContainer = styled(Box)`
   display: flex;
   gap: 16px;
-  align-items: center;
+  align-items: flex-start;
   
   @media (max-width: 768px) {
     width: 100%;
     justify-content: flex-start;
   }
+`;
+
+const FilterGroup = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+`;
+
+const FilterLabel = styled(Typography)`
+  font-family: ${fontFamily};
+  font-weight: 500;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2px;
 `;
 
 const StyledFormControl = styled(FormControl)`
@@ -145,12 +160,6 @@ const StyledFormControl = styled(FormControl)`
     &.Mui-focused {
       background-color: rgba(255, 255, 255, 1);
     }
-  }
-  
-  & .MuiInputLabel-root {
-    color: rgba(0, 0, 0, 0.7);
-    font-family: ${fontFamily};
-    font-weight: 500;
   }
   
   & .MuiSelect-select {
@@ -439,34 +448,36 @@ const Dashboard = () => {
                 />
                 
                 <FilterContainer>
-                  <StyledFormControl size="small" variant="outlined">
-                    <InputLabel id="year-label">Year</InputLabel>
-                    <Select
-                      labelId="year-label"
-                      value={year}
-                      onChange={handleYearChange}
-                      label="Year"
-                    >
-                      {generateYears().map((yr) => (
-                        <MenuItem key={yr} value={yr}>{yr}</MenuItem>
-                      ))}
-                    </Select>
-                  </StyledFormControl>
+                  <FilterGroup>
+                    <FilterLabel>Year</FilterLabel>
+                    <StyledFormControl size="small" variant="outlined">
+                      <Select
+                        value={year}
+                        onChange={handleYearChange}
+                        displayEmpty
+                      >
+                        {generateYears().map((yr) => (
+                          <MenuItem key={yr} value={yr}>{yr}</MenuItem>
+                        ))}
+                      </Select>
+                    </StyledFormControl>
+                  </FilterGroup>
                   
-                  <StyledFormControl size="small" variant="outlined">
-                    <InputLabel id="quarter-label">Quarter</InputLabel>
-                    <Select
-                      labelId="quarter-label"
-                      value={quarter}
-                      onChange={handleQuarterChange}
-                      label="Quarter"
-                    >
-                      <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
-                      <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
-                      <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>
-                      <MenuItem value={4}>Q4 (Oct-Dec)</MenuItem>
-                    </Select>
-                  </StyledFormControl>
+                  <FilterGroup>
+                    <FilterLabel>Quarter</FilterLabel>
+                    <StyledFormControl size="small" variant="outlined">
+                      <Select
+                        value={quarter}
+                        onChange={handleQuarterChange}
+                        displayEmpty
+                      >
+                        <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
+                        <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
+                        <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>
+                        <MenuItem value={4}>Q4 (Oct-Dec)</MenuItem>
+                      </Select>
+                    </StyledFormControl>
+                  </FilterGroup>
                 </FilterContainer>
               </Box>
             </HeaderContent>
