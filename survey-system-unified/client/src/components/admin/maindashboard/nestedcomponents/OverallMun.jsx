@@ -1,8 +1,92 @@
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Typography } from "@mui/material";
-import { ChartContainer, MainContent, ChartContainer as PieChartContainer } from '../../shared/styledComponents';
+import { Typography, Box, Skeleton, Fade } from "@mui/material";
+import styled from 'styled-components';
+import { ChartContainer, MainContent } from '../../shared/styledComponents';
+import { fontFamily } from "../../../../config/fontConfig";
 import axios from "axios";
+
+// Enhanced styled components for better presentation
+const StyledChartContainer = styled(ChartContainer)`
+  position: relative;
+  min-height: 300px;
+  
+  .recharts-legend-wrapper {
+    font-family: ${fontFamily} !important;
+  }
+`;
+
+const ChartTitle = styled(Typography)`
+  font-family: ${fontFamily};
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 16px;
+  color: #2d3748;
+  font-size: 16px;
+`;
+
+const LoadingContainer = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+`;
+
+// Custom tooltip component
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    return (
+      <Box
+        sx={{
+          backgroundColor: 'rgba(255, 255, 255, 0.98)',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          padding: '12px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+          fontFamily: fontFamily,
+        }}
+      >
+        <Typography variant="body2" sx={{ fontWeight: 600, color: data.payload.color }}>
+          {data.payload.name}
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#4a5568' }}>
+          Count: {data.value}
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#718096' }}>
+          {((data.value / payload.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1)}%
+        </Typography>
+      </Box>
+    );
+  }
+  return null;
+};
+
+// Custom label function for the pie chart
+const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+  if (percent < 0.05) return null; // Don't show labels for slices less than 5%
+  
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text 
+      x={x} 
+      y={y} 
+      fill="white" 
+      textAnchor={x > cx ? 'start' : 'end'} 
+      dominantBaseline="central"
+      fontSize="12"
+      fontWeight="600"
+      fontFamily={fontFamily}
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
 
 const OverallMun = ({ year, quarter }) => {
   const [pieData, setPieData] = useState([]);
@@ -65,16 +149,37 @@ const OverallMun = ({ year, quarter }) => {
       const neutralLabel = await fetchCustomLabels(neutral, "neutral");
       const negativeLabel = await fetchCustomLabels(negative, "negative");
 
-      // Prepare pie chart data with updated colors
+      // Prepare pie chart data with updated colors and gradients
+      const modernColors = {
+        positive: '#10B981', // Emerald green
+        neutral: '#F59E0B',  // Amber
+        negative: '#EF4444'  // Red
+      };
+
       const data = [];
       if (counts.positive !== "0" && positiveLabel) {
-        data.push({ name: `Positive (${positiveLabel})`, value: parseInt(counts.positive), color: "#1f78b4" }); // Blue
+        data.push({ 
+          name: `Positive (${positiveLabel})`, 
+          value: parseInt(counts.positive), 
+          color: modernColors.positive,
+          gradient: 'url(#positiveGradient)'
+        });
       }
       if (counts.neutral !== "0" && neutralLabel) {
-        data.push({ name: `Neutral (${neutralLabel})`, value: parseInt(counts.neutral), color: "rgb(251, 255, 41)" }); // Yellow
+        data.push({ 
+          name: `Neutral (${neutralLabel})`, 
+          value: parseInt(counts.neutral), 
+          color: modernColors.neutral,
+          gradient: 'url(#neutralGradient)'
+        });
       }
       if (counts.negative !== "0" && negativeLabel) {
-        data.push({ name: `Negative (${negativeLabel})`, value: parseInt(counts.negative), color: "#e31a1c" }); // Red
+        data.push({ 
+          name: `Negative (${negativeLabel})`, 
+          value: parseInt(counts.negative), 
+          color: modernColors.negative,
+          gradient: 'url(#negativeGradient)'
+        });
       }
       console.log(`PIE DATA -->${JSON.stringify(data)}`);
 
@@ -85,41 +190,84 @@ const OverallMun = ({ year, quarter }) => {
   }, [year, quarter]);
 
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return (
+      <MainContent>
+        <LoadingContainer>
+          <Skeleton variant="text" width="60%" height={32} />
+          <Skeleton variant="circular" width={200} height={200} />
+          <Box display="flex" gap={2} mt={2}>
+            <Skeleton variant="rectangular" width={80} height={20} />
+            <Skeleton variant="rectangular" width={80} height={20} />
+            <Skeleton variant="rectangular" width={80} height={20} />
+          </Box>
+        </LoadingContainer>
+      </MainContent>
+    );
   }
 
   return (
     <MainContent>
-      <PieChartContainer>
-        <Typography variant="h6">OVERALL SENTIMENT (PANGLAO)</Typography>
-        <ChartContainer>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                fill="#8884d8"
-                label
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend
-                wrapperStyle={{
-                  fontSize: '13px',
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </PieChartContainer>
+      <Fade in={!loading} timeout={600}>
+        <Box>
+          <ChartTitle>
+            Overall Sentiment Analysis
+          </ChartTitle>
+          <StyledChartContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <defs>
+                  <linearGradient id="positiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#10B981" />
+                    <stop offset="100%" stopColor="#059669" />
+                  </linearGradient>
+                  <linearGradient id="neutralGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#F59E0B" />
+                    <stop offset="100%" stopColor="#D97706" />
+                  </linearGradient>
+                  <linearGradient id="negativeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#EF4444" />
+                    <stop offset="100%" stopColor="#DC2626" />
+                  </linearGradient>
+                </defs>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={65}
+                  outerRadius={110}
+                  paddingAngle={2}
+                  labelLine={false}
+                  label={renderCustomLabel}
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={entry.color}
+                      stroke="#ffffff"
+                      strokeWidth={3}
+                      style={{
+                        filter: 'drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.1))',
+                        transition: 'all 0.3s ease'
+                      }}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  wrapperStyle={{
+                    fontSize: '13px',
+                    fontFamily: fontFamily,
+                    paddingTop: '20px'
+                  }}
+                  iconType="circle"
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </StyledChartContainer>
+        </Box>
+      </Fade>
     </MainContent>
   );
 };

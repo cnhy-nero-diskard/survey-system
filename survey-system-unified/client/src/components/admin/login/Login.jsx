@@ -179,11 +179,7 @@ const Login = () => {
                 {formik.isSubmitting ? 'Logging in...' : 'Login'}
               </StyledButton>
             </StyledForm>
-            <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-              <a href="/forgot-password" style={{ textDecoration: 'none' }}>
-                Forgot your password?
-              </a>
-            </Typography>
+
           </StyledPaper>
         </Grid>
 

@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, Typography, MenuItem, Select, FormControl } from '@mui/material';
-import styled, { createGlobalStyle } from 'styled-components';
+import { 
+  Box, 
+  Grid, 
+  Typography, 
+  MenuItem, 
+  Select, 
+  FormControl,
+  InputLabel,
+  Chip,
+  Skeleton,
+  Fade,
+  Paper
+} from '@mui/material';
+import styled, { createGlobalStyle, keyframes } from 'styled-components';
 import OverallMun from './nestedcomponents/OverallMun';
 import OverallBarangay from './nestedcomponents/OverallBarangay';
 import OverallSurveyTopic from './nestedcomponents/OverallSurveyTopic';
@@ -9,6 +21,13 @@ import { fcolor, fontFamily, fontSize, fontWeight } from '../../../config/fontCo
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { 
+  TrendingUp as TrendingUpIcon,
+  LocationCity as LocationIcon,
+  Business as BusinessIcon,
+  Topic as TopicIcon,
+  CalendarToday as CalendarIcon
+} from '@mui/icons-material';
 // Global styles to disable scrolling
 const GlobalStyle = createGlobalStyle`
   body, html {
@@ -19,26 +38,186 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+// Animations
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const shimmer = keyframes`
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+`;
+
 // Styled components
 const MainContent = styled(Box)`
   flex-grow: 1;
-  padding: 24px;
-  background-color: transparent;
+  padding: 32px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
   font-family: ${fontFamily};
-  font-size: ${fontSize};
-  font-weight: ${fontWeight};
+  animation: ${fadeIn} 0.6s ease-out;
 `;
 
-const CardContainer = styled(Box)`
-  background: linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97));
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-  height: 47vh;
+const HeaderContainer = styled(Box)`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: white;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="25" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="25" cy="75" r="1" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+    pointer-events: none;
+  }
+`;
+
+const HeaderContent = styled(Box)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+`;
+
+const HeaderTitle = styled(Typography)`
+  font-family: ${fontFamily};
+  font-weight: 600;
+  font-size: 28px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  @media (max-width: 768px) {
+    font-size: 24px;
+  }
+`;
+
+const FilterContainer = styled(Box)`
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: flex-start;
+  }
+`;
+
+const StyledFormControl = styled(FormControl)`
+  min-width: 120px;
+  
+  & .MuiOutlinedInput-root {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+    
+    &.Mui-focused {
+      background-color: rgba(255, 255, 255, 1);
+    }
+  }
+  
+  & .MuiInputLabel-root {
+    color: rgba(0, 0, 0, 0.7);
+    font-family: ${fontFamily};
+    font-weight: 500;
+  }
+  
+  & .MuiSelect-select {
+    font-family: ${fontFamily};
+    font-weight: 500;
+  }
+`;
+
+const CardContainer = styled(Paper)`
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  height: 480px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 16px 16px 0 0;
+  }
+`;
+
+const CardHeader = styled(Box)`
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 12px;
+`;
+
+const CardTitle = styled(Typography)`
+  font-family: ${fontFamily};
+  font-weight: 600;
+  font-size: 18px;
+  color: #2d3748;
+  margin: 0;
+`;
+
+const CardIcon = styled(Box)`
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  
+  & svg {
+    font-size: 20px;
+  }
 `;
 
 const ContentBox = styled(Box)`
@@ -47,30 +226,57 @@ const ContentBox = styled(Box)`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 `;
 
-const CustomTypography = styled(Typography)`
+const LoadingCard = styled(CardContainer)`
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -468px;
+    width: 468px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: ${shimmer} 1.2s ease-in-out infinite;
+  }
+`;
+
+const StatusChip = styled(Chip)`
   font-family: ${fontFamily};
-  padding-top: 16px;
-  color: black;
-`;
-
-const DropdownContainer = styled(Box)`
-  display: flex;
-  gap: 16px;
-  margin-left: 16px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 `;
 
 const Dashboard = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [quarter, setQuarter] = useState(Math.floor((new Date().getMonth() + 3) / 3));
+  const [isLoading, setIsLoading] = useState(true);
+  const [classificationStatus, setClassificationStatus] = useState('idle');
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     
+    // Simulate loading for better UX
+    const loadTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    
     // Make API request for relevance classification
     const classifyResponses = async () => {
-      const toastId = toast.loading("Classifying responses...");
+      setClassificationStatus('loading');
+      const toastId = toast.loading("🔍 Analyzing and classifying responses...", {
+        style: {
+          fontFamily: fontFamily,
+        }
+      });
+      
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/automateclassification`, {
           withCredentials: true
@@ -81,18 +287,28 @@ const Dashboard = () => {
         const irrelevantCount = results.filter(item => item.relevance === "IRRELEVANT").length;
         
         toast.update(toastId, {
-          render: `${message} | RELEVANT: ${relevantCount} | IRRELEVANT: ${irrelevantCount}`,
+          render: `✅ ${message} | Relevant: ${relevantCount} | Irrelevant: ${irrelevantCount}`,
           type: "success",
           isLoading: false,
-          autoClose: 5000
+          autoClose: 6000,
+          style: {
+            fontFamily: fontFamily,
+          }
         });
+        
+        setClassificationStatus('success');
       } catch (error) {
         toast.update(toastId, {
-          render: error.response?.data?.message || "Relevance Classifier: NO NEW FEEDBACKS AT THE MOMENT",
-          type: "error",
+          render: `ℹ️ ${error.response?.data?.message || "No new feedback responses to classify at the moment"}`,
+          type: "info",
           isLoading: false,
-          autoClose: 5000
+          autoClose: 5000,
+          style: {
+            fontFamily: fontFamily,
+          }
         });
+        
+        setClassificationStatus('idle');
       }
     };
 
@@ -100,6 +316,7 @@ const Dashboard = () => {
 
     return () => {
       document.body.style.overflow = 'auto';
+      clearTimeout(loadTimer);
     };
   }, []);
 
@@ -107,7 +324,7 @@ const Dashboard = () => {
   const getCurrentDate = () => {
     const date = new Date();
     const options = { year: 'numeric', month: 'long', day: '2-digit' };
-    return date.toLocaleDateString('en-US', options).replace(',', '');
+    return date.toLocaleDateString('en-US', options);
   };
 
   // Generate years for dropdown (current year and previous 5 years)
@@ -126,6 +343,51 @@ const Dashboard = () => {
     setQuarter(event.target.value);
   };
 
+  // Get status color for classification
+  const getStatusColor = () => {
+    switch (classificationStatus) {
+      case 'loading': return 'warning';
+      case 'success': return 'success';
+      default: return 'default';
+    }
+  };
+
+  const getStatusText = () => {
+    switch (classificationStatus) {
+      case 'loading': return 'Analyzing...';
+      case 'success': return 'Classification Complete';
+      default: return 'Ready';
+    }
+  };
+
+  // Card configurations with icons
+  const cardConfigs = [
+    {
+      title: "Municipality Overview",
+      icon: <LocationIcon />,
+      component: <OverallMun year={year} quarter={quarter} />,
+      description: "Municipal-level survey data and insights"
+    },
+    {
+      title: "Barangay Analysis", 
+      icon: <BusinessIcon />,
+      component: <OverallBarangay year={year} quarter={quarter} />,
+      description: "Area-specific response patterns"
+    },
+    {
+      title: "Topic Distribution",
+      icon: <TopicIcon />,
+      component: <OverallSurveyTopic year={year} quarter={quarter} />,
+      description: "Survey topic categorization and trends"
+    },
+    {
+      title: "Establishment Data",
+      icon: <TrendingUpIcon />,
+      component: <OverallEstablishment year={year} quarter={quarter} />,
+      description: "Business establishment survey metrics"
+    }
+  ];
+
   return (
     <>
       <GlobalStyle />
@@ -133,132 +395,132 @@ const Dashboard = () => {
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
-        newestOnTop={false}
+        newestOnTop={true}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        theme="light"
+        toastStyle={{
+          fontFamily: fontFamily,
+          borderRadius: '8px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        }}
       />
+      
       <MainContent>
-        <Box display="flex" alignItems="center">
-          <CustomTypography variant="h4" sx={{
-            fontFamily: fontFamily,
-            fontSize: fontSize + 5,
-            fontWeight: fontWeight,
-          }}
-            gutterBottom>
-            As of {getCurrentDate()}
-          </CustomTypography>
-          
-          <DropdownContainer>
-            <FormControl size="small" variant="outlined">
-              <Select
-                value={year}
-                onChange={handleYearChange}
-                displayEmpty
-              >
-                {generateYears().map((yr) => (
-                  <MenuItem key={yr} value={yr}>{yr}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            
-            <FormControl size="small" variant="outlined">
-              <Select
-                value={quarter}
-                onChange={handleQuarterChange}
-                displayEmpty
-              >
-                <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
-                <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
-                <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>
-                <MenuItem value={4}>Q4 (Oct-Dec)</MenuItem>
-              </Select>
-            </FormControl>
-          </DropdownContainer>
-        </Box>
+        <Fade in={true} timeout={600}>
+          <HeaderContainer>
+            <HeaderContent>
+              <Box>
+                <HeaderTitle>
+                  <CalendarIcon sx={{ fontSize: 32 }} />
+                  Dashboard Overview
+                </HeaderTitle>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontFamily: fontFamily,
+                    opacity: 0.9,
+                    fontWeight: 400,
+                    marginTop: '4px'
+                  }}
+                >
+                  {getCurrentDate()} • Real-time survey analytics
+                </Typography>
+              </Box>
+              
+              <Box display="flex" alignItems="center" gap={2}>
+                <StatusChip 
+                  label={getStatusText()}
+                  color={getStatusColor()}
+                  size="small"
+                />
+                
+                <FilterContainer>
+                  <StyledFormControl size="small" variant="outlined">
+                    <InputLabel id="year-label">Year</InputLabel>
+                    <Select
+                      labelId="year-label"
+                      value={year}
+                      onChange={handleYearChange}
+                      label="Year"
+                    >
+                      {generateYears().map((yr) => (
+                        <MenuItem key={yr} value={yr}>{yr}</MenuItem>
+                      ))}
+                    </Select>
+                  </StyledFormControl>
+                  
+                  <StyledFormControl size="small" variant="outlined">
+                    <InputLabel id="quarter-label">Quarter</InputLabel>
+                    <Select
+                      labelId="quarter-label"
+                      value={quarter}
+                      onChange={handleQuarterChange}
+                      label="Quarter"
+                    >
+                      <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
+                      <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
+                      <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>
+                      <MenuItem value={4}>Q4 (Oct-Dec)</MenuItem>
+                    </Select>
+                  </StyledFormControl>
+                </FilterContainer>
+              </Box>
+            </HeaderContent>
+          </HeaderContainer>
+        </Fade>
 
-        <Grid container spacing={2}>
-          {/* First Row */}
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardContainer>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontFamily: fontFamily,
-                  fontSize: fontSize + 5,
-                  fontWeight: fontWeight,
-                  color: fcolor
-                }}
-              >
-                Overall Municipality
-              </Typography>
-              <ContentBox>
-                <OverallMun year={year} quarter={quarter} />
-              </ContentBox>
-            </CardContainer>
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardContainer>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontFamily: fontFamily,
-                  fontSize: fontSize + 5,
-                  fontWeight: fontWeight,
-                  color: fcolor
-                }}
-              >
-                Barangay Data
-              </Typography>
-              <ContentBox>
-                <OverallBarangay year={year} quarter={quarter} />
-              </ContentBox>
-            </CardContainer>
-          </Grid>
-
-          {/* Second Row */}
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardContainer>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontFamily: fontFamily,
-                  fontSize: fontSize + 5,
-                  fontWeight: fontWeight,
-                  color: fcolor
-                }}
-              >
-                Overall Topic
-              </Typography>
-              <ContentBox>
-                <OverallSurveyTopic year={year} quarter={quarter} />
-              </ContentBox>
-            </CardContainer>
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-            <CardContainer>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontFamily: fontFamily,
-                  fontSize: fontSize + 5,
-                  fontWeight: fontWeight,
-                  color: fcolor
-                }}
-              >
-                Overall Establishment
-              </Typography>
-              <ContentBox>
-                <OverallEstablishment year={year} quarter={quarter} />
-              </ContentBox>
-            </CardContainer>
-          </Grid>
+        <Grid container spacing={3}>
+          {cardConfigs.map((config, index) => (
+            <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={index}>
+              <Fade in={!isLoading} timeout={800 + (index * 200)}>
+                <div>
+                  {isLoading ? (
+                    <LoadingCard elevation={0}>
+                      <CardHeader>
+                        <Skeleton variant="circular" width={40} height={40} />
+                        <Box flex={1}>
+                          <Skeleton variant="text" width="60%" height={24} />
+                          <Skeleton variant="text" width="40%" height={16} sx={{ mt: 1 }} />
+                        </Box>
+                      </CardHeader>
+                      <Skeleton variant="rectangular" height="100%" />
+                    </LoadingCard>
+                  ) : (
+                    <CardContainer elevation={0}>
+                      <CardHeader>
+                        <CardIcon>
+                          {config.icon}
+                        </CardIcon>
+                        <Box>
+                          <CardTitle>
+                            {config.title}
+                          </CardTitle>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: '#718096',
+                              fontFamily: fontFamily,
+                              display: 'block',
+                              marginTop: '2px'
+                            }}
+                          >
+                            {config.description}
+                          </Typography>
+                        </Box>
+                      </CardHeader>
+                      <ContentBox>
+                        {config.component}
+                      </ContentBox>
+                    </CardContainer>
+                  )}
+                </div>
+              </Fade>
+            </Grid>
+          ))}
         </Grid>
       </MainContent>
     </>

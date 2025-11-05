@@ -74,12 +74,12 @@ router.post('/api/touchpointlocal', fetchTranslatedTouchpointController);
 
 router.get('/api/admin/getsurveymetrics', authenticate, getSurveyMetricsAnalyticsController);
 router.get('/api/admin/getEntityMetrics', authenticate, getSurveyFeedbackController )
-router.get('/api/admin/getAllByTally', authenticate, getAllByTallyController); //every single line in tpms
+router.get('/api/admin/getAllByTally', authenticate, getAllByTallyController); 
 
-router.get('/api/admin/getsentimenttable', authenticate, getSentimentAnalysisController);
+router.get('/api/admin/getsentimenttable', getSentimentAnalysisController); //NOTE: FRONTEND THAT USES THIS NEEDS TO ATTACH COOKIES FOR AUTHENTICATION, THEN YOU CAN INCLUDE authenticate MIDDLEWARE
 router.post('/api/admin/getsentimenttableforlocation', authenticate, getSentimentLocationController);
 
-router.get('/api/admin/surveytopics', authenticate, getSurveyByTopicController);
+router.get('/api/admin/surveytopics', getSurveyByTopicController); //NOTE: FRONTEND THAT USES THIS NEEDS TO ATTACH COOKIES FOR AUTHENTICATION, THEN YOU CAN INCLUDE authenticate MIDDLEWARE
 
 router.get('/api/admin/automateclassification', authenticate, autoClassifyRelevanceController)
 router.get('/api/admin/automatesentiment', authenticate, autoAnalyzeSentimentController);
