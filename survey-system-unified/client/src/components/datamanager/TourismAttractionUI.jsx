@@ -1,182 +1,64 @@
-// TourismAttractionUI.jsx
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import {
+  Place as PlaceIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  LocationOn as LocationIcon,
+} from '@mui/icons-material';
 import {
     createTourismAttraction,
     fetchTourismAttractions,
     updateTourismAttraction,
     deleteTourismAttraction,
 } from '../utils/crudapi';
+import {
+  ModernContainer,
+  SectionHeader,
+  ModernForm,
+  InputGroup,
+  Label,
+  ModernInput,
+  ModernSelect,
+  ModernButton,
+  TableSection,
+  TableHeader,
+  TableContainer,
+  ModernTable,
+  ModernTableHead,
+  ModernTableRow,
+  ModernTableCell,
+  ActionButtonGroup,
+  ActionButton,
+  LoadingSpinner,
+  EmptyState,
+  StatsCard,
+} from './styles/SharedStyles';
 
-// Styled Components (Reused from LocalizationUI.jsx)
-const Container = styled.div`
-  max-width: 90vw;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: linear-gradient(145deg, rgb(193, 215, 255), rgb(205, 255, 113));
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-`;
-
-const Title = styled.h2`
-  font-size: 2rem;
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: 600;
-`;
-
-const Form = styled.form`
+// Component specific styled components
+const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-
-  &:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 8px rgba(52, 152, 219, 0.3));
-    outline: none;
-  }
-`;
-
-const Button = styled.button`
-  width: fit-content;
-  padding: 0.75rem 1.5rem;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-
-  &:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    background-color: #2472a4;
-    transform: translateY(0);
-  }
-`;
-
-const CollapseButton = styled(Button)`
-  width: 100%;
-  margin-bottom: 1.5rem;
-  background-color: #95a5a6;
-
-  &:hover {
-    background-color: #7f8c8d;
-  }
-`;
-
-const TableContainer = styled.div`
-  max-height: 500px;
-  overflow-y: auto;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: white;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHeader = styled.thead`
-  background-color: #3498db;
-  color: white;
-  position: sticky;
-  top: 0;
-`;
-
-const TableRow = styled.tr`
-  &:nth-child(even) {
-    background-color: rgba(4, 108, 177, 0.86);
-  }
-  &:nth-child(odd) {
-    background-color: rgba(5, 124, 160, 0.59);
-  }
-
-  &:hover {
-    background-color: #0099ff;
-    color: white;
-  }
-`;
-
-const TableCell = styled.td`
-  padding: 1rem;
-  border: 1px solid #ddd;
-  text-align: left;
-`;
-
-const ActionButton = styled.button`
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  margin-right: 0.5rem;
-
-  &:hover {
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const EditButton = styled(ActionButton)`
-  background-color: #f1c40f;
-  color: white;
-
-  &:hover {
-    background-color: #f39c12;
-  }
-`;
-
-const DeleteButton = styled(ActionButton)`
-  background-color: #e74c3c;
-  color: white;
-
-  &:hover {
-    background-color: #c0392b;
-  }
-`;
-
-const SearchInput = styled(Input)`
-  width: 100%;
-  margin-bottom: 1.5rem;
+  gap: 16px;
+  margin-bottom: 24px;
 `;
 
 const Snackbar = styled.div`
   position: fixed;
   bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #4caf50;
+  right: 20px;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
   color: white;
-  padding: 1rem 2rem;
+  padding: 16px 24px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
   opacity: ${(props) => (props.show ? 1 : 0)};
-  transition: opacity 0.3s ease;
+  transform: translateY(${(props) => (props.show ? '0' : '20px')});
+  transition: all 0.3s ease;
+  z-index: 1000;
+  font-family: 'Poppins';
+  font-weight: 500;
 `;
 
 const TourismAttractionUI = () => {
@@ -292,169 +174,257 @@ const TourismAttractionUI = () => {
     );
 
     return (
-        <Container>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                <Button
+        <ModernContainer>
+            <SectionHeader>
+                <h2>
+                    <LocationIcon />
+                    Tourism Attractions Management
+                </h2>
+                <p>Manage tourism attractions, locations, and attraction data</p>
+            </SectionHeader>
+
+            <StatsGrid>
+                <StatsCard>
+                    <h4>{attractions.length}</h4>
+                    <p>Total Attractions</p>
+                </StatsCard>
+                <StatsCard>
+                    <h4>{filteredAttractions.length}</h4>
+                    <p>Filtered Results</p>
+                </StatsCard>
+                <StatsCard>
+                    <h4>{attractions.filter(att => att.report_year === new Date().getFullYear().toString()).length}</h4>
+                    <p>Current Year</p>
+                </StatsCard>
+                <StatsCard>
+                    <h4>{new Set(attractions.map(att => att.city_mun)).size}</h4>
+                    <p>Cities/Municipalities</p>
+                </StatsCard>
+            </StatsGrid>
+
+            <ModernForm onSubmit={handleSubmit}>
+                <InputGroup>
+                    <Label>Tourism Attraction Name</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter attraction name"
+                        value={formData.ta_name}
+                        onChange={(e) => setFormData({ ...formData, ta_name: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Type Code</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter type code"
+                        value={formData.type_code}
+                        onChange={(e) => setFormData({ ...formData, type_code: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Region</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter region"
+                        value={formData.region}
+                        onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Province/HUC</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter province/HUC"
+                        value={formData.prov_huc}
+                        onChange={(e) => setFormData({ ...formData, prov_huc: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>City/Municipality</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter city/municipality"
+                        value={formData.city_mun}
+                        onChange={(e) => setFormData({ ...formData, city_mun: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Report Year</Label>
+                    <ModernInput
+                        type="number"
+                        placeholder="Enter report year"
+                        value={formData.report_year}
+                        onChange={(e) => setFormData({ ...formData, report_year: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Barangay</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter barangay"
+                        value={formData.brgy}
+                        onChange={(e) => setFormData({ ...formData, brgy: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Latitude</Label>
+                    <ModernInput
+                        type="number"
+                        placeholder="Enter latitude"
+                        value={formData.latitude}
+                        onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                        step="0.000001"
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Longitude</Label>
+                    <ModernInput
+                        type="number"
+                        placeholder="Enter longitude"
+                        value={formData.longitude}
+                        onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                        step="0.000001"
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Tourism Attraction Category</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter attraction category"
+                        value={formData.ta_category}
+                        onChange={(e) => setFormData({ ...formData, ta_category: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>NTDP Category</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter NTDP category"
+                        value={formData.ntdp_category}
+                        onChange={(e) => setFormData({ ...formData, ntdp_category: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Development Level</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter development level"
+                        value={formData.devt_lvl}
+                        onChange={(e) => setFormData({ ...formData, devt_lvl: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Management</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter management info"
+                        value={formData.mgt}
+                        onChange={(e) => setFormData({ ...formData, mgt: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Online Connectivity</Label>
+                    <ModernInput
+                        type="text"
+                        placeholder="Enter online connectivity"
+                        value={formData.online_connectivity}
+                        onChange={(e) => setFormData({ ...formData, online_connectivity: e.target.value })}
+                        required={!commaSeparatedValues}
+                        disabled={!!commaSeparatedValues}
+                    />
+                </InputGroup>
+
+                <InputGroup>
+                    <Label>Comma Separated Values</Label>
+                    <ModernInput
+                        style={{ background: '#fff3cd' }}
+                        type="text"
+                        placeholder="Enter comma separated values for bulk input"
+                        value={commaSeparatedValues}
+                        onChange={(e) => setCommaSeparatedValues(e.target.value)}
+                    />
+                </InputGroup>
+
+                <ModernButton type="submit" variant="primary">
+                    <AddIcon />
+                    {editMode ? 'Update Attraction' : 'Create Attraction'}
+                </ModernButton>
+
+                <ModernButton 
+                    type="button" 
+                    variant="secondary"
                     onClick={() => fetchTourismAttractions().then(data => setAttractions(data))}
-                    style={{ flexShrink: 0 }}
                 >
-                    🔄 Reload
-                </Button>
-                <Title style={{ margin: 0 }}>Tourism Attractions Management</Title>
-            </div>
-            <Form onSubmit={handleSubmit}>
-                <Input
+                    🔄 Reload Data
+                </ModernButton>
+            </ModernForm>
+
+            <InputGroup style={{ marginBottom: '16px' }}>
+                <Label>Search Attractions</Label>
+                <ModernInput
                     type="text"
-                    placeholder="Tourism Attraction Name"
-                    value={formData.ta_name}
-                    onChange={(e) => setFormData({ ...formData, ta_name: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
+                    placeholder="Search by attraction name, location, or category..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <Input
-                    type="text"
-                    placeholder="Type Code"
-                    value={formData.type_code}
-                    onChange={(e) => setFormData({ ...formData, type_code: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
+            </InputGroup>
 
-                />
-                <Input
-                    type="text"
-                    placeholder="Region"
-                    value={formData.region}
-                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="text"
-                    placeholder="Province/HUC"
-                    value={formData.prov_huc}
-                    onChange={(e) => setFormData({ ...formData, prov_huc: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="text"
-                    placeholder="City/Municipality"
-                    value={formData.city_mun}
-                    onChange={(e) => setFormData({ ...formData, city_mun: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="number"
-                    placeholder="Report Year"
-                    value={formData.report_year}
-                    onChange={(e) => setFormData({ ...formData, report_year: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="text"
-                    placeholder="Barangay"
-                    value={formData.brgy}
-                    onChange={(e) => setFormData({ ...formData, brgy: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="number"
-                    placeholder="Latitude"
-                    value={formData.latitude}
-                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="number"
-                    placeholder="Longitude"
-                    value={formData.longitude}
-                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="text"
-                    placeholder="Tourism Attraction Category"
-                    value={formData.ta_category}
-                    onChange={(e) => setFormData({ ...formData, ta_category: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="text"
-                    placeholder="NTDP Category"
-                    value={formData.ntdp_category}
-                    onChange={(e) => setFormData({ ...formData, ntdp_category: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="text"
-                    placeholder="Development Level"
-                    value={formData.devt_lvl}
-                    onChange={(e) => setFormData({ ...formData, devt_lvl: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="text"
-                    placeholder="Management"
-                    value={formData.mgt}
-                    onChange={(e) => setFormData({ ...formData, mgt: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    type="text"
-                    placeholder="Online Connectivity"
-                    value={formData.online_connectivity}
-                    onChange={(e) => setFormData({ ...formData, online_connectivity: e.target.value })}
-                    required={!commaSeparatedValues}
-                    disabled={!!commaSeparatedValues}
-
-                />
-                <Input
-                    style={{ background: 'yellow' }}
-                    type="text"
-                    placeholder="Comma Separated Values"
-                    value={commaSeparatedValues}
-                    onChange={(e) => setCommaSeparatedValues(e.target.value)}
-                />
-
-                <Button type="submit">{editMode ? 'Update Attraction' : 'Create Attraction'}</Button>
-            </Form>
-
-            <CollapseButton onClick={toggleCollapse}>
-                {isCollapsed ? 'Show Attractions' : 'Hide Attractions'}
-            </CollapseButton>
+            <ModernButton 
+                type="button" 
+                variant="secondary" 
+                onClick={toggleCollapse}
+                style={{ width: '100%', marginBottom: '24px' }}
+            >
+                {isCollapsed ? 'Show Attractions Table' : 'Hide Attractions Table'}
+            </ModernButton>
 
             {!isCollapsed && (
-                <>
-                    <SearchInput
-                        type="text"
-                        placeholder="Search attractions..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                <TableSection>
+                    <TableHeader>
+                        <h3>Tourism Attractions ({filteredAttractions.length})</h3>
+                    </TableHeader>
                     <TableContainer>
-                        <Table>
-                            <TableHeader>
+                        <ModernTable>
+                            <ModernTableHead>
                                 <tr>
                                     <th>Name</th>
                                     <th>Type Code</th>
@@ -472,37 +442,62 @@ const TourismAttractionUI = () => {
                                     <th>Online Connectivity</th>
                                     <th>Actions</th>
                                 </tr>
-                            </TableHeader>
+                            </ModernTableHead>
                             <tbody>
-                                {filteredAttractions.map((att) => (
-                                    <TableRow key={att.id}>
-                                        <TableCell>{att.ta_name}</TableCell>
-                                        <TableCell>{att.type_code}</TableCell>
-                                        <TableCell>{att.region}</TableCell>
-                                        <TableCell>{att.prov_huc}</TableCell>
-                                        <TableCell>{att.city_mun}</TableCell>
-                                        <TableCell>{att.report_year}</TableCell>
-                                        <TableCell>{att.brgy}</TableCell>
-                                        <TableCell>{att.latitude}</TableCell>
-                                        <TableCell>{att.longitude}</TableCell>
-                                        <TableCell>{att.ta_category}</TableCell>
-                                        <TableCell>{att.ntdp_category}</TableCell>
-                                        <TableCell>{att.devt_lvl}</TableCell>
-                                        <TableCell>{att.mgt}</TableCell>
-                                        <TableCell>{att.online_connectivity}</TableCell>
-                                        <TableCell>
-                                            <EditButton onClick={() => handleEdit(att)}>Edit</EditButton>
-                                            <DeleteButton onClick={() => handleDelete(att.id)}>Delete</DeleteButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                {filteredAttractions.length > 0 ? (
+                                    filteredAttractions.map((att) => (
+                                        <ModernTableRow key={att.id}>
+                                            <ModernTableCell>{att.ta_name}</ModernTableCell>
+                                            <ModernTableCell>{att.type_code}</ModernTableCell>
+                                            <ModernTableCell>{att.region}</ModernTableCell>
+                                            <ModernTableCell>{att.prov_huc}</ModernTableCell>
+                                            <ModernTableCell>{att.city_mun}</ModernTableCell>
+                                            <ModernTableCell>{att.report_year}</ModernTableCell>
+                                            <ModernTableCell>{att.brgy}</ModernTableCell>
+                                            <ModernTableCell>{att.latitude}</ModernTableCell>
+                                            <ModernTableCell>{att.longitude}</ModernTableCell>
+                                            <ModernTableCell>{att.ta_category}</ModernTableCell>
+                                            <ModernTableCell>{att.ntdp_category}</ModernTableCell>
+                                            <ModernTableCell>{att.devt_lvl}</ModernTableCell>
+                                            <ModernTableCell>{att.mgt}</ModernTableCell>
+                                            <ModernTableCell>{att.online_connectivity}</ModernTableCell>
+                                            <ModernTableCell>
+                                                <ActionButtonGroup>
+                                                    <ActionButton variant="edit" onClick={() => handleEdit(att)}>
+                                                        <EditIcon />
+                                                        Edit
+                                                    </ActionButton>
+                                                    <ActionButton variant="delete" onClick={() => handleDelete(att.id)}>
+                                                        <DeleteIcon />
+                                                        Delete
+                                                    </ActionButton>
+                                                </ActionButtonGroup>
+                                            </ModernTableCell>
+                                        </ModernTableRow>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <ModernTableCell colSpan="15">
+                                            <EmptyState>
+                                                <div className="icon">
+                                                    <PlaceIcon />
+                                                </div>
+                                                <h4>No attractions found</h4>
+                                                <p>Try adjusting your search criteria or add a new attraction.</p>
+                                            </EmptyState>
+                                        </ModernTableCell>
+                                    </tr>
+                                )}
                             </tbody>
-                        </Table>
+                        </ModernTable>
                     </TableContainer>
-                </>
+                </TableSection>
             )}
-            <Snackbar show={showSnackbar}>Attraction successfully {editMode ? 'updated' : 'created'}!</Snackbar>
-        </Container>
+            
+            <Snackbar show={showSnackbar}>
+                Attraction successfully {editMode ? 'updated' : 'created'}!
+            </Snackbar>
+        </ModernContainer>
     );
 };
 

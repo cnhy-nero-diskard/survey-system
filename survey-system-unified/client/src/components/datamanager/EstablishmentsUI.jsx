@@ -1,197 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-
+import {
+  Business as BusinessIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Store as StoreIcon,
+} from '@mui/icons-material';
 import {
   createEstablishment,
   updateEstablishment,
   deleteEstablishment,
   fetchEstablishment,
 } from '../utils/crudapi';
-import { orange } from '@mui/material/colors';
+import {
+  ModernContainer,
+  SectionHeader,
+  ModernForm,
+  InputGroup,
+  Label,
+  ModernInput,
+  ModernSelect,
+  ModernButton,
+  TableSection,
+  TableHeader,
+  TableContainer,
+  ModernTable,
+  ModernTableHead,
+  ModernTableRow,
+  ModernTableCell,
+  ActionButtonGroup,
+  ActionButton,
+  LoadingSpinner,
+  EmptyState,
+  StatsCard,
+} from './styles/SharedStyles';
+
 const API_HOST = process.env.REACT_APP_API_HOST;
 
-// Styled Components (Copied from LocalizationUI)
-const Container = styled.div`
-  max-width: 90vw;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: linear-gradient(145deg, rgb(193, 215, 255), rgb(205, 255, 113));
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-`;
-
-const Title = styled.h2`
-  font-size: 2rem;
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: 600;
-`;
-
-const Form = styled.form`
+// Component specific styled components
+const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  height:40px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-
-  &:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
-    outline: none;
-  }
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  height: 40px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-
-  &:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
-    outline: none;
-  }
-`;
-
-const Button = styled.button`
-  width: fit-content;
-  padding: 0.75rem 1.5rem;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-
-  &:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    background-color: #2472a4;
-    transform: translateY(0);
-  }
-`;
-
-const CollapseButton = styled(Button)`
-  width: 100%;
-  margin-bottom: 1.5rem;
-  background-color: #95a5a6;
-
-  &:hover {
-    background-color: #7f8c8d;
-  }
-`;
-
-const TableContainer = styled.div`
-  max-height: 500px;
-  overflow-y: auto;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: white;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHeader = styled.thead`
-  background-color: #3498db;
-  color: white;
-  position: sticky;
-  top: 0;
-`;
-
-const TableRow = styled.tr`
-  &:nth-child(even) {
-    background-color: rgba(4, 108, 177, 0.86);
-  }
-  &:nth-child(odd) {
-    background-color: rgba(5, 124, 160, 0.59);
-  }
-
-  &:hover {
-    background-color: #0099ff;
-    color: white;
-  }
-`;
-
-const TableCell = styled.td`
-  padding: 1rem;
-  border: 1px solid #ddd;
-  text-align: left;
-  min-width: 100px; 
-  max-height: 150px;
-`;
-
-const ActionButton = styled.button`
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  margin-right: 0.5rem;
-
-  &:hover {
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const EditButton = styled(ActionButton)`
-  background-color: #f1c40f;
-  color: white;
-
-  &:hover {
-    background-color: #f39c12;
-  }
-`;
-
-const DeleteButton = styled(ActionButton)`
-  background-color: #e74c3c;
-  color: white;
-
-  &:hover {
-    background-color: #c0392b;
-  }
+  gap: 16px;
+  margin-bottom: 24px;
 `;
 
 const Snackbar = styled.div`
   position: fixed;
   bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: ${props => props.type === 'success' ? '#4caf50' : '#f44336'};
+  right: 20px;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
   color: white;
-  padding: 1rem 2rem;
+  padding: 16px 24px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
   opacity: ${(props) => (props.show ? 1 : 0)};
-  transition: opacity 0.3s ease;
+  transform: translateY(${(props) => (props.show ? '0' : '20px')});
+  transition: all 0.3s ease;
+  z-index: 1000;
+  font-family: 'Poppins';
+  font-weight: 500;
+  
+  ${props => props.type === 'error' && `
+    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+    box-shadow: 0 8px 25px rgba(245, 101, 101, 0.3);
+  `}
 `;
 
 const EstablishmentsUI = () => {
@@ -364,220 +238,328 @@ const EstablishmentsUI = () => {
   });
 
   return (
-    <Container>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
-        <Button
+    <ModernContainer>
+      <SectionHeader>
+        <h2>
+          <StoreIcon />
+          Establishments Management
+        </h2>
+        <p>Manage tourism establishments, locations, and multilingual content</p>
+      </SectionHeader>
+
+      <StatsGrid>
+        <StatsCard>
+          <h4>{establishments.length}</h4>
+          <p>Total Establishments</p>
+        </StatsCard>
+        <StatsCard>
+          <h4>{filteredEstablishments.length}</h4>
+          <p>Filtered Results</p>
+        </StatsCard>
+        <StatsCard>
+          <h4>{barangays.length}</h4>
+          <p>Available Barangays</p>
+        </StatsCard>
+        <StatsCard>
+          <h4>{establishmentTypes.length}</h4>
+          <p>Establishment Types</p>
+        </StatsCard>
+      </StatsGrid>
+
+      <ModernForm onSubmit={handleSubmit}>
+        <InputGroup>
+          <Label>Establishment Name</Label>
+          <ModernInput
+            type="text"
+            placeholder="Enter establishment name"
+            value={formData.est_name}
+            onChange={(e) => setFormData({ ...formData, est_name: e.target.value })}
+            required={!commaSeparatedValues}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Type</Label>
+          <ModernSelect
+            value={formData.type}
+            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            required={!commaSeparatedValues}
+            disabled={!!commaSeparatedValues}
+          >
+            <option value="">Select Type</option>
+            {establishmentTypes.map((type, index) => (
+              <option key={index} value={type}>{type}</option>
+            ))}
+          </ModernSelect>
+        </InputGroup>
+
+        <InputGroup>
+          <Label>City/Municipality</Label>
+          <ModernInput
+            type="text"
+            placeholder="Enter city/municipality"
+            value={formData.city_mun}
+            onChange={(e) => setFormData({ ...formData, city_mun: e.target.value })}
+            required={!commaSeparatedValues}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Barangay</Label>
+          <ModernSelect
+            value={formData.barangay}
+            onChange={(e) => setFormData({ ...formData, barangay: e.target.value })}
+            required={!commaSeparatedValues}
+            disabled={!!commaSeparatedValues}
+          >
+            <option value="">Select Barangay</option>
+            {barangays.map((barangay, index) => (
+              <option key={index} value={barangay}>{barangay}</option>
+            ))}
+          </ModernSelect>
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Latitude</Label>
+          <ModernInput
+            type="number"
+            placeholder="Enter latitude"
+            value={formData.latitude}
+            onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+            required={!commaSeparatedValues}
+            disabled={!!commaSeparatedValues}
+            step="0.000001"
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Longitude</Label>
+          <ModernInput
+            type="number"
+            placeholder="Enter longitude"
+            value={formData.longitude}
+            onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+            required={!commaSeparatedValues}
+            disabled={!!commaSeparatedValues}
+            step="0.000001"
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>English</Label>
+          <ModernInput
+            type="text"
+            placeholder="English translation"
+            value={formData.english}
+            onChange={(e) => setFormData({ ...formData, english: e.target.value })}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Korean</Label>
+          <ModernInput
+            type="text"
+            placeholder="Korean translation"
+            value={formData.korean}
+            onChange={(e) => setFormData({ ...formData, korean: e.target.value })}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Chinese</Label>
+          <ModernInput
+            type="text"
+            placeholder="Chinese translation"
+            value={formData.chinese}
+            onChange={(e) => setFormData({ ...formData, chinese: e.target.value })}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Japanese</Label>
+          <ModernInput
+            type="text"
+            placeholder="Japanese translation"
+            value={formData.japanese}
+            onChange={(e) => setFormData({ ...formData, japanese: e.target.value })}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Russian</Label>
+          <ModernInput
+            type="text"
+            placeholder="Russian translation"
+            value={formData.russian}
+            onChange={(e) => setFormData({ ...formData, russian: e.target.value })}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>French</Label>
+          <ModernInput
+            type="text"
+            placeholder="French translation"
+            value={formData.french}
+            onChange={(e) => setFormData({ ...formData, french: e.target.value })}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Spanish</Label>
+          <ModernInput
+            type="text"
+            placeholder="Spanish translation"
+            value={formData.spanish}
+            onChange={(e) => setFormData({ ...formData, spanish: e.target.value })}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Hindi</Label>
+          <ModernInput
+            type="text"
+            placeholder="Hindi translation"
+            value={formData.hindi}
+            onChange={(e) => setFormData({ ...formData, hindi: e.target.value })}
+            disabled={!!commaSeparatedValues}
+          />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>Comma Separated Values</Label>
+          <ModernInput
+            style={{ background: '#fff3cd' }}
+            type="text"
+            placeholder="Enter comma separated values for bulk input"
+            value={commaSeparatedValues}
+            onChange={(e) => setCommaSeparatedValues(e.target.value)}
+          />
+        </InputGroup>
+
+        <ModernButton type="submit" variant="primary">
+          <AddIcon />
+          {editMode ? 'Update Establishment' : 'Create Establishment'}
+        </ModernButton>
+
+        <ModernButton 
+          type="button" 
+          variant="secondary"
           onClick={() => fetchEstablishment().then(data => setEstablishments(data))}
-          style={{ flexShrink: 0 }}
         >
-          🔄 Reload
-        </Button>
-        <Title style={{ margin: 0 }}>Establishments Management</Title>
-      </div>
+          🔄 Reload Data
+        </ModernButton>
+      </ModernForm>
 
-      <Form onSubmit={handleSubmit}>
-        <Input
+      <InputGroup style={{ marginBottom: '16px' }}>
+        <Label>Search Establishments</Label>
+        <ModernInput
           type="text"
-          placeholder="Establishment Name"
-          value={formData.est_name}
-          onChange={(e) => setFormData({ ...formData, est_name: e.target.value })}
-          required={!commaSeparatedValues}
-          disabled={!!commaSeparatedValues}
+          placeholder="Search by establishment name..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
+      </InputGroup>
 
-        <Select
-          value={formData.type}
-          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-          required={!commaSeparatedValues}
-          disabled={!!commaSeparatedValues}
-        >
-          <option value="">Select Type</option>
-          {establishmentTypes.map((type, index) => (
-            <option key={index} value={type}>{type}</option>
-          ))}
-        </Select>
-
-        <Input
-          type="text"
-          placeholder="City/Municipality"
-          value={formData.city_mun}
-          onChange={(e) => setFormData({ ...formData, city_mun: e.target.value })}
-          required={!commaSeparatedValues}
-          disabled={!!commaSeparatedValues}
-        />
-
-        <Select
-          value={formData.barangay}
-          onChange={(e) => setFormData({ ...formData, barangay: e.target.value })}
-          required={!commaSeparatedValues}
-          disabled={!!commaSeparatedValues}
-        >
-          <option value="">Select Barangay</option>
-          {barangays.map((barangay, index) => (
-            <option key={index} value={barangay}>{barangay}</option>
-          ))}
-        </Select>
-
-        <Input
-          type="number"
-          placeholder="Latitude"
-          value={formData.latitude}
-          onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-          required={!commaSeparatedValues}
-          disabled={!!commaSeparatedValues}
-          step="0.000001"
-        />
-
-        <Input
-          type="number"
-          placeholder="Longitude"
-          value={formData.longitude}
-          onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-          required={!commaSeparatedValues}
-          disabled={!!commaSeparatedValues}
-          step="0.000001"
-        />
-
-        <Input
-          type="text"
-          placeholder="English"
-          value={formData.english}
-          onChange={(e) => setFormData({ ...formData, english: e.target.value })}
-          disabled={!!commaSeparatedValues}
-        />
-
-        <Input
-          type="text"
-          placeholder="Korean"
-          value={formData.korean}
-          onChange={(e) => setFormData({ ...formData, korean: e.target.value })}
-          disabled={!!commaSeparatedValues}
-        />
-
-        <Input
-          type="text"
-          placeholder="Chinese"
-          value={formData.chinese}
-          onChange={(e) => setFormData({ ...formData, chinese: e.target.value })}
-          disabled={!!commaSeparatedValues}
-        />
-
-        <Input
-          type="text"
-          placeholder="Japanese"
-          value={formData.japanese}
-          onChange={(e) => setFormData({ ...formData, japanese: e.target.value })}
-          disabled={!!commaSeparatedValues}
-        />
-
-        <Input
-          type="text"
-          placeholder="Russian"
-          value={formData.russian}
-          onChange={(e) => setFormData({ ...formData, russian: e.target.value })}
-          disabled={!!commaSeparatedValues}
-        />
-
-        <Input
-          type="text"
-          placeholder="French"
-          value={formData.french}
-          onChange={(e) => setFormData({ ...formData, french: e.target.value })}
-          disabled={!!commaSeparatedValues}
-        />
-
-        <Input
-          type="text"
-          placeholder="Spanish"
-          value={formData.spanish}
-          onChange={(e) => setFormData({ ...formData, spanish: e.target.value })}
-          disabled={!!commaSeparatedValues}
-        />
-
-        <Input
-          type="text"
-          placeholder="Hindi"
-          value={formData.hindi}
-          onChange={(e) => setFormData({ ...formData, hindi: e.target.value })}
-          disabled={!!commaSeparatedValues}
-        />
-
-        <Input
-          style={{ background: 'yellow' }}
-          type="text"
-          placeholder="Comma Separated Values"
-          value={commaSeparatedValues}
-          onChange={(e) => setCommaSeparatedValues(e.target.value)}
-        />
-
-        <Button type="submit">{editMode ? 'Update Establishment' : 'Create Establishment'}</Button>
-      </Form>
-
-      <Input
-        type="text"
-        placeholder="Search Establishments"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-
-      <CollapseButton onClick={toggleCollapse}>
-        {isCollapsed ? 'Show Establishments' : 'Hide Establishments'}
-      </CollapseButton>
+      <ModernButton 
+        type="button" 
+        variant="secondary" 
+        onClick={toggleCollapse}
+        style={{ width: '100%', marginBottom: '24px' }}
+      >
+        {isCollapsed ? 'Show Establishments Table' : 'Hide Establishments Table'}
+      </ModernButton>
 
       {!isCollapsed && (
-        <TableContainer>
-          <Table>
-            <TableHeader>
-              <tr>
-                <th>Establishment Name</th>
-                <th>Type</th>
-                <th>City/Municipality</th>
-                <th>Barangay</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>English</th>
-                <th>Korean</th>
-                <th>Chinese</th>
-                <th>Japanese</th>
-                <th>Russian</th>
-                <th>French</th>
-                <th>Spanish</th>
-                <th>Hindi</th>
-                <th>Actions</th>
-              </tr>
-            </TableHeader>
-            <tbody>
-              {filteredEstablishments.map((est) => (
-                <TableRow key={est.id}>
-                  <TableCell>{est.est_name}</TableCell>
-                  <TableCell>{est.type}</TableCell>
-                  <TableCell>{est.city_mun}</TableCell>
-                  <TableCell>{est.barangay}</TableCell>
-                  <TableCell>{est.latitude}</TableCell>
-                  <TableCell>{est.longitude}</TableCell>
-                  <TableCell>{est.en}</TableCell>
-                  <TableCell>{est.ko}</TableCell>
-                  <TableCell>{est.zh}</TableCell>
-                  <TableCell>{est.ja}</TableCell>
-                  <TableCell>{est.ru}</TableCell>
-                  <TableCell>{est.fr}</TableCell>
-                  <TableCell>{est.es}</TableCell>
-                  <TableCell>{est.hi}</TableCell>
-                  <TableCell>
-                    <EditButton onClick={() => handleEdit(est)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(est.id)}>Delete</DeleteButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </tbody>
-          </Table>
-        </TableContainer>
+        <TableSection>
+          <TableHeader>
+            <h3>Establishments ({filteredEstablishments.length})</h3>
+          </TableHeader>
+          <TableContainer>
+            <ModernTable>
+              <ModernTableHead>
+                <tr>
+                  <th>Establishment Name</th>
+                  <th>Type</th>
+                  <th>City/Municipality</th>
+                  <th>Barangay</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>English</th>
+                  <th>Korean</th>
+                  <th>Chinese</th>
+                  <th>Japanese</th>
+                  <th>Russian</th>
+                  <th>French</th>
+                  <th>Spanish</th>
+                  <th>Hindi</th>
+                  <th>Actions</th>
+                </tr>
+              </ModernTableHead>
+              <tbody>
+                {filteredEstablishments.length > 0 ? (
+                  filteredEstablishments.map((est) => (
+                    <ModernTableRow key={est.id}>
+                      <ModernTableCell>{est.est_name}</ModernTableCell>
+                      <ModernTableCell>{est.type}</ModernTableCell>
+                      <ModernTableCell>{est.city_mun}</ModernTableCell>
+                      <ModernTableCell>{est.barangay}</ModernTableCell>
+                      <ModernTableCell>{est.latitude}</ModernTableCell>
+                      <ModernTableCell>{est.longitude}</ModernTableCell>
+                      <ModernTableCell>{est.en}</ModernTableCell>
+                      <ModernTableCell>{est.ko}</ModernTableCell>
+                      <ModernTableCell>{est.zh}</ModernTableCell>
+                      <ModernTableCell>{est.ja}</ModernTableCell>
+                      <ModernTableCell>{est.ru}</ModernTableCell>
+                      <ModernTableCell>{est.fr}</ModernTableCell>
+                      <ModernTableCell>{est.es}</ModernTableCell>
+                      <ModernTableCell>{est.hi}</ModernTableCell>
+                      <ModernTableCell>
+                        <ActionButtonGroup>
+                          <ActionButton variant="edit" onClick={() => handleEdit(est)}>
+                            <EditIcon />
+                            Edit
+                          </ActionButton>
+                          <ActionButton variant="delete" onClick={() => handleDelete(est.id)}>
+                            <DeleteIcon />
+                            Delete
+                          </ActionButton>
+                        </ActionButtonGroup>
+                      </ModernTableCell>
+                    </ModernTableRow>
+                  ))
+                ) : (
+                  <tr>
+                    <ModernTableCell colSpan="15">
+                      <EmptyState>
+                        <div className="icon">
+                          <StoreIcon />
+                        </div>
+                        <h4>No establishments found</h4>
+                        <p>Try adjusting your search criteria or add a new establishment.</p>
+                      </EmptyState>  
+                    </ModernTableCell>
+                  </tr>
+                )}
+              </tbody>
+            </ModernTable>
+          </TableContainer>
+        </TableSection>
       )}
 
       <Snackbar show={showSnackbar} type={snackbarType}>
         {snackbarMessage}
       </Snackbar>
-    </Container>
+    </ModernContainer>
   );
 };
 

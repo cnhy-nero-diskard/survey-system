@@ -1,7 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styled, { keyframes, css } from 'styled-components';
-import { FaRobot, FaExclamationTriangle } from 'react-icons/fa';
+import {
+  Person as PersonIcon,
+  Warning as WarningIcon,
+  SmartToy as RobotIcon,
+  CheckCircle as CheckIcon,
+  Cancel as CancelIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material';
+import {
+  ModernContainer,
+  SectionHeader,
+  ModernForm,
+  InputGroup,
+  Label,
+  ModernInput,
+  ModernSelect,
+  ModernButton,
+  TableSection,
+  TableHeader,
+  TableContainer,
+  ModernTable,
+  ModernTableHead,
+  ModernTableRow,
+  ModernTableCell,
+  ActionButtonGroup,
+  ActionButton,
+  LoadingSpinner,
+  EmptyState,
+  StatsCard,
+} from './styles/SharedStyles';
 
 // Animations
 const shake = keyframes`
@@ -18,85 +47,48 @@ const pulse = keyframes`
   100% { opacity: 0.8; }
 `;
 
-// Styled Components
-const Container = styled.div`
-  max-width: 90vw;
-  height: 70vh;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: linear-gradient(145deg, rgb(193, 215, 255), rgb(205, 255, 113));
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+// Component specific styled components
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 `;
 
-const Title = styled.h2`
-  font-size: 2rem;
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: 600;
-`;
-
-const TableContainer = styled.div`
-  max-height: 500px;
-  overflow-y: auto;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: white;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHeader = styled.thead`
-  background-color: #3498db;
-  color: white;
-  position: sticky;
-  top: 0;
-`;
-
-const TableRow = styled.tr`
-  &:nth-child(even) {
-    background-color: rgba(4, 108, 177, 0.86);
-  }
-  &:nth-child(odd) {
-    background-color: rgba(5, 124, 160, 0.59);
-  }
+const CustomTableRow = styled(ModernTableRow)`
   font-size: 0.8rem;
-
-  &:hover {
-    background-color: #0099ff;
-    color: white;
-  }
-
+  
   ${({ status }) =>
     status === 'AT LEAST ONE ENTRY, HAS COMPLETED' &&
     css`
-      background-color: green !important;
+      background-color: #48bb78 !important;
       color: white;
+      
+      &:hover {
+        background-color: #38a169 !important;
+      }
     `}
 
   ${({ isSpam }) =>
     isSpam &&
     css`
-      background-color:rgb(245, 91, 91) !important;
+      background-color: #fc8181 !important;
+      color: white;
       animation: ${pulse} 2s infinite;
+      
+      &:hover {
+        background-color: #f56565 !important;
+      }
     `}
 `;
 
-const TableCell = styled.td`
-  padding: 1rem;
-  border: 1px solid #ddd;
-  text-align: left;
-  min-width: 100px;
-  max-height: 150px;
-
+const CustomTableCell = styled(ModernTableCell)`
   ${({ feedback }) =>
     feedback === 'Yes' &&
     css`
-      background-color: rgb(212, 113, 0);
+      background-color: #f6ad55;
+      color: white;
+      font-weight: 600;
     `}
 
   ${({ tpms }) =>
@@ -106,105 +98,70 @@ const TableCell = styled.td`
     `}
 `;
 
-const LoadingMessage = styled.div`
-  text-align: center;
-  font-size: 1.5rem;
-  color: #3498db;
-`;
-
-const ErrorMessage = styled.div`
-  text-align: center;
-  font-size: 1.5rem;
-  color: red;
-`;
-
-const PurgeButton = styled.button`
-  display: block;
-  margin: 1rem auto;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  color: white;
-  background-color: #e74c3c;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #c0392b;
-  }
-`;
-
 const DetailsContainer = styled.div`
-  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 24px;
   border-radius: 12px;
-  background: linear-gradient(145deg, rgb(128, 195, 221), rgb(0, 156, 204));
-  margin: 1rem 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  margin: 16px 0;
 `;
 
 const GroupedDetails = styled.div`
-  margin-bottom: 1.5rem;
+  margin-bottom: 24px;
 `;
 
 const GroupTitle = styled.h5`
-  font-size: 1.25rem;
-  color: #2c3e50;
-  margin-bottom: 0.75rem;
+  font-size: 18px;
+  color: #4a5568;
+  margin-bottom: 12px;
   font-weight: 600;
 `;
 
 const ResponseItem = styled.div`
-  padding: 0.75rem;
-  background: rgba(187, 223, 240, 0.47);
+  padding: 12px;
+  background: rgba(102, 126, 234, 0.05);
   border-radius: 8px;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 8px;
+  border-left: 4px solid #667eea;
 `;
 
 const ResponseText = styled.p`
   margin: 0;
-  font-size: 0.95rem;
-  color: #34495e;
+  font-size: 14px;
+  color: #4a5568;
   line-height: 1.5;
 `;
 
 const Timestamp = styled.small`
   display: block;
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  color: #7f8c8d;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #718096;
 `;
 
 const SpamBadge = styled.div`
   display: inline-flex;
   align-items: center;
-  background-color: #ff4444;
+  background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
   color: white;
-  padding: 0.25rem 0.5rem;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  margin-left: 0.5rem;
-  
-  svg {
-    margin-right: 0.25rem;
-  }
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
 `;
 
 const SpamWarningBanner = styled.div`
-  padding: 0.5rem;
-  background-color: #ff4444;
+  padding: 12px;
+  background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
   color: white;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  border-radius: 8px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
-  font-weight: bold;
-  
-  svg {
-    margin-right: 0.5rem;
-    font-size: 1.2rem;
-  }
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
 `;
 
 const AnonymousUsersHandler = () => {
@@ -337,122 +294,211 @@ const AnonymousUsersHandler = () => {
     sortUsers(criteria);
   };
 
-  if (loading) return <LoadingMessage>Loading...</LoadingMessage>;
-  if (error) return <ErrorMessage>Error: {error}</ErrorMessage>;
+  if (loading) {
+    return (
+      <ModernContainer>
+        <div style={{ textAlign: 'center', padding: '48px' }}>
+          <LoadingSpinner />
+          <p style={{ marginTop: '16px', color: '#718096' }}>Loading user data...</p>
+        </div>
+      </ModernContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <ModernContainer>
+        <div style={{ textAlign: 'center', padding: '48px', color: '#fc8181' }}>
+          <WarningIcon style={{ fontSize: '48px', marginBottom: '16px' }} />
+          <h3>Error Loading Data</h3>
+          <p>{error}</p>
+        </div>
+      </ModernContainer>
+    );
+  }
 
   return (
-    <Container>
-      <Title>Anonymous Users and Survey Status</Title>
-      <PurgeButton onClick={handlePurge}>PURGE ALL USERS</PurgeButton>
-      
-      <div style={{ marginBottom: '1rem' }}>
-        <label>Sort by: </label>
-        <select value={sortCriteria} onChange={handleSortChange}>
-          <option value="alphabetical">Alphabetical</option>
-          <option value="created_at">Created At</option>
-          <option value="present_data">Present Data</option>
-        </select>
+    <ModernContainer>
+      <SectionHeader>
+        <h2>
+          <PersonIcon />
+          Anonymous Users and Survey Status
+        </h2>
+        <p>Monitor anonymous users, survey completions, and identify potential spam</p>
+      </SectionHeader>
+
+      <StatsGrid>
+        <StatsCard>
+          <h4>{users.length}</h4>
+          <p>Total Users</p>
+        </StatsCard>
+        <StatsCard>
+          <h4>{users.filter(u => u.completionStatus === 'HAS COMPLETED').length}</h4>
+          <p>Completed Surveys</p>
+        </StatsCard>
+        <StatsCard>
+          <h4>{users.filter(u => u.feedback).length}</h4>
+          <p>With Feedback</p>
+        </StatsCard>
+        <StatsCard style={{ background: 'linear-gradient(135deg, #fc8181 0%, #f56565 100%)' }}>
+          <h4>{users.filter(u => u.isSpam).length}</h4>
+          <p>Suspected Spam</p>
+        </StatsCard>
+      </StatsGrid>
+
+      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', alignItems: 'end' }}>
+        <InputGroup>
+          <Label>Sort by</Label>
+          <ModernSelect value={sortCriteria} onChange={handleSortChange}>
+            <option value="alphabetical">Alphabetical</option>
+            <option value="created_at">Created At</option>
+            <option value="present_data">Present Data</option>
+          </ModernSelect>
+        </InputGroup>
+        
+        <ModernButton variant="danger" onClick={handlePurge}>
+          <DeleteIcon />
+          PURGE ALL USERS
+        </ModernButton>
       </div>
 
-      <TableContainer>
-        <Table>
-          <TableHeader>
-            <tr>
-              <th>Anonymous User ID</th>
-              <th>Nickname</th>
-              <th>Survey Status</th>
-              <th>Completion Status</th>
-              <th>Feedback</th>
-              <th>TPMS</th>
-              <th>Actions</th>
-            </tr>
-          </TableHeader>
-          <tbody>
-            {users.map(user => (
-              <React.Fragment key={user.anonymous_user_id}>
-                <TableRow status={`${user.surveyStatus}, ${user.completionStatus}`} isSpam={user.isSpam}>
-                  <TableCell>
-                    {user.anonymous_user_id}
-                    {user.isSpam && (
-                      <SpamBadge title="This user exhibits behavior patterns consistent with spam">
-                        <FaRobot /> SUSPECTED SPAM⚠️
-                      </SpamBadge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {user.nickname || 'Anonymous'}
-                    {/* {user.isSpam && (
-                      <SpamBadge title="This user exhibits behavior patterns consistent with spam">
-                        <FaExclamationTriangle /> RISK
-                      </SpamBadge>
-                    )} */}
-                  </TableCell>
-                  <TableCell>
-                    {user.surveyStatus}
-                    {user.isSpam && user.surveyStatus === 'HAS NO SURVEY' && (
-                      <SpamBadge style={{ animation: 'none', backgroundColor: '#ff8800' }}>
-                        NO DATA
-                      </SpamBadge>
-                    )}
-                  </TableCell>
-                  <TableCell>{user.completionStatus}</TableCell>
-                  <TableCell feedback={user.feedback ? 'Yes' : 'No'}>{user.feedback ? 'Yes' : 'No'}</TableCell>
-                  <TableCell tpms={user.tpms ? 'Yes' : 'No'}>{user.tpms ? 'Yes' : 'No'}</TableCell>
-                  <TableCell>
-                    <button onClick={() => toggleDetails(user.anonymous_user_id)}>
-                      {detailsVisible === user.anonymous_user_id ? 'HIDE DETAILS' : 'SHOW DETAILS'}
-                    </button>
-                  </TableCell>
-                </TableRow>
-                {detailsVisible === user.anonymous_user_id && (
-                  <TableRow>
-                    <TableCell colSpan="7">
-                      <DetailsContainer>
-                        <h4>Survey Responses for {user.nickname || 'Anonymous User'}</h4>
+      <TableSection>
+        <TableHeader>
+          <h3>Anonymous Users ({users.length})</h3>
+        </TableHeader>
+        <TableContainer>
+          <ModernTable>
+            <ModernTableHead>
+              <tr>
+                <th>Anonymous User ID</th>
+                <th>Nickname</th>
+                <th>Survey Status</th>
+                <th>Completion Status</th>
+                <th>Feedback</th>
+                <th>TPMS</th>
+                <th>Actions</th>
+              </tr>
+            </ModernTableHead>
+            <tbody>
+              {users.length > 0 ? (
+                users.map(user => (
+                  <React.Fragment key={user.anonymous_user_id}>
+                    <CustomTableRow status={`${user.surveyStatus}, ${user.completionStatus}`} isSpam={user.isSpam}>
+                      <CustomTableCell>
+                        {user.anonymous_user_id}
                         {user.isSpam && (
-                          <SpamWarningBanner>
-                            <FaExclamationTriangle />
-                            <span>WARNING: This user has been flagged as likely spam based on behavior patterns.</span>
-                          </SpamWarningBanner>
+                          <SpamBadge title="This user exhibits behavior patterns consistent with spam">
+                            <RobotIcon style={{ fontSize: '14px', marginRight: '4px' }} />
+                            SUSPECTED SPAM⚠️
+                          </SpamBadge>
                         )}
-                        {user.surveyEntries.length > 0 ? (
-                          Object.entries(groupResponsesByTitle(user.surveyEntries)).map(([title, responses]) => (
-                            <GroupedDetails key={title}>
-                              <GroupTitle>{title}</GroupTitle>
-                              {responses.map((response, index) => {
-                                const matchingQuestion = surveyQuestions.find(
-                                  question => question.surveyresponses_ref === response.surveyquestion_ref
-                                );
+                      </CustomTableCell>
+                      <CustomTableCell>
+                        {user.nickname || 'Anonymous'}
+                      </CustomTableCell>
+                      <CustomTableCell>
+                        {user.surveyStatus}
+                        {user.isSpam && user.surveyStatus === 'HAS NO SURVEY' && (
+                          <SpamBadge style={{ animation: 'none', background: '#f6ad55' }}>
+                            NO DATA
+                          </SpamBadge>
+                        )}
+                      </CustomTableCell>
+                      <CustomTableCell>
+                        <span style={{ 
+                          color: user.completionStatus === 'HAS COMPLETED' ? '#48bb78' : '#f56565',
+                          fontWeight: '500'
+                        }}>
+                          {user.completionStatus}
+                        </span>
+                      </CustomTableCell>
+                      <CustomTableCell feedback={user.feedback ? 'Yes' : 'No'}>
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                          {user.feedback ? <CheckIcon style={{ color: '#48bb78', marginRight: '4px' }} /> : <CancelIcon style={{ color: '#f56565', marginRight: '4px' }} />}
+                          {user.feedback ? 'Yes' : 'No'}
+                        </span>
+                      </CustomTableCell>
+                      <CustomTableCell>
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                          {user.tpms ? <CheckIcon style={{ color: '#48bb78', marginRight: '4px' }} /> : <CancelIcon style={{ color: '#f56565', marginRight: '4px' }} />}
+                          {user.tpms ? 'Yes' : 'No'}
+                        </span>
+                      </CustomTableCell>
+                      <CustomTableCell>
+                        <ActionButtonGroup>
+                          <ActionButton variant="edit" onClick={() => toggleDetails(user.anonymous_user_id)}>
+                            {detailsVisible === user.anonymous_user_id ? 'HIDE DETAILS' : 'SHOW DETAILS'}
+                          </ActionButton>
+                        </ActionButtonGroup>
+                      </CustomTableCell>
+                    </CustomTableRow>
+                    {detailsVisible === user.anonymous_user_id && (
+                      <CustomTableRow>
+                        <CustomTableCell colSpan="7">
+                          <DetailsContainer>
+                            <h4>Survey Responses for {user.nickname || 'Anonymous User'}</h4>
+                            {user.isSpam && (
+                              <SpamWarningBanner>
+                                <WarningIcon style={{ marginRight: '8px' }} />
+                                <span>WARNING: This user has been flagged as likely spam based on behavior patterns.</span>
+                              </SpamWarningBanner>
+                            )}
+                            {user.surveyEntries.length > 0 ? (
+                              Object.entries(groupResponsesByTitle(user.surveyEntries)).map(([title, responses]) => (
+                                <GroupedDetails key={title}>
+                                  <GroupTitle>{title}</GroupTitle>
+                                  {responses.map((response, index) => {
+                                    const matchingQuestion = surveyQuestions.find(
+                                      question => question.surveyresponses_ref === response.surveyquestion_ref
+                                    );
 
-                                return (
-                                  <ResponseItem key={index}>
-                                    <ResponseText>
-                                      <strong>Question:</strong> {matchingQuestion?.content || 'N/A'} <br />
-                                      <strong>Response:</strong> {response.response_value}
-                                    </ResponseText>
-                                    <Timestamp>
-                                      {new Date(response.created_at).toLocaleString()}
-                                    </Timestamp>
-                                  </ResponseItem>
-                                );
-                              })}
-                            </GroupedDetails>
-                          ))
-                        ) : (
-                          <div style={{ padding: '1rem', textAlign: 'center', color: '#666' }}>
-                            No survey responses found for this user.
-                          </div>
-                        )}
-                      </DetailsContainer>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </Table>
-      </TableContainer>
-    </Container>
+                                    return (
+                                      <ResponseItem key={index}>
+                                        <ResponseText>
+                                          <strong>Question:</strong> {matchingQuestion?.content || 'N/A'} <br />
+                                          <strong>Response:</strong> {response.response_value}
+                                        </ResponseText>
+                                        <Timestamp>
+                                          {new Date(response.created_at).toLocaleString()}
+                                        </Timestamp>
+                                      </ResponseItem>
+                                    );
+                                  })}
+                                </GroupedDetails>
+                              ))
+                            ) : (
+                              <EmptyState>
+                                <div className="icon">
+                                  <PersonIcon />
+                                </div>
+                                <h4>No survey responses found</h4>
+                                <p>This user has not completed any survey responses yet.</p>
+                              </EmptyState>
+                            )}
+                          </DetailsContainer>
+                        </CustomTableCell>
+                      </CustomTableRow>
+                    )}
+                  </React.Fragment>
+                ))
+              ) : (
+                <tr>
+                  <CustomTableCell colSpan="7">
+                    <EmptyState>
+                      <div className="icon">
+                        <PersonIcon />
+                      </div>
+                      <h4>No users found</h4>
+                      <p>No anonymous users have been created yet.</p>
+                    </EmptyState>
+                  </CustomTableCell>
+                </tr>
+              )}
+            </tbody>
+          </ModernTable>
+        </TableContainer>
+      </TableSection>
+    </ModernContainer>
   );
 };
 

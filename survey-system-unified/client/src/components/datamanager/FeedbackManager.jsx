@@ -1,7 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { color } from 'framer-motion';
+import {
+  Feedback as FeedbackIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Visibility as ViewIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+} from '@mui/icons-material';
+import {
+  ModernContainer,
+  SectionHeader,
+  ModernForm,
+  InputGroup,
+  Label,
+  ModernInput,
+  ModernSelect,
+  ModernButton,
+  TableSection,
+  TableHeader,
+  TableContainer,
+  ModernTable,
+  ModernTableHead,
+  ModernTableRow,
+  ModernTableCell,
+  ActionButtonGroup,
+  ActionButton,
+  LoadingSpinner,
+  EmptyState,
+  StatsCard,
+} from './styles/SharedStyles';
 
 // Axios instance with base URL and credentials
 const api = axios.create({
@@ -9,131 +39,58 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Styled components
-const Container = styled.div`
-  max-width: 2000px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: 'Arial', sans-serif;
-  overflow-x: auto;  
-  background-color: rgb(168, 216, 240); // Light background for better contrast
-  height: 100vh; // Ensures full viewport height
-`;
-
-const Header = styled.h1`
-  color: #2c3e50;
-  text-align: center;
-  margin-bottom: 30px;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-`;
-
-const Th = styled.th`
-  background-color: #3498db;
-  color: white;
-  padding: 12px;
-  text-align: left;
-`;
-
-const Td = styled.td`
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-`;
-
-const Tr = styled.tr`
-  &:nth-child(even) {
-    background-color: rgb(96, 165, 255);
-  }
-  &:nth-child(odd) {
-    background-color: rgb(66, 107, 160);
-  }
-  &:hover {
-    background-color: rgb(69, 85, 92);
-  }
-`;
-
-const Button = styled.button`
-  padding: 8px 12px;
-  margin: 0 5px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
-
-  &:hover {
-    opacity: 0.9;
-  }
-`;
-
-const PrimaryButton = styled(Button)`
-  background-color: #3498db;
-  color: white;
-`;
-
-const DangerButton = styled(Button)`
-  background-color: #e74c3c;
-  color: white;
-`;
-
-const SuccessButton = styled(Button)`
-  background-color: #2ecc71;
-  color: white;
+// Component specific styled components
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 `;
 
 const CollapsibleContainer = styled.div`
-  background-color: rgba(113, 173, 197, 0.78);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  margin-bottom: 24px;
 `;
 
-const FormGroup = styled.div`
-  margin-bottom: 15px;
-`;
-
-const Label = styled.label`
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  min-height: 100px;
-`;
-
-const FilterContainer = styled.div`
+const CollapsibleHeader = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 12px 0;
+  
+  h3 {
+    margin: 0;
+    color: #4a5568;
+    font-size: 18px;
+    font-weight: 600;
+  }
 `;
 
-const FilterGroup = styled.div`
-  flex: 1;
-  min-width: 200px;
+const Snackbar = styled.div`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
+  opacity: ${(props) => (props.show ? 1 : 0)};
+  transform: translateY(${(props) => (props.show ? '0' : '20px')});
+  transition: all 0.3s ease;
+  z-index: 1000;
+  font-family: 'Poppins';
+  font-weight: 500;
+  
+  ${props => props.type === 'error' && `
+    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+    box-shadow: 0 8px 25px rgba(245, 101, 101, 0.3);
+  `}
 `;
 
 // Helper function to truncate text
@@ -278,78 +235,116 @@ const SurveyFeedbackCRUD = () => {
   };
 
   return (
-    <Container>
-      <Header>Survey Feedback Management</Header>
+    <ModernContainer>
+      <SectionHeader>
+        <h2>
+          <FeedbackIcon />
+          Survey Feedback Management
+        </h2>
+        <p>Manage and analyze survey feedback from users</p>
+      </SectionHeader>
 
-      {error && <div style={{ color: 'red', marginBottom: '20px' }}>{error}</div>}
-      {/* Filter Section */}
-      <FilterContainer>
-        <FilterGroup>
-          <Label>User ID</Label>
-          <Input
-            type="text"
-            name="anonymous_user_id"
-            value={filters.anonymous_user_id}
-            onChange={handleFilterChange}
-            placeholder="Filter by user ID"
-          />
-        </FilterGroup>
+      <StatsGrid>
+        <StatsCard>
+          <h4>{feedbacks.length}</h4>
+          <p>Total Feedback</p>
+        </StatsCard>
+        <StatsCard>
+          <h4>{feedbacks.filter(f => f.is_analyzed).length}</h4>
+          <p>Analyzed</p>
+        </StatsCard>
+        <StatsCard>
+          <h4>{feedbacks.filter(f => !f.is_analyzed).length}</h4>
+          <p>Not Analyzed</p>
+        </StatsCard>
+        <StatsCard>
+          <h4>{new Set(feedbacks.map(f => f.entity)).size}</h4>
+          <p>Unique Entities</p>
+        </StatsCard>
+      </StatsGrid>
 
-        <FilterGroup>
-          <Label>Entity</Label>
-          <Input
-            type="text"
-            name="entity"
-            value={filters.entity}
-            onChange={handleFilterChange}
-            placeholder="Filter by entity"
-          />
-        </FilterGroup>
+      {error && (
+        <Snackbar show={true} type="error">
+          {error}
+        </Snackbar>
+      )}
 
-        <FilterGroup>
-          <Label>Touchpoint</Label>
-          <Input
-            type="text"
-            name="touchpoint"
-            value={filters.touchpoint}
-            onChange={handleFilterChange}
-            placeholder="Filter by touchpoint"
-          />
-        </FilterGroup>
+      <CollapsibleContainer>
+        <CollapsibleHeader>
+          <h3>Filter Options</h3>
+        </CollapsibleHeader>
+        
+        <ModernForm style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+          <InputGroup>
+            <Label>User ID</Label>
+            <ModernInput
+              type="text"
+              name="anonymous_user_id"
+              value={filters.anonymous_user_id}
+              onChange={handleFilterChange}
+              placeholder="Filter by user ID"
+            />
+          </InputGroup>
 
-        <FilterGroup>
-          <Label>Analyzed Status</Label>
-          <Select
-            name="is_analyzed"
-            value={filters.is_analyzed}
-            onChange={handleFilterChange}
-          >
-            <option value="">All</option>
-            <option value="true">Analyzed</option>
-            <option value="false">Not Analyzed</option>
-          </Select>
-        </FilterGroup>
-      </FilterContainer>
+          <InputGroup>
+            <Label>Entity</Label>
+            <ModernInput
+              type="text"
+              name="entity"
+              value={filters.entity}
+              onChange={handleFilterChange}
+              placeholder="Filter by entity"
+            />
+          </InputGroup>
 
-      {/* Collapsible Form Section */}
+          <InputGroup>
+            <Label>Touchpoint</Label>
+            <ModernInput
+              type="text"
+              name="touchpoint"
+              value={filters.touchpoint}
+              onChange={handleFilterChange}
+              placeholder="Filter by touchpoint"
+            />
+          </InputGroup>
+
+          <InputGroup>
+            <Label>Analyzed Status</Label>
+            <ModernSelect
+              name="is_analyzed"
+              value={filters.is_analyzed}
+              onChange={handleFilterChange}
+            >
+              <option value="">All</option>
+              <option value="true">Analyzed</option>
+              <option value="false">Not Analyzed</option>
+            </ModernSelect>
+          </InputGroup>
+        </ModernForm>
+      </CollapsibleContainer>
+
+      {/* Edit Form Section */}
       {editingId && (
         <CollapsibleContainer>
-          <h2>Edit Feedback</h2>
-          <form onSubmit={handleSubmit}>
-            <FormGroup>
+          <CollapsibleHeader>
+            <h3>Edit Feedback</h3>
+          </CollapsibleHeader>
+          
+          <ModernForm onSubmit={handleSubmit}>
+            <InputGroup>
               <Label>Entity</Label>
-              <Input
+              <ModernInput
                 type="text"
                 name="entity"
                 value={formData.entity}
                 onChange={handleInputChange}
                 disabled
               />
-            </FormGroup>
+            </InputGroup>
 
-            <FormGroup>
+            <InputGroup>
               <Label>Rating</Label>
-              <Input
+              <ModernInput
                 type="number"
                 name="rating"
                 value={formData.rating}
@@ -358,54 +353,56 @@ const SurveyFeedbackCRUD = () => {
                 max="5"
                 required
               />
-            </FormGroup>
+            </InputGroup>
 
-            <FormGroup>
+            <InputGroup>
               <Label>Response Value</Label>
-              <TextArea
+              <ModernInput
+                as="textarea"
                 name="response_value"
                 value={formData.response_value}
                 onChange={handleInputChange}
                 required
+                style={{ minHeight: '100px', resize: 'vertical' }}
               />
-            </FormGroup>
+            </InputGroup>
 
-            <FormGroup>
+            <InputGroup>
               <Label>Touchpoint</Label>
-              <Input
+              <ModernInput
                 type="text"
                 name="touchpoint"
                 value={formData.touchpoint}
                 onChange={handleInputChange}
                 disabled 
               />
-            </FormGroup>
+            </InputGroup>
 
-            <FormGroup>
+            <InputGroup>
               <Label>Anonymous User ID</Label>
-              <Input
+              <ModernInput
                 type="text"
                 name="anonymous_user_id"
                 value={formData.anonymous_user_id}
                 onChange={handleInputChange}
                 disabled 
               />
-            </FormGroup>
+            </InputGroup>
 
-            <FormGroup>
+            <InputGroup>
               <Label>Survey Question Reference</Label>
-              <Input
+              <ModernInput
                 type="text"
                 name="surveyquestion_ref"
                 value={formData.surveyquestion_ref}
                 onChange={handleInputChange}
                 disabled 
               />
-            </FormGroup>
+            </InputGroup>
 
-            <FormGroup>
+            <InputGroup>
               <Label>Language</Label>
-              <Select
+              <ModernSelect
                 name="language"
                 value={formData.language}
                 onChange={handleInputChange}
@@ -419,12 +416,12 @@ const SurveyFeedbackCRUD = () => {
                 <option value="fr">French</option>
                 <option value="ru">Russian</option>
                 <option value="hi">Hindi</option>
-              </Select>
-            </FormGroup>
+              </ModernSelect>
+            </InputGroup>
 
-            <FormGroup>
+            <InputGroup>
               <Label>Relevance</Label>
-              <Select
+              <ModernSelect
                 name="relevance"
                 value={formData.relevance}
                 onChange={handleInputChange}
@@ -433,71 +430,104 @@ const SurveyFeedbackCRUD = () => {
                 <option value="UNKNOWN">UNKNOWN</option>
                 <option value="RELEVANT">RELEVANT</option>
                 <option value="IRRELEVANT">IRRELEVANT</option>
-              </Select>
-            </FormGroup>
+              </ModernSelect>
+            </InputGroup>
 
-            <div style={{ marginTop: '20px' }}>
-              <Button type="submit" disabled={loading}>
-                Update
-              </Button>
-              <Button type="button" onClick={resetForm} disabled={loading}>
-                Cancel
-              </Button>
-            </div>
-          </form>
+            <ModernButton type="submit" variant="primary" disabled={loading}>
+              <EditIcon />
+              Update Feedback
+            </ModernButton>
+
+            <ModernButton type="button" variant="secondary" onClick={resetForm} disabled={loading}>
+              Cancel
+            </ModernButton>
+          </ModernForm>
         </CollapsibleContainer>
       )}
 
-      {/* List Section */}
-      <h2 style={{color: 'black'}}>Feedback List</h2>
-      {loading && !feedbacks.length ? (
-        <div>Loading...</div>
-      ) : (
-        <Table>
-          <thead>
-            <Tr>
-              <Th>ID</Th>
-              <Th>Entity</Th>
-              <Th>Rating</Th>
-              <Th>Feedback</Th>
-              <Th>Sentiment</Th>
-              <Th>Relevance</Th>
-              <Th>Touchpoint</Th>
-              <Th>User ID</Th>
-              <Th>Language</Th>
-              <Th>Analyzed</Th>
-              <Th>Actions</Th>
-            </Tr>
-          </thead>
-          <tbody>
-            {feedbacks.map(feedback => (
-              <Tr key={feedback.response_id}>
-                <Td>{feedback.response_id}</Td>
-                <Td>{feedback.entity}</Td>
-                <Td>{feedback.rating}</Td>
-                <Td>{truncateText(feedback.response_value)}</Td>
-                <Td>{getSentiment(feedback)}</Td>
-                <Td>{feedback.relevance}</Td>
-                <Td>{feedback.touchpoint}</Td>
-                <Td>{feedback.anonymous_user_id}</Td>
-                <Td>{feedback.language}</Td>
-                <Td>{feedback.is_analyzed ? 'Yes' : 'No'}</Td>
-                <Td>
-                  <PrimaryButton onClick={() => handleEdit(feedback)}>
-                    Edit
-                  </PrimaryButton>
-                  <DangerButton onClick={() => handleDelete(feedback.response_id)}>
-                    Delete
-                  </DangerButton>
-                </Td>
-              </Tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
-
-      {!loading && !feedbacks.length && <div>No feedback entries found.</div>}
-    </Container>
+      <TableSection>
+        <TableHeader>
+          <h3>Survey Feedback List ({feedbacks.length})</h3>
+        </TableHeader>
+        <TableContainer>
+          {loading && !feedbacks.length ? (
+            <div style={{ textAlign: 'center', padding: '48px' }}>
+              <LoadingSpinner />
+              <p style={{ marginTop: '16px', color: '#718096' }}>Loading feedback data...</p>
+            </div>
+          ) : (
+            <ModernTable>
+              <ModernTableHead>
+                <tr>
+                  <th>ID</th>
+                  <th>Entity</th>
+                  <th>Rating</th>
+                  <th>Feedback</th>
+                  <th>Sentiment</th>
+                  <th>Relevance</th>
+                  <th>Touchpoint</th>
+                  <th>User ID</th>
+                  <th>Language</th>
+                  <th>Analyzed</th>
+                  <th>Actions</th>
+                </tr>
+              </ModernTableHead>
+              <tbody>
+                {feedbacks.length > 0 ? (
+                  feedbacks.map(feedback => (
+                    <ModernTableRow key={feedback.response_id}>
+                      <ModernTableCell>{feedback.response_id}</ModernTableCell>
+                      <ModernTableCell>{feedback.entity}</ModernTableCell>
+                      <ModernTableCell>{feedback.rating}</ModernTableCell>
+                      <ModernTableCell title={feedback.response_value}>
+                        {truncateText(feedback.response_value)}
+                      </ModernTableCell>
+                      <ModernTableCell>{getSentiment(feedback)}</ModernTableCell>
+                      <ModernTableCell>{feedback.relevance}</ModernTableCell>
+                      <ModernTableCell>{feedback.touchpoint}</ModernTableCell>
+                      <ModernTableCell>{feedback.anonymous_user_id}</ModernTableCell>
+                      <ModernTableCell>{feedback.language}</ModernTableCell>
+                      <ModernTableCell>
+                        <span style={{ 
+                          color: feedback.is_analyzed ? '#48bb78' : '#f56565',
+                          fontWeight: '500'
+                        }}>
+                          {feedback.is_analyzed ? 'Yes' : 'No'}
+                        </span>
+                      </ModernTableCell>
+                      <ModernTableCell>
+                        <ActionButtonGroup>
+                          <ActionButton variant="edit" onClick={() => handleEdit(feedback)}>
+                            <EditIcon />
+                            Edit
+                          </ActionButton>
+                          <ActionButton variant="delete" onClick={() => handleDelete(feedback.response_id)}>
+                            <DeleteIcon />
+                            Delete
+                          </ActionButton>
+                        </ActionButtonGroup>
+                      </ModernTableCell>
+                    </ModernTableRow>
+                  ))
+                ) : (
+                  <tr>
+                    <ModernTableCell colSpan="11">
+                      <EmptyState>
+                        <div className="icon">
+                          <FeedbackIcon />
+                        </div>
+                        <h4>No feedback entries found</h4>
+                        <p>No feedback matches your current filters.</p>
+                      </EmptyState>
+                    </ModernTableCell>
+                  </tr>
+                )}
+              </tbody>
+            </ModernTable>
+          )}
+        </TableContainer>
+      </TableSection>
+    </ModernContainer>
   );
 };
 
