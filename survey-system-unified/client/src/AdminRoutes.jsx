@@ -24,6 +24,7 @@ import AttractionDashboard from './components/admin/perattractiondashboard/Attra
 import LogStream from './components/admin/logstream/LogStream';
 import DataManager from './components/datamanager/DataManager';
 import SurveyTally from './components/admin/surveytallybreakdown/SurveyTally';
+import SurveyStatsErrorBoundary from './components/admin/surveytallybreakdown/SurveyStatsErrorBoundary';
 import GlobalLoadingOverlay from './components/partials/GlobalLoadingOverlay';
 import useGlobalLoadingStore from './utils/globalLoadingStore';
 
@@ -113,7 +114,11 @@ const AdminRoutes = () => {
           <Route path="barangaydashboard" element={<AreaDashboard />} />
           <Route path="attractiondashboard" element={<AttractionDashboard />} />
           <Route path="datamanager" element={<DataManager />} />
-          <Route path="stally" element={<SurveyTally />} />
+          <Route path="stally" element={
+            <SurveyStatsErrorBoundary>
+              <SurveyTally />
+            </SurveyStatsErrorBoundary>
+          } />
           <Route path="sentimentgraphs" element={<HeatmapChart />} />
           <Route path="logstream" element={<LogStream />} />
         </Route>

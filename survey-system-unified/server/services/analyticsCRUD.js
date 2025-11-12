@@ -746,6 +746,82 @@ export const getAllSurveyTally = async () => {
         client.release();
     }
 };
+
+export const getAllSurveyTallyPaginated = async (page = 1, limit = 10, search = '') => {
+    const client = await pool.connect();
+    try {
+        const offset = (page - 1) * limit;
+        
+        // Step 1: Get total count for pagination
+        let countQuery = 'SELECT COUNT(*) FROM survey_questions';
+        let countParams = [];
+        
+        if (search) {
+            countQuery += ' WHERE title ILIKE $1 OR content ILIKE $1';
+            countParams = [`%${search}%`];
+        }
+        
+        const countResult = await client.query(countQuery, countParams);
+        const totalCount = parseInt(countResult.rows[0].count);
+        
+        // Step 2: Retrieve paginated surveyresponses_ref from survey_questions
+        let surveyRefsQuery = 'SELECT surveyresponses_ref, title, content FROM survey_questions';
+        let queryParams = [];
+        
+        if (search) {
+            surveyRefsQuery += ' WHERE title ILIKE $1 OR content ILIKE $1';
+            queryParams.push(`%${search}%`);
+        }
+        
+        surveyRefsQuery += ` ORDER BY title, content LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
+        queryParams.push(limit, offset);
+        
+        const surveyRefsResult = await client.query(surveyRefsQuery, queryParams);
+        const surveyRefs = surveyRefsResult.rows;
+
+        // Step 3: For each surveyresponses_ref, query survey_responses
+        const results = [];
+        for (const ref of surveyRefs) {
+            const responseQuery = `
+                SELECT surveyquestion_ref, response_value, COUNT(*) AS occurrence
+                FROM survey_responses
+                WHERE surveyquestion_ref = $1
+                GROUP BY surveyquestion_ref, response_value
+            `;
+            const responseResult = await client.query(responseQuery, [ref.surveyresponses_ref]);
+
+            // Step 4: Construct the array object
+            const occurrences = {};
+            let totalResponses = 0;
+            responseResult.rows.forEach(row => {
+                occurrences[row.response_value] = parseInt(row.occurrence);
+                totalResponses += parseInt(row.occurrence);
+            });
+
+            results.push({
+                division: ref.title,
+                question: ref.content,
+                surveyquestion_ref: ref.surveyresponses_ref,
+                occurrences: occurrences,
+                totalResponses: totalResponses
+            });
+        }
+
+        return {
+            data: results,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / limit),
+                totalCount: totalCount,
+                hasNextPage: page < Math.ceil(totalCount / limit),
+                hasPrevPage: page > 1
+            }
+        };
+    } finally {
+        client.release();
+    }
+};
+
 export const getSentimentAnalysis = async (year = null, quarter = null) => {
 
     const client = await pool.connect();

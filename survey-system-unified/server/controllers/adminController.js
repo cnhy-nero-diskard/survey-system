@@ -9,7 +9,7 @@ import { logEmitter } from '../middleware/logger.js';
 import dotenv from 'dotenv';
 import { response } from 'express';
 import { createEstablishmentService, createLocalizationService, createSentimentAnalysisService, createSurveyFeedbackService, createTourismAttractionService, deleteEstablishmentService, deleteLocalizationService, deleteSentimentAnalysisService, deleteSurveyFeedbackService, deleteSurveyResponseService, deleteTourismAttractionService, fetchAllTouchpointsService, fetchEstablishmentsService, fetchEstTypes, fetchLocalizationsService, fetchLocationsWithFilterService, fetchSentimentAnalysisService, fetchSurveyFeedbackService, fetchSurveyResponsesService, fetchTourismAttractionsService, fetchTranslatedTouchpointService, insertTopicDataService, updateEstablishmentService, updateLocalizationService, updateSentimentAnalysisService, updateSurveyFeedbackService, updateSurveyResponseService, updateTourismAttractionService } from '../services/adminCRUD.js';
-import { calculateAverageCompletionTimeService, fetchAllFinishedRows, fetchAndGroupFinishedSurveyResponsesByMonthService, fetchByAgeGroup, fetchByCountryResidence, fetchByGender, fetchByNationality, fetchByTimeOfDay, fetchEntityinSurveyFeedbackService, fetchTouchpointsService, fetchUnfinishedSurveys, getAllSurveyTally, getSentimentAnalysis, getSentimentLocation, getSurveyResponseByTopic, groupByLikertRatingService } from '../services/analyticsCRUD.js';
+import { calculateAverageCompletionTimeService, fetchAllFinishedRows, fetchAndGroupFinishedSurveyResponsesByMonthService, fetchByAgeGroup, fetchByCountryResidence, fetchByGender, fetchByNationality, fetchByTimeOfDay, fetchEntityinSurveyFeedbackService, fetchTouchpointsService, fetchUnfinishedSurveys, getAllSurveyTally, getAllSurveyTallyPaginated, getSentimentAnalysis, getSentimentLocation, getSurveyResponseByTopic, groupByLikertRatingService } from '../services/analyticsCRUD.js';
 dotenv.config();
 
 export const getAdminData = async (req, res, next) => {
@@ -949,6 +949,25 @@ export const getAllByTallyController = async (req, res) => {
       res.status(200).json(surveyResponses);
   } catch (error) {
       console.error('Error in surveyResponsesController:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const getAllByTallyPaginatedController = async (req, res) => {
+  try {
+      const { page = 1, limit = 10, search = '' } = req.query;
+      
+      // Call the service function to get the paginated survey responses
+      const surveyResponses = await getAllSurveyTallyPaginated(
+          parseInt(page), 
+          parseInt(limit), 
+          search
+      );
+
+      // Send the response back to the client
+      res.status(200).json(surveyResponses);
+  } catch (error) {
+      console.error('Error in getAllByTallyPaginatedController:', error);
       res.status(500).json({ error: 'Internal Server Error' });
   }
 };
