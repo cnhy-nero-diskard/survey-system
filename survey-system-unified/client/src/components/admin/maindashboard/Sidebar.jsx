@@ -323,9 +323,9 @@ const menuSections = [
     ]
   },
   {
-    title: "Administration",
+    title: "System Management",
     items: [
-      { text: "Users Dashboard", icon: <UserIcon />, to: "usersdashboard", description: "User management" },
+      // { text: "Users Dashboard", icon: <UserIcon />, to: "usersdashboard", description: "User management" },
       { text: "Data Manager", icon: <DBIcon />, to: "datamanager", description: "Data operations" },
       { text: "System Performance", icon: <CompIcon />, to: "systemperf", description: "System monitoring" },
       { text: "Log Stream", icon: <SurveyTouchpointsIcon />, to: "logstream", description: "System logs" },

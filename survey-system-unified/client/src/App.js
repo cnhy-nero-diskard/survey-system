@@ -23,6 +23,7 @@ import AdminRoutes from './AdminRoutes';
 import WebpageRoutesDev from './WebpageRoutesDev';
 import NotFound from './components/admin/fallback/NotFound';
 import { AuthProvider } from './components/context/AuthContext';
+import { GlobalLoadingProvider } from './utils/globalLoadingStore';
 import Login from './components/admin/login/Login';
 import SurveyRoutes from './routes/SurveyRoutes';
 const App = () => {
@@ -49,38 +50,40 @@ const App = () => {
 
   return (
     <Router>
-      <AuthProvider>
-        <style>
-          {`
-            body {
-              background-color:#00a2ff ;
-              height: 100vh;
-              margin: 0;
-            }
-            .App {
-              height: 100vh;
-              display: flex;
-              flex-direction: column;
-            }
-          `}
-        </style>
-        <Routes>
-          {/* Default route to show the RouteSelector */}
-          <Route path="/" element={<RouteSelector />} />
+      <GlobalLoadingProvider>
+        <AuthProvider>
+          <style>
+            {`
+              body {
+                background-color:#00a2ff ;
+                height: 100vh;
+                margin: 0;
+              }
+              .App {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+              }
+            `}
+          </style>
+          <Routes>
+            {/* Default route to show the RouteSelector */}
+            <Route path="/" element={<RouteSelector />} />
 
-          {/* Admin Routes */}
-          <Route path="/admin/*" element={<AdminRoutes />} />
-          <Route path="/login" element={<Login />} />
+            {/* Admin Routes */}
+            <Route path="/admin/*" element={<AdminRoutes />} />
+            <Route path="/login" element={<Login />} />
 
-          {/* App Routes */}
-          {/* <Route path="/devpath1/*" element={<WebpageRoutesDev />} /> */}
-          <Route path="/survey/*" element={<SurveyRoutes />} />
-          <Route path="/feedback/*" element={<SurveyRoutes />} />
+            {/* App Routes */}
+            {/* <Route path="/devpath1/*" element={<WebpageRoutesDev />} /> */}
+            <Route path="/survey/*" element={<SurveyRoutes />} />
+            <Route path="/feedback/*" element={<SurveyRoutes />} />
 
-          {/* Fallback route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </AuthProvider>
+            {/* Fallback route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
+      </GlobalLoadingProvider>
     </Router>
   );
 };

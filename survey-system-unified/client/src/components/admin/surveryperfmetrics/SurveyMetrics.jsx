@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
     Box,
     Typography,
+    Card,
     CardContent,
     Grid,
     useTheme,
@@ -14,7 +15,14 @@ import {
     TableHead,
     TableRow,
     Paper,
-    Button
+    Button,
+    Fade,
+    Backdrop,
+    Chip,
+    IconButton,
+    Divider,
+    Container,
+    alpha
 } from '@mui/material';
 import {
     PieChart,
@@ -26,47 +34,217 @@ import {
     YAxis,
     Tooltip,
     Legend,
-    ResponsiveContainer
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    Area,
+    AreaChart
 } from 'recharts';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CancelIcon from '@mui/icons-material/Cancel';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import PeopleIcon from '@mui/icons-material/People';
+import PublicIcon from '@mui/icons-material/Public';
+import GroupIcon from '@mui/icons-material/Group';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import CloseIcon from '@mui/icons-material/Close';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { sentimentColors } from '../../../config/sentimentConfig';
-import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import styled, { ThemeProvider as StyledThemeProvider, keyframes } from 'styled-components';
 import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
 import * as XLSX from 'xlsx';
 
-// Styled components
-const StyledCardContent = styled(CardContent)`
-  text-align: center;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 32px; // Rounded corners
-  background: linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97)); // Gradient background
-  &:hover {
-    transform: scale(1.05);
+// Animations
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  font-family: ${fontFamily};
-  font-size: ${fontSize};
-  font-weight: ${fontWeight};
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 `;
 
-const StyledTypography = styled(Typography)`
-  margin-bottom: ${({ theme }) => theme.spacing(1)};
-  color: black;
-  font-family: ${fontFamily};
-  font-size: ${fontSize};
-  font-weight: ${fontWeight};
+const slideIn = keyframes`
+  from {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 `;
 
-const StyledIcon = styled.div`
-  font-size: 50px;
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
+const scaleIn = keyframes`
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+
+// Styled components
+const StyledDashboardContainer = styled(Box)`
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  animation: ${fadeIn} 0.8s ease-out;
+  box-sizing: border-box;
+  position: relative;
+  overflow-x: hidden;
+  padding-top: 2rem; /* Ensure title has enough space */
+`;
+
+const StyledHeaderCard = styled(Card)`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin: 0 0 1rem 0;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  animation: ${slideIn} 0.6s ease-out;
+  
+  .MuiCardContent-root {
+    padding: 1rem;
+  }
+`;
+
+const StyledMetricCard = styled(Card)`
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  animation: ${scaleIn} 0.5s ease-out;
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: ${({ gradient }) => gradient || 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)'};
+  }
+  
+  .MuiCardContent-root {
+    padding: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+`;
+
+const StyledMetricIcon = styled.div`
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
   color: ${({ color }) => color};
+  background: ${({ color }) => `${color}20`};
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const StyledExportButton = styled(Button)`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 25px;
+  padding: 12px 30px;
+  text-transform: none;
+  font-weight: 600;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  
+  &:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+  }
+`;
+
+const StyledModal = styled(Modal)`
+  .MuiBackdrop-root {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+  }
+`;
+
+const StyledModalContent = styled(Box)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 1200px;
+  max-height: 85vh;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  overflow-y: auto;
+  animation: ${scaleIn} 0.3s ease-out;
+`;
+
+const StyledChip = styled(Chip)`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  margin: 0.25rem;
+  
+  &:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  }
+`;
+
+const StyledTableContainer = styled(TableContainer)`
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  
+  .MuiTableHead-root {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    .MuiTableCell-head {
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+  }
+  
+  .MuiTableRow-root:nth-of-type(even) {
+    background-color: rgba(102, 126, 234, 0.05);
+  }
+  
+  .MuiTableRow-root:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+  }
 `;
 
 const SurveyMetrics = () => {
@@ -116,14 +294,25 @@ const SurveyMetrics = () => {
         <Box
             sx={{
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
-                height: '100%',
+                height: '200px',
                 color: 'text.secondary',
                 fontStyle: 'italic',
+                background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                borderRadius: '15px',
+                border: '2px dashed #cbd5e0',
+                margin: '1rem 0'
             }}
         >
-            <Typography variant="h6">No Data Available</Typography>
+            <AnalyticsIcon sx={{ fontSize: '3rem', color: '#9ca3af', mb: 1 }} />
+            <Typography variant="h6" color="text.secondary">
+                No Data Available
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                Data will appear here when available
+            </Typography>
         </Box>
     );
     // Function to get current time in a readable format
@@ -267,658 +456,846 @@ const SurveyMetrics = () => {
 
     return (
         <StyledThemeProvider theme={theme}>
-            <Box sx={{ padding: 4 }}>
-                <Typography
-                    variant="h4"
-                    gutterBottom
-                    sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}
-                >
-                    Survey Performance Metrics
-                </Typography>
+            <StyledDashboardContainer>
+                {/* Header Section */}
+                <StyledHeaderCard elevation={0}>
+                    <CardContent>
+                        <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
+                            <Box flex={1}>
+                                <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+                                    📊 Survey Performance Analytics
+                                </Typography>
+                                <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 400, mb: 1 }}>
+                                    Real-time insights and comprehensive survey metrics
+                                </Typography>
+                                <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
+                                    <StyledChip label={`Updated: ${getCurrentTime()}`} size="small" />
+                                    <StyledChip label={`Period: ${capitalizeFirstLetter(getCurrentMonth())}`} size="small" />
+                                </Box>
+                            </Box>
+                            <Box>
+                                <StyledExportButton
+                                    variant="contained"
+                                    startIcon={<FileDownloadIcon />}
+                                    onClick={exportToExcel}
+                                    size="medium"
+                                >
+                                    Export Analytics
+                                </StyledExportButton>
+                            </Box>
+                        </Box>
+                    </CardContent>
+                </StyledHeaderCard>
 
-                <Button variant="contained" color="primary" onClick={exportToExcel} sx={{ mb: 4 }}>
-                    Export to Excel
-                </Button>
-
-                <Grid container spacing={4}>
+                {/* Key Metrics Grid */}
+                <Grid container spacing={2}>
                     {/* Total Surveys Completed */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent>
-                            <StyledIcon as={CheckCircleIcon} color={theme.palette.success.main} />
-                            <StyledTypography variant="h6">Total Surveys Completed</StyledTypography>
-                            <Typography variant="h4" sx={{ color: theme.palette.success.main }}>
-                                {surveyMetrics.totalSurveysCompleted} / {surveyMetrics.totalSurveys}
-                            </Typography>
-                            <Typography variant="subtitle2" sx={{ color: theme.palette.text.secondary }}>
-                                As of {getCurrentTime()}
-                            </Typography>
-                        </StyledCardContent>
+                    <Grid item xs={12} sm={6} lg={3}>
+                        <StyledMetricCard gradient="linear-gradient(135deg, #4ade80 0%, #22c55e 100%)">
+                            <CardContent>
+                                <StyledMetricIcon color={theme.palette.success.main}>
+                                    <CheckCircleIcon fontSize="inherit" />
+                                </StyledMetricIcon>
+                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#1f2937' }}>
+                                    Surveys Completed
+                                </Typography>
+                                <Typography variant="h4" sx={{ color: theme.palette.success.main, fontWeight: 700, mb: 1 }}>
+                                    {surveyMetrics.totalSurveysCompleted}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#6b7280' }}>
+                                    out of {surveyMetrics.totalSurveys} total
+                                </Typography>
+                                <Box sx={{ mt: 1.5, p: 1, bgcolor: 'rgba(34, 197, 94, 0.1)', borderRadius: '10px' }}>
+                                    <Typography variant="caption" sx={{ color: theme.palette.success.dark }}>
+                                        Last updated: {getCurrentTime()}
+                                    </Typography>
+                                </Box>
+                            </CardContent>
+                        </StyledMetricCard>
                     </Grid>
 
                     {/* Survey Completion Rate */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent>
-                            <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
-                                Survey Completion Rate
-                            </StyledTypography>
-                            {completionRateData[0]["value"] != null ? (
-                                <ResponsiveContainer width="100%" height={200}>
-                                    <PieChart>
-                                        <Pie
-                                            data={completionRateData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={50}
-                                            outerRadius={70}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            label={({
-                                                cx,
-                                                cy,
-                                                midAngle,
-                                                innerRadius,
-                                                outerRadius,
-                                                percent,
-                                                index,
-                                            }) => {
-                                                const RADIAN = Math.PI / 180;
-                                                const radius = innerRadius + (outerRadius - innerRadius) * 1.5;
-                                                const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                                                const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-                                                return (
-                                                    <text
-                                                        x={x}
-                                                        y={y}
-                                                        fill={colors[index % colors.length]}
-                                                        textAnchor={x > cx ? 'start' : 'end'}
-                                                        dominantBaseline="central"
-                                                    >
-                                                        {`${(percent * 100).toFixed(0)}%`}
-                                                    </text>
-                                                );
-                                            }}
-                                        >
-                                            {completionRateData.map((entry, index) => (
-                                                <Cell
-                                                    key={`cell-${index}`}
-                                                    fill={colors[index % colors.length]}
-                                                />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                        <Legend />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <NoData />
-                            )}
-                        </StyledCardContent>
+                    <Grid item xs={12} sm={6} lg={3}>
+                        <StyledMetricCard gradient="linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)">
+                            <CardContent>
+                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
+                                    Completion Rate
+                                </Typography>
+                                {completionRateData[0]["value"] != null ? (
+                                    <Box sx={{ width: '100%', height: 220 }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={completionRateData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    innerRadius={40}
+                                                    outerRadius={80}
+                                                    dataKey="value"
+                                                    label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
+                                                >
+                                                    {completionRateData.map((entry, index) => (
+                                                        <Cell
+                                                            key={`cell-${index}`}
+                                                            fill={index === 0 ? '#22c55e' : '#ef4444'}
+                                                        />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip formatter={(value) => [`${value}%`, 'Rate']} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </Box>
+                                ) : (
+                                    <NoData />
+                                )}
+                            </CardContent>
+                        </StyledMetricCard>
                     </Grid>
 
                     {/* Average Time to Complete */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent>
-                            <StyledIcon as={AccessTimeIcon} color={theme.palette.warning.main} />
-                            <StyledTypography variant="h6">Average Time to Complete</StyledTypography>
-                            {surveyMetrics.averageTimeToComplete != null ?
-                                (
-                                <>
-                                    <Typography variant="h4" sx={{ color: theme.palette.warning.main }}>
-                                        {surveyMetrics.averageTimeToComplete}
-                                    </Typography></>)
-                                : (
+                    <Grid item xs={12} sm={6} lg={3}>
+                        <StyledMetricCard gradient="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">
+                            <CardContent>
+                                <StyledMetricIcon color={theme.palette.warning.main}>
+                                    <AccessTimeIcon fontSize="inherit" />
+                                </StyledMetricIcon>
+                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#1f2937' }}>
+                                    Avg. Completion Time
+                                </Typography>
+                                {surveyMetrics.averageTimeToComplete != null ? (
+                                    <>
+                                        <Typography variant="h4" sx={{ color: theme.palette.warning.main, fontWeight: 700, mb: 1 }}>
+                                            {surveyMetrics.averageTimeToComplete}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: '#6b7280' }}>
+                                            minutes per survey
+                                        </Typography>
+                                    </>
+                                ) : (
                                     <NoData />
-                                )
-                            }
-                        </StyledCardContent>
+                                )}
+                            </CardContent>
+                        </StyledMetricCard>
                     </Grid>
 
                     {/* Drop-off Rate */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent>
-                            <StyledIcon as={CancelIcon} color={theme.palette.error.main} />
-                            <StyledTypography variant="h6">Drop-off Rate</StyledTypography>
-                            {surveyMetrics.dropOffRate != null ? (
-                                <>
-                                    <Typography variant="h4" sx={{ color: theme.palette.error.main }}>
-                                        {surveyMetrics.dropOffRate}%
-                                    </Typography>
-                                </>
-                            ) : (
-                                <NoData />
-                            )
-
-                            }
-                        </StyledCardContent>
+                    <Grid item xs={12} sm={6} lg={3}>
+                        <StyledMetricCard gradient="linear-gradient(135deg, #ef4444 0%, #dc2626 100%)">
+                            <CardContent>
+                                <StyledMetricIcon color={theme.palette.error.main}>
+                                    <CancelIcon fontSize="inherit" />
+                                </StyledMetricIcon>
+                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#1f2937' }}>
+                                    Drop-off Rate
+                                </Typography>
+                                {surveyMetrics.dropOffRate != null ? (
+                                    <>
+                                        <Typography variant="h4" sx={{ color: theme.palette.error.main, fontWeight: 700, mb: 1 }}>
+                                            {surveyMetrics.dropOffRate}%
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: '#6b7280' }}>
+                                            incomplete surveys
+                                        </Typography>
+                                    </>
+                                ) : (
+                                    <NoData />
+                                )}
+                            </CardContent>
+                        </StyledMetricCard>
                     </Grid>
 
                     {/* Survey Distribution */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent
+                    <Grid item xs={12} sm={6} lg={3}>
+                        <StyledMetricCard 
+                            gradient="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
                             onClick={handleDistributionOpen}
-                            style={{ cursor: 'pointer' }}
                         >
-                            <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
-                                Survey Distribution
-                            </StyledTypography>
-                            {surveyDistributionData.length > 0 ? (
-                                <ResponsiveContainer width="100%" height={200}>
-                                    <PieChart>
-                                        <Pie
-                                            data={surveyDistributionData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={50}
-                                            outerRadius={70}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            label
-                                        >
-                                            {surveyDistributionData.map((entry, index) => (
-                                                <Cell
-                                                    key={`cell-${index}`}
-                                                    fill={distributionColors[index % distributionColors.length]}
-                                                />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                        <Legend />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <NoData />
-                            )}
-                        </StyledCardContent>
+                            <CardContent>
+                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
+                                    📍 Survey Distribution
+                                </Typography>
+                                {surveyDistributionData.length > 0 ? (
+                                    <Box sx={{ width: '100%', height: 200 }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={surveyDistributionData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    innerRadius={30}
+                                                    outerRadius={70}
+                                                    dataKey="value"
+                                                >
+                                                    {surveyDistributionData.map((entry, index) => (
+                                                        <Cell
+                                                            key={`cell-${index}`}
+                                                            fill={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'][index % 6]}
+                                                        />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </Box>
+                                ) : (
+                                    <NoData />
+                                )}
+                                <Typography variant="caption" sx={{ color: '#6b7280', mt: 1 }}>
+                                    Click to view details
+                                </Typography>
+                            </CardContent>
+                        </StyledMetricCard>
                     </Grid>
 
                     {/* Survey Responses by Nationality */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent
+                    <Grid item xs={12} sm={6} lg={3}>
+                        <StyledMetricCard
+                            gradient="linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)"
                             onClick={handleNationalityOpen}
-                            style={{ cursor: 'pointer' }}
                         >
-                            <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
-                                Responses by Nationality
-                            </StyledTypography>
-                            {surveyResponsesByRegionData.length > 0 ? (
-                                <>
-                                    {/* Display Top 3 Nationalities */}
-                                    {topThreeRegions.length > 0 && (
-                                        <Box sx={{ mb: 2 }}>
-                                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
-                                                {topThreeRegions[0].name}: {topThreeRegions[0].value}
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                    {topThreeRegions.length > 1 && (
-                                        <Box sx={{ mb: 1 }}>
-                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                                {topThreeRegions[1].name}: {topThreeRegions[1].value}
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                    {topThreeRegions.length > 2 && (
-                                        <Box>
-                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                                {topThreeRegions[2].name}: {topThreeRegions[2].value}
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                </>
-                            ) : (
-                                <NoData />
-                            )}
-                        </StyledCardContent>
+                            <CardContent>
+                                <StyledMetricIcon color="#06b6d4">
+                                    <PublicIcon fontSize="inherit" />
+                                </StyledMetricIcon>
+                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
+                                    Top Nationalities
+                                </Typography>
+                                {surveyResponsesByRegionData.length > 0 ? (
+                                    <Box sx={{ width: '100%' }}>
+                                        {topThreeRegions.slice(0, 3).map((region, index) => (
+                                            <Box key={region.name} sx={{ mb: 1, p: 1, bgcolor: `rgba(6, 182, 212, ${0.1 + index * 0.05})`, borderRadius: '8px' }}>
+                                                <Typography variant="body1" sx={{ fontWeight: index === 0 ? 700 : 500, color: '#1f2937' }}>
+                                                    {index + 1}. {region.name}
+                                                </Typography>
+                                                <Typography variant="h6" sx={{ color: '#06b6d4', fontWeight: 600 }}>
+                                                    {region.value} responses
+                                                </Typography>
+                                            </Box>
+                                        ))}
+                                        <Typography variant="caption" sx={{ color: '#6b7280', mt: 1 }}>
+                                            Click to view all
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    <NoData />
+                                )}
+                            </CardContent>
+                        </StyledMetricCard>
                     </Grid>
+
                     {/* Survey Responses by Country of Residence */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent
+                    <Grid item xs={12} sm={6} lg={3}>
+                        <StyledMetricCard
+                            gradient="linear-gradient(135deg, #ec4899 0%, #db2777 100%)"
                             onClick={handleCountryOpen}
-                            style={{ cursor: 'pointer' }}
                         >
-                            <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
-                                Responses by Country of Residence
-                            </StyledTypography>
-
-                            {sortedResidence.length > 0 ? (
-                                <>
-                                    {/* Display Top 3 Country of Residence */}
-                                    {topThreeResidence.length > 0 && (
-                                        <Box sx={{ mb: 2 }}>
-                                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
-                                                {topThreeResidence[0].name}: {topThreeResidence[0].value}
-                                            </Typography>
-                                        </Box>
-                                    )}
-
-                                    {topThreeResidence.length > 1 && (
-                                        <Box sx={{ mb: 1 }}>
-                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                                {topThreeResidence[1].name}: {topThreeResidence[1].value}
-                                            </Typography>
-                                        </Box>
-                                    )}
-
-                                    {topThreeResidence.length > 2 && (
-                                        <Box>
-                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                                {topThreeResidence[2].name}: {topThreeResidence[2].value}
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                </>
-                            ) : (
-                                <NoData />
-                            )
-
-                            }
-
-
-                        </StyledCardContent>
+                            <CardContent>
+                                <StyledMetricIcon color="#ec4899">
+                                    <PeopleIcon fontSize="inherit" />
+                                </StyledMetricIcon>
+                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
+                                    Residence Countries
+                                </Typography>
+                                {sortedResidence.length > 0 ? (
+                                    <Box sx={{ width: '100%' }}>
+                                        {topThreeResidence.slice(0, 3).map((country, index) => (
+                                            <Box key={country.name} sx={{ mb: 1, p: 1, bgcolor: `rgba(236, 72, 153, ${0.1 + index * 0.05})`, borderRadius: '8px' }}>
+                                                <Typography variant="body1" sx={{ fontWeight: index === 0 ? 700 : 500, color: '#1f2937' }}>
+                                                    {index + 1}. {country.name}
+                                                </Typography>
+                                                <Typography variant="h6" sx={{ color: '#ec4899', fontWeight: 600 }}>
+                                                    {country.value} responses
+                                                </Typography>
+                                            </Box>
+                                        ))}
+                                        <Typography variant="caption" sx={{ color: '#6b7280', mt: 1 }}>
+                                            Click to view all
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    <NoData />
+                                )}
+                            </CardContent>
+                        </StyledMetricCard>
                     </Grid>
 
                     {/* Survey Responses by Age Group */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent
+                    <Grid item xs={12} sm={6} lg={3}>
+                        <StyledMetricCard
+                            gradient="linear-gradient(135deg, #84cc16 0%, #65a30d 100%)"
                             onClick={handleAgeGroupOpen}
-                            style={{ cursor: 'pointer' }}
                         >
-                            <StyledTypography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
-                                Responses by Age Group
-                            </StyledTypography>
-                            {sortedAgeGroup.length > 0 ? (
-                                <>
-
-                                    {/* Display Top 3 Country of Residence */}
-                                    {topThreeAgeGroup.length > 0 && (
-                                        <Box sx={{ mb: 2 }}>
-                                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
-                                                {topThreeAgeGroup[0].name} yrs old:
-                                                <Typography style={{ color: 'rgb(59, 221, 113)' }} variant="h5" sx={{ fontWeight: 'bold', color: theme.palette.success.main, textAlign: 'center' }}>
-                                                    ({topThreeAgeGroup[0].value} respondents)
-                                                </Typography>
-                                            </Typography>
-                                        </Box>
-                                    )}
-
-                                    {topThreeAgeGroup.length > 1 && (
-                                        <Box sx={{ mb: 1 }}>
-                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                                {topThreeAgeGroup[1].name}: {topThreeAgeGroup[1].value} respondents
-                                            </Typography>
-                                        </Box>
-                                    )}
-
-                                    {topThreeAgeGroup.length > 2 && (
-                                        <Box>
-                                            <Typography style={{ color: "grey" }} variant="subtitle1" sx={{ textAlign: 'center' }}>
-                                                {topThreeAgeGroup[2].name}: {topThreeAgeGroup[2].value} respondents
-                                            </Typography>
-                                        </Box>
-                                    )}
-
-
-                                </>
-                            ) : (
-                                <NoData />
-                            )
-                            }
-                        </StyledCardContent>
-                    </Grid>
-                    {/* Survey Responses by Month */}
-                    <Grid item xs={12} md={6} lg={3}>
-                        <StyledCardContent onClick={handleOpen} style={{ cursor: 'pointer' }}>
-                            <StyledIcon as={InsertChartIcon} color={theme.palette.info.main} />
-                            <StyledTypography variant="h6">Responses by Month</StyledTypography>
-                            {surveyMetrics.surveyResponsesByMonth[capitalizeFirstLetter(getCurrentMonth())] != undefined ? (
-                                <Typography variant="h4" sx={{ color: theme.palette.info.main }}>
-                                    {capitalizeFirstLetter(getCurrentMonth())}:
-                                    <Typography variant="h5" sx={{ color: "rgb(5, 66, 136)" }}>
-                                        {surveyMetrics.surveyResponsesByMonth[capitalizeFirstLetter(getCurrentMonth())]} surveys
-                                    </Typography>
+                            <CardContent>
+                                <StyledMetricIcon color="#84cc16">
+                                    <GroupIcon fontSize="inherit" />
+                                </StyledMetricIcon>
+                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
+                                    Top Age Groups
                                 </Typography>
-                            ) : (
-                                <NoData />
-                            )}
-                        </StyledCardContent>
+                                {sortedAgeGroup.length > 0 ? (
+                                    <Box sx={{ width: '100%' }}>
+                                        {topThreeAgeGroup.slice(0, 3).map((age, index) => (
+                                            <Box key={age.name} sx={{ mb: 1, p: 1, bgcolor: `rgba(132, 204, 22, ${0.1 + index * 0.05})`, borderRadius: '8px' }}>
+                                                <Typography variant="body1" sx={{ fontWeight: index === 0 ? 700 : 500, color: '#1f2937' }}>
+                                                    {index + 1}. {age.name} years
+                                                </Typography>
+                                                <Typography variant="h6" sx={{ color: '#84cc16', fontWeight: 600 }}>
+                                                    {age.value} responses
+                                                </Typography>
+                                            </Box>
+                                        ))}
+                                        <Typography variant="caption" sx={{ color: '#6b7280', mt: 1 }}>
+                                            Click to view all
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    <NoData />
+                                )}
+                            </CardContent>
+                        </StyledMetricCard>
+                    </Grid>
+
+                    {/* Survey Responses by Month */}
+                    <Grid item xs={12} sm={6} lg={3}>
+                        <StyledMetricCard 
+                            gradient="linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)"
+                            onClick={handleOpen}
+                        >
+                            <CardContent>
+                                <StyledMetricIcon color="#6366f1">
+                                    <TrendingUpIcon fontSize="inherit" />
+                                </StyledMetricIcon>
+                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#1f2937' }}>
+                                    Monthly Trends
+                                </Typography>
+                                {surveyMetrics.surveyResponsesByMonth[capitalizeFirstLetter(getCurrentMonth())] != undefined ? (
+                                    <>
+                                        <Typography variant="h6" sx={{ color: '#1f2937', mb: 1 }}>
+                                            {capitalizeFirstLetter(getCurrentMonth())}
+                                        </Typography>
+                                        <Typography variant="h4" sx={{ color: '#6366f1', fontWeight: 700, mb: 1 }}>
+                                            {surveyMetrics.surveyResponsesByMonth[capitalizeFirstLetter(getCurrentMonth())]}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: '#6b7280' }}>
+                                            surveys this month
+                                        </Typography>
+                                    </>
+                                ) : (
+                                    <NoData />
+                                )}
+                                <Typography variant="caption" sx={{ color: '#6b7280', mt: 1 }}>
+                                    Click to view trends
+                                </Typography>
+                            </CardContent>
+                        </StyledMetricCard>
                     </Grid>
                 </Grid>
 
-                {/* Popup for Survey Responses by Month */}
-                <Modal open={open} onClose={handleClose}>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: 1000,
-                            bgcolor: 'background.paper',
-                            boxShadow: 24,
-                            p: 4,
-                            display: 'flex',
-                            gap: 4
-                        }}
-                    >
-                        {/* Bar Chart */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>
-                                Survey Responses by Month
-                            </Typography>
-                            <ResponsiveContainer width="100%" height={400}>
-                                <BarChart data={surveyResponsesByMonthData}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="value" fill="#8884d8" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </Box>
+                {/* Enhanced Modals */}
+                
+                {/* Monthly Trends Modal */}
+                <StyledModal
+                    open={open}
+                    onClose={handleClose}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{ timeout: 500 }}
+                >
+                    <Fade in={open}>
+                        <StyledModalContent>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1f2937' }}>
+                                    📈 Monthly Response Trends
+                                </Typography>
+                                <IconButton onClick={handleClose} size="large">
+                                    <CloseIcon />
+                                </IconButton>
+                            </Box>
+                            
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} lg={8}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px', mb: 2 }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Response Trend Analysis
+                                        </Typography>
+                                        <ResponsiveContainer width="100%" height={400}>
+                                            <AreaChart data={surveyResponsesByMonthData}>
+                                                <defs>
+                                                    <linearGradient id="colorArea" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8}/>
+                                                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0.1}/>
+                                                    </linearGradient>
+                                                </defs>
+                                                <XAxis dataKey="name" />
+                                                <YAxis />
+                                                <Tooltip 
+                                                    contentStyle={{
+                                                        backgroundColor: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '12px',
+                                                        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                                    }}
+                                                />
+                                                <Area 
+                                                    type="monotone" 
+                                                    dataKey="value" 
+                                                    stroke="#6366f1" 
+                                                    fillOpacity={1} 
+                                                    fill="url(#colorArea)" 
+                                                    strokeWidth={3}
+                                                />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </Box>
+                                </Grid>
 
-                        {/* Table */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>
-                                Monthly Responses
-                            </Typography>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Month</TableCell>
-                                            <TableCell align="right">Responses</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {surveyResponsesByMonthData.map((row) => (
-                                            <TableRow key={row.name}>
-                                                <TableCell component="th" scope="row">
-                                                    {row.name}
-                                                </TableCell>
-                                                <TableCell align="right">{row.value}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
-                    </Box>
-                </Modal>
+                                <Grid item xs={12} lg={4}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px' }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Monthly Breakdown
+                                        </Typography>
+                                        <StyledTableContainer component={Paper}>
+                                            <Table>
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>Month</TableCell>
+                                                        <TableCell align="right">Responses</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {surveyResponsesByMonthData.map((row, index) => (
+                                                        <TableRow key={row.name}>
+                                                            <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
+                                                                {row.name}
+                                                            </TableCell>
+                                                            <TableCell align="right">
+                                                                <Chip 
+                                                                    label={row.value} 
+                                                                    color="primary" 
+                                                                    variant="outlined"
+                                                                    size="small"
+                                                                />
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </StyledTableContainer>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </StyledModalContent>
+                    </Fade>
+                </StyledModal>
 
-                {/* Popup for Survey Distribution */}
-                <Modal open={openDistributionModal} onClose={handleDistributionClose}>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: 1000,
-                            bgcolor: 'background.paper',
-                            boxShadow: 24,
-                            p: 4,
-                            display: 'flex',
-                            gap: 4
-                        }}
-                    >
-                        {/* Pie Chart */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>
-                                Survey Distribution
-                            </Typography>
-                            <ResponsiveContainer width="100%" height={400}>
-                                <PieChart>
-                                    <Pie
-                                        data={surveyDistributionData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={50}
-                                        outerRadius={120}
-                                        fill="#8884d8"
-                                        dataKey="value"
-                                        label
-                                    >
-                                        {surveyDistributionData.map((entry, index) => (
-                                            <Cell
-                                                key={`cell-${index}`}
-                                                fill={distributionColors[index % distributionColors.length]}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                    <Legend />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </Box>
+                {/* Survey Distribution Modal */}
+                <StyledModal
+                    open={openDistributionModal}
+                    onClose={handleDistributionClose}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{ timeout: 500 }}
+                >
+                    <Fade in={openDistributionModal}>
+                        <StyledModalContent>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1f2937' }}>
+                                    📍 Survey Distribution Analysis
+                                </Typography>
+                                <IconButton onClick={handleDistributionClose} size="large">
+                                    <CloseIcon />
+                                </IconButton>
+                            </Box>
 
-                        {/* Table */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>
-                                Survey Distribution Data
-                            </Typography>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Entrypoint</TableCell>
-                                            <TableCell align="right">Value</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {surveyDistributionData.map((row) => (
-                                            <TableRow key={row.name}>
-                                                <TableCell component="th" scope="row">
-                                                    {row.name}
-                                                </TableCell>
-                                                <TableCell align="right">{row.value}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
-                    </Box>
-                </Modal>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} lg={6}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px' }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Distribution Overview
+                                        </Typography>
+                                        <ResponsiveContainer width="100%" height={400}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={surveyDistributionData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    innerRadius={60}
+                                                    outerRadius={140}
+                                                    dataKey="value"
+                                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                                                >
+                                                    {surveyDistributionData.map((entry, index) => (
+                                                        <Cell
+                                                            key={`cell-${index}`}
+                                                            fill={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'][index % 6]}
+                                                        />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip 
+                                                    contentStyle={{
+                                                        backgroundColor: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '12px',
+                                                        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                                    }}
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </Box>
+                                </Grid>
 
-                {/* Popup for Survey Responses by Nationality */}
-                <Modal
+                                <Grid item xs={12} lg={6}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px' }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Entry Point Details
+                                        </Typography>
+                                        <StyledTableContainer component={Paper}>
+                                            <Table>
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>Entry Point</TableCell>
+                                                        <TableCell align="center">Responses</TableCell>
+                                                        <TableCell align="center">Percentage</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {surveyDistributionData.map((row, index) => {
+                                                        const total = surveyDistributionData.reduce((sum, item) => sum + item.value, 0);
+                                                        const percentage = ((row.value / total) * 100).toFixed(1);
+                                                        return (
+                                                            <TableRow key={row.name}>
+                                                                <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
+                                                                    {row.name}
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <Chip 
+                                                                        label={row.value} 
+                                                                        color="primary" 
+                                                                        variant="outlined"
+                                                                        size="small"
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <Chip 
+                                                                        label={`${percentage}%`} 
+                                                                        color="secondary" 
+                                                                        size="small"
+                                                                    />
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })}
+                                                </TableBody>
+                                            </Table>
+                                        </StyledTableContainer>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </StyledModalContent>
+                    </Fade>
+                </StyledModal>
+
+                {/* Nationality Modal */}
+                <StyledModal
                     open={openNationalityModal}
                     onClose={handleNationalityClose}
-                    aria-labelledby="modal-nationality-title"
-                    aria-describedby="modal-nationality-description"
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{ timeout: 500 }}
                 >
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: '80%',
-                            maxHeight: '80vh',
-                            bgcolor: 'background.paper',
-                            boxShadow: 24,
-                            p: 4,
-                            display: 'flex',
-                            gap: 4,
-                            overflowY: 'auto', // Enables vertical scrolling
-                        }}
-                    >
-                        {/* Bar Chart */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }} id="modal-nationality-title">
-                                Responses by Nationality
-                            </Typography>
-                            <ResponsiveContainer width="100%" height={400}>
-                                <BarChart data={surveyResponsesByRegionData}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend formatter={(label) => `Nationality`} />
-                                    <Bar dataKey="value" fill="#82ca9d" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </Box>
+                    <Fade in={openNationalityModal}>
+                        <StyledModalContent>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1f2937' }}>
+                                    🌍 Nationality Distribution
+                                </Typography>
+                                <IconButton onClick={handleNationalityClose} size="large">
+                                    <CloseIcon />
+                                </IconButton>
+                            </Box>
 
-                        {/* Table */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }} id="modal-nationality-description">
-                                Nationality Breakdown
-                            </Typography>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Nationality</TableCell>
-                                            <TableCell align="right">Count</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {surveyResponsesByRegionData.map((row) => (
-                                            <TableRow key={row.name}>
-                                                <TableCell component="th" scope="row">
-                                                    {row.name}
-                                                </TableCell>
-                                                <TableCell align="right">{row.value}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
-                    </Box>
-                </Modal>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} lg={8}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px' }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Responses by Nationality
+                                        </Typography>
+                                        <ResponsiveContainer width="100%" height={400}>
+                                            <BarChart data={surveyResponsesByRegionData.slice(0, 10)}>
+                                                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                                                <YAxis />
+                                                <Tooltip 
+                                                    contentStyle={{
+                                                        backgroundColor: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '12px',
+                                                        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                                    }}
+                                                />
+                                                <Bar 
+                                                    dataKey="value" 
+                                                    fill="url(#nationalityGradient)"
+                                                    radius={[4, 4, 0, 0]}
+                                                />
+                                                <defs>
+                                                    <linearGradient id="nationalityGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.8}/>
+                                                        <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.3}/>
+                                                    </linearGradient>
+                                                </defs>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </Box>
+                                </Grid>
 
-                {/* Popup for Survey Responses by Country of residence */}
-                <Modal
+                                <Grid item xs={12} lg={4}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px' }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Top Nationalities
+                                        </Typography>
+                                        <StyledTableContainer component={Paper} sx={{ maxHeight: 400 }}>
+                                            <Table stickyHeader>
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>Nationality</TableCell>
+                                                        <TableCell align="right">Count</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {surveyResponsesByRegionData.map((row, index) => (
+                                                        <TableRow key={row.name}>
+                                                            <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
+                                                                <Box display="flex" alignItems="center">
+                                                                    <Chip 
+                                                                        label={index + 1} 
+                                                                        size="small" 
+                                                                        color={index < 3 ? "primary" : "default"}
+                                                                        sx={{ mr: 1, minWidth: '32px' }}
+                                                                    />
+                                                                    {row.name}
+                                                                </Box>
+                                                            </TableCell>
+                                                            <TableCell align="right">
+                                                                <Chip 
+                                                                    label={row.value} 
+                                                                    color={index < 3 ? "primary" : "default"}
+                                                                    variant={index < 3 ? "filled" : "outlined"}
+                                                                    size="small"
+                                                                />
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </StyledTableContainer>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </StyledModalContent>
+                    </Fade>
+                </StyledModal>
+
+                {/* Country of Residence Modal */}
+                <StyledModal
                     open={openCountryModal}
                     onClose={handleCountryClose}
-                    aria-labelledby="modal-country-title"
-                    aria-describedby="modal-country-description"
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{ timeout: 500 }}
                 >
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: '80%',
-                            maxHeight: '80vh',
-                            bgcolor: 'background.paper',
-                            boxShadow: 24,
-                            p: 4,
-                            display: 'flex',
-                            gap: 4,
-                            overflowY: 'auto', // Enables vertical scrolling
-                        }}
-                    >
-                        {/* Bar Chart by country of residence*/}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }} id="modal-country-title">
-                                Responses by Nationality
-                            </Typography>
-                            <ResponsiveContainer width="100%" height={400}>
-                                <BarChart data={surveyResponsesByCountryData}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend formatter={(label) => `Country`} />
-                                    <Bar dataKey="value" fill="rgb(204, 45, 191)" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </Box>
+                    <Fade in={openCountryModal}>
+                        <StyledModalContent>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1f2937' }}>
+                                    🏠 Country of Residence Distribution
+                                </Typography>
+                                <IconButton onClick={handleCountryClose} size="large">
+                                    <CloseIcon />
+                                </IconButton>
+                            </Box>
 
-                        {/* Table by country of residence*/}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }} id="modal-nationality-description">
-                                Nationality Breakdown
-                            </Typography>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Nationality</TableCell>
-                                            <TableCell align="right">Count</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {surveyResponsesByCountryData.map((row) => (
-                                            <TableRow key={row.name}>
-                                                <TableCell component="th" scope="row">
-                                                    {row.name}
-                                                </TableCell>
-                                                <TableCell align="right">{row.value}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
-                    </Box>
-                </Modal>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} lg={8}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px' }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Responses by Country of Residence
+                                        </Typography>
+                                        <ResponsiveContainer width="100%" height={400}>
+                                            <BarChart data={surveyResponsesByCountryData.slice(0, 10)}>
+                                                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                                                <YAxis />
+                                                <Tooltip 
+                                                    contentStyle={{
+                                                        backgroundColor: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '12px',
+                                                        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                                    }}
+                                                />
+                                                <Bar 
+                                                    dataKey="value" 
+                                                    fill="url(#countryGradient)"
+                                                    radius={[4, 4, 0, 0]}
+                                                />
+                                                <defs>
+                                                    <linearGradient id="countryGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#ec4899" stopOpacity={0.8}/>
+                                                        <stop offset="95%" stopColor="#ec4899" stopOpacity={0.3}/>
+                                                    </linearGradient>
+                                                </defs>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </Box>
+                                </Grid>
 
-                <Modal open={openAgeGroupModal} onClose={handleAgeGroupClose}>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: 1000,
-                            bgcolor: 'background.paper',
-                            boxShadow: 24,
-                            p: 4,
-                            display: 'flex',
-                            gap: 4
-                        }}
-                    >
-                        {/* Bar Chart age group */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>
-                                Responses by Age Group
-                            </Typography>
-                            <ResponsiveContainer width="100%" height={400}>
-                                <BarChart data={surveyResponsesByAgeGroupData}>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend formatter={(label) => `Age group`} />
-                                    <Bar dataKey="value" fill="#ffc658" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </Box>
+                                <Grid item xs={12} lg={4}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px' }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Top Countries
+                                        </Typography>
+                                        <StyledTableContainer component={Paper} sx={{ maxHeight: 400 }}>
+                                            <Table stickyHeader>
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>Country</TableCell>
+                                                        <TableCell align="right">Count</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {surveyResponsesByCountryData.map((row, index) => (
+                                                        <TableRow key={row.name}>
+                                                            <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
+                                                                <Box display="flex" alignItems="center">
+                                                                    <Chip 
+                                                                        label={index + 1} 
+                                                                        size="small" 
+                                                                        color={index < 3 ? "secondary" : "default"}
+                                                                        sx={{ mr: 1, minWidth: '32px' }}
+                                                                    />
+                                                                    {row.name}
+                                                                </Box>
+                                                            </TableCell>
+                                                            <TableCell align="right">
+                                                                <Chip 
+                                                                    label={row.value} 
+                                                                    color={index < 3 ? "secondary" : "default"}
+                                                                    variant={index < 3 ? "filled" : "outlined"}
+                                                                    size="small"
+                                                                />
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </StyledTableContainer>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </StyledModalContent>
+                    </Fade>
+                </StyledModal>
 
-                        {/* Table by age group */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>
-                                Age Group Breakdown
-                            </Typography>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Age Group</TableCell>
-                                            <TableCell align="right">Responses</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {surveyResponsesByAgeGroupData.map((row) => (
-                                            <TableRow key={row.name}>
-                                                <TableCell component="th" scope="row">
-                                                    {row.name}
-                                                </TableCell>
-                                                <TableCell align="right">{row.value}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
-                    </Box>
-                </Modal>
+                {/* Age Group Modal */}
+                <StyledModal
+                    open={openAgeGroupModal}
+                    onClose={handleAgeGroupClose}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{ timeout: 500 }}
+                >
+                    <Fade in={openAgeGroupModal}>
+                        <StyledModalContent>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                                <Typography variant="h4" sx={{ fontWeight: 700, color: '#1f2937' }}>
+                                    👥 Age Group Distribution
+                                </Typography>
+                                <IconButton onClick={handleAgeGroupClose} size="large">
+                                    <CloseIcon />
+                                </IconButton>
+                            </Box>
 
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} lg={8}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px' }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Responses by Age Group
+                                        </Typography>
+                                        <ResponsiveContainer width="100%" height={400}>
+                                            <BarChart data={surveyResponsesByAgeGroupData}>
+                                                <XAxis dataKey="name" />
+                                                <YAxis />
+                                                <Tooltip 
+                                                    contentStyle={{
+                                                        backgroundColor: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '12px',
+                                                        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                                    }}
+                                                />
+                                                <Bar 
+                                                    dataKey="value" 
+                                                    fill="url(#ageGradient)"
+                                                    radius={[4, 4, 0, 0]}
+                                                />
+                                                <defs>
+                                                    <linearGradient id="ageGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#84cc16" stopOpacity={0.8}/>
+                                                        <stop offset="95%" stopColor="#84cc16" stopOpacity={0.3}/>
+                                                    </linearGradient>
+                                                </defs>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </Box>
+                                </Grid>
 
-            </Box>
+                                <Grid item xs={12} lg={4}>
+                                    <Box sx={{ p: 2, bgcolor: '#f8fafc', borderRadius: '15px' }}>
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Age Group Summary
+                                        </Typography>
+                                        <StyledTableContainer component={Paper}>
+                                            <Table>
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>Age Group</TableCell>
+                                                        <TableCell align="right">Responses</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {surveyResponsesByAgeGroupData.map((row, index) => (
+                                                        <TableRow key={row.name}>
+                                                            <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
+                                                                <Box display="flex" alignItems="center">
+                                                                    <Chip 
+                                                                        label={index + 1} 
+                                                                        size="small" 
+                                                                        color={index < 3 ? "success" : "default"}
+                                                                        sx={{ mr: 1, minWidth: '32px' }}
+                                                                    />
+                                                                    {row.name} years
+                                                                </Box>
+                                                            </TableCell>
+                                                            <TableCell align="right">
+                                                                <Chip 
+                                                                    label={row.value} 
+                                                                    color={index < 3 ? "success" : "default"}
+                                                                    variant={index < 3 ? "filled" : "outlined"}
+                                                                    size="small"
+                                                                />
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </StyledTableContainer>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </StyledModalContent>
+                    </Fade>
+                </StyledModal>
+
+                </StyledDashboardContainer>
         </StyledThemeProvider>
     );
 };

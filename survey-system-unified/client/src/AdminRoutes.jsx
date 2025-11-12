@@ -24,17 +24,34 @@ import AttractionDashboard from './components/admin/perattractiondashboard/Attra
 import LogStream from './components/admin/logstream/LogStream';
 import DataManager from './components/datamanager/DataManager';
 import SurveyTally from './components/admin/surveytallybreakdown/SurveyTally';
+import GlobalLoadingOverlay from './components/partials/GlobalLoadingOverlay';
+import useGlobalLoadingStore from './utils/globalLoadingStore';
 
 const AdminRoutes = () => {
   const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth();
   const [loading, setLoading] = useState(true);
   const hasCheckedAuth = useRef(false); // Track if the auth check has been performed
+  
+  // Safe loading store access with fallback
+  let setFetchingData, clearGlobalLoading;
+  try {
+    const loadingStore = useGlobalLoadingStore();
+    setFetchingData = loadingStore.setFetchingData;
+    clearGlobalLoading = loadingStore.clearGlobalLoading;
+  } catch (error) {
+    console.warn('GlobalLoadingProvider not found, using fallback functions');
+    setFetchingData = () => {};
+    clearGlobalLoading = () => {};
+  }
 
   useEffect(() => {
     if (hasCheckedAuth.current) return; // Skip if already checked
     hasCheckedAuth.current = true; // Mark as checked
 
     const checkAuth = async () => {
+      // Show global loading during authentication check
+      setFetchingData('Authenticating user access and verifying permissions');
+      
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/auth/check`, {
           withCredentials: true,
@@ -51,6 +68,7 @@ const AdminRoutes = () => {
         handleUnauthorized();
       } finally {
         setLoading(false);
+        clearGlobalLoading();
       }
     };
 
@@ -60,12 +78,17 @@ const AdminRoutes = () => {
   console.log('authorized? --> ', isAuthenticated);
 
   if (loading) {
-    return <div>Loading...</div>; 
+    return (
+      <>
+        <GlobalLoadingOverlay />
+      </>
+    ); 
   }
 
   return (
     <>
       {unauthorized && <WarningMessage message="Unauthorized Access! Please log in." />}
+      <GlobalLoadingOverlay />
 
       <Routes>
         <Route path="/login" element={<Login />} />

@@ -4,6 +4,8 @@ import styled, { keyframes } from 'styled-components';
 import DataDashboard from '../xdatadashboard/DataDashboard';
 import { fetchEntityMetrics } from '../../utils/getSurveyFeedbackApi';
 import { fontFamily } from '../../../config/fontConfig';
+import FetchingDataLoader from '../../partials/FetchingDataLoader';
+import useGlobalLoadingStore from '../../../utils/globalLoadingStore';
 
 // Enhanced loading and error components
 const fadeIn = keyframes`
@@ -74,6 +76,18 @@ const AttractionDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());
   const [quarter, setQuarter] = useState(Math.floor((new Date().getMonth() + 3) / 3));
+  
+  // Safe loading store access with fallback
+  let setFetchingData, clearGlobalLoading;
+  try {
+    const loadingStore = useGlobalLoadingStore();
+    setFetchingData = loadingStore.setFetchingData;
+    clearGlobalLoading = loadingStore.clearGlobalLoading;
+  } catch (error) {
+    console.warn('GlobalLoadingProvider not found, using fallback functions');
+    setFetchingData = () => {};
+    clearGlobalLoading = () => {};
+  }
 
   const handleYearChange = (event) => {
     setYear(event.target.value);
@@ -86,6 +100,9 @@ const AttractionDashboard = () => {
   useEffect(() => {
     const getMetrics = async () => {
       setIsLoading(true);
+      // Show global loading with specific message for attractions
+      setFetchingData('Fetching attraction survey data and visitor feedback analytics...');
+      
       try {
         const data = await fetchEntityMetrics(year, quarter);
         // Check if data is an array, if not, default to an empty array
@@ -113,6 +130,7 @@ const AttractionDashboard = () => {
         setError(err);
       } finally {
         setIsLoading(false);
+        clearGlobalLoading();
       }
     };
 
@@ -175,23 +193,21 @@ const AttractionDashboard = () => {
 
   if (isLoading) {
     return (
-      <LoadingContainer>
-        <LoadingTitle>
-          Loading Attraction Dashboard
-        </LoadingTitle>
-        <LoadingSubtitle>
-          Fetching and processing tourism attraction survey data and visitor feedback...
-        </LoadingSubtitle>
-        <Box sx={{ width: '100%', maxWidth: 600 }}>
-          <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 2, mb: 3 }} />
-          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-            <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 2 }} />
-            <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 2 }} />
-            <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 2 }} />
-          </Box>
-          <Skeleton variant="rectangular" width="100%" height={100} sx={{ borderRadius: 2 }} />
-        </Box>
-      </LoadingContainer>
+      <FetchingDataLoader
+        message="Fetching Data"
+        subtitle="Loading tourism attraction survey data and visitor feedback analytics..."
+        showCircularLoader={true}
+        showSkeleton={true}
+        showDots={true}
+        minHeight="60vh"
+        background="linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)"
+        borderRadius="0px"
+        titleColor="#4a5568"
+        subtitleColor="#718096"
+        loaderColor="#667eea"
+        titleSize="24px"
+        skeletonMaxWidth="800px"
+      />
     );
   }
 
