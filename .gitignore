@@ -1,5 +1,6 @@
 # Prompts and internal docs (optional)
 .github/prompts/
+.github/workflows/
 
 # Secrets and credentials (CRITICAL)
 .env
