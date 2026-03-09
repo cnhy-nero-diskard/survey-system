@@ -1,0 +1,75 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: survey_system_test
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: npm
+        cache-dependency-path: survey-system-unified/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: survey-system-unified
+      run: npm run install:all
+    
+    - name: Initialize test database
+      env:
+        PGHOST: localhost
+        PGUSER: postgres
+        PGPASSWORD: test_password
+        PGDATABASE: survey_system_test
+        PGPORT: 5432
+      run: |
+        psql < survey-system-unified/context/db_template_survey.sql
+    
+    - name: Run server tests
+      working-directory: survey-system-unified
+      env:
+        NODE_ENV: test
+        DB_HOST: localhost
+        DB_USER: postgres
+        DB_PASSWORD: test_password
+        DB_NAME: survey_system_test
+        DB_PORT: 5432
+        SESSION_SECRET: test_secret_key_for_ci_testing_only
+      run: npm test -- --passWithNoTests --bail
+      timeout-minutes: 10
+    
+    - name: Build frontend
+      working-directory: survey-system-unified
+      run: npm run client:build
+      env:
+        CI: true
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        files: ./survey-system-unified/coverage/coverage-final.json
+        fail_ci_if_error: false

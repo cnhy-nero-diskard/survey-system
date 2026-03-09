@@ -1,0 +1,114 @@
+name: Deploy to GCP Cloud Run
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to deploy to
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_REGION: us-central1
+  SERVICE_NAME: survey-system
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+    
+    - name: Configure Docker for GCR
+      run: |
+        gcloud auth configure-docker
+    
+    - name: Determine environment
+      id: env
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          ENV=${{ github.event.inputs.environment }}
+        else
+          ENV=staging
+        fi
+        echo "environment=$ENV" >> $GITHUB_OUTPUT
+        echo "service_name=$SERVICE_NAME-$ENV" >> $GITHUB_OUTPUT
+        echo "image_tag=gcr.io/$GCP_PROJECT_ID/$SERVICE_NAME-$ENV:${{ github.sha }}" >> $GITHUB_OUTPUT
+        echo "image_tag_latest=gcr.io/$GCP_PROJECT_ID/$SERVICE_NAME-$ENV:latest" >> $GITHUB_OUTPUT
+    
+    - name: Build and push Docker image
+      run: |
+        cd survey-system-unified
+        docker build -t ${{ steps.env.outputs.image_tag }} .
+        docker tag ${{ steps.env.outputs.image_tag }} ${{ steps.env.outputs.image_tag_latest }}
+        docker push ${{ steps.env.outputs.image_tag }}
+        docker push ${{ steps.env.outputs.image_tag_latest }}
+    
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy ${{ steps.env.outputs.service_name }} \
+          --image=${{ steps.env.outputs.image_tag }} \
+          --region=$GCP_REGION \
+          --platform=managed \
+          --allow-unauthenticated \
+          --memory=512Mi \
+          --cpu=1 \
+          --timeout=300 \
+          --set-env-vars=NODE_ENV=${{ steps.env.outputs.environment }} \
+          --update-env-vars=\
+            DB_HOST=${{ secrets[format('GCP_{0}_DB_HOST', steps.env.outputs.environment)] }},\
+            DB_USER=${{ secrets[format('GCP_{0}_DB_USER', steps.env.outputs.environment)] }},\
+            DB_NAME=${{ secrets[format('GCP_{0}_DB_NAME', steps.env.outputs.environment)] }},\
+            DB_PORT=${{ secrets[format('GCP_{0}_DB_PORT', steps.env.outputs.environment)] }},\
+            SESSION_SECRET=${{ secrets[format('GCP_{0}_SESSION_SECRET', steps.env.outputs.environment)] }} \
+          --add-cloudsql-instances=${{ secrets[format('GCP_{0}_CLOUD_SQL_INSTANCE', steps.env.outputs.environment)] }}
+    
+    - name: Get service URL
+      id: service
+      run: |
+        SERVICE_URL=$(gcloud run services describe ${{ steps.env.outputs.service_name }} \
+          --region=$GCP_REGION \
+          --format='value(status.url)')
+        echo "url=$SERVICE_URL" >> $GITHUB_OUTPUT
+    
+    - name: Health check
+      run: |
+        for i in {1..30}; do
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.service.outputs.url }}/api/health)
+          if [[ $HTTP_CODE == "200" ]]; then
+            echo "✓ Service is healthy"
+            exit 0
+          fi
+          echo "Attempt $i: HTTP $HTTP_CODE, retrying..."
+          sleep 2
+        done
+        echo "✗ Service failed health check"
+        exit 1
+    
+    - name: Notify deployment
+      if: success()
+      run: |
+        echo "✓ Deployment successful!"
+        echo "Environment: ${{ steps.env.outputs.environment }}"
+        echo "Service: ${{ steps.env.outputs.service_name }}"
+        echo "URL: ${{ steps.service.outputs.url }}"

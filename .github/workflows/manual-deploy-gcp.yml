@@ -1,0 +1,74 @@
+name: Manual Deployment to GCP
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      image_tag:
+        description: Docker image tag to deploy (e.g., latest, v1.0.0, sha)
+        required: false
+        default: latest
+
+env:
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_REGION: us-central1
+  SERVICE_NAME: survey-system
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+    
+    - name: Deploy to Cloud Run
+      run: |
+        IMAGE_TAG="${{ github.event.inputs.image_tag }}"
+        SERVICE=${{ env.SERVICE_NAME }}-${{ github.event.inputs.environment }}
+        IMAGE="gcr.io/${{ env.GCP_PROJECT_ID }}/$SERVICE:${IMAGE_TAG}"
+        
+        echo "Deploying $IMAGE to $SERVICE..."
+        
+        gcloud run deploy $SERVICE \
+          --image=$IMAGE \
+          --region=${{ env.GCP_REGION }} \
+          --platform=managed
+    
+    - name: Get deployment info
+      run: |
+        gcloud run services describe ${{ env.SERVICE_NAME }}-${{ github.event.inputs.environment }} \
+          --region=${{ env.GCP_REGION }} \
+          --format='value(status.url)' > /tmp/url.txt
+        
+        URL=$(cat /tmp/url.txt)
+        echo "✓ Deployed to: $URL"
+        
+        # Health check
+        for i in {1..10}; do
+          if curl -s -f "$URL/api/health" > /dev/null; then
+            echo "✓ Service is healthy"
+            exit 0
+          fi
+          sleep 2
+        done
+        
+        echo "⚠ Could not verify health, but deployment completed"

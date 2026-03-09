@@ -1,0 +1,70 @@
+name: Deploy to DigitalOcean
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to deploy to
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY_NAME: ${{ secrets.DIGITALOCEAN_REGISTRY_NAME }}
+  DO_REGION: nyc3
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+    
+    - name: Log in to Digital Ocean Container Registry
+      run: doctl registry login --expiry-seconds 600
+    
+    - name: Build image
+      working-directory: survey-system-unified
+      run: |
+        docker build -t $REGISTRY_NAME/survey-system:${{ github.event.inputs.environment }}-${{ github.sha }} .
+        docker tag $REGISTRY_NAME/survey-system:${{ github.event.inputs.environment }}-${{ github.sha }} $REGISTRY_NAME/survey-system:${{ github.event.inputs.environment }}-latest
+    
+    - name: Push image to DigitalOcean Registry
+      run: |
+        docker push $REGISTRY_NAME/survey-system:${{ github.event.inputs.environment }}-${{ github.sha }}
+        docker push $REGISTRY_NAME/survey-system:${{ github.event.inputs.environment }}-latest
+    
+    - name: Update DigitalOcean App
+      run: |
+        SPEC_FILE="app-${{ github.event.inputs.environment }}.yaml"
+        
+        # Update image in app spec
+        sed -i "s|image_identifier:.*|image_identifier: $REGISTRY_NAME/survey-system:${{ github.event.inputs.environment }}-${{ github.sha }}|" "$SPEC_FILE"
+        
+        # Deploy
+        doctl apps update ${{ secrets[format('DO_{0}_APP_ID', github.event.inputs.environment)] }} \
+          --spec="$SPEC_FILE"
+    
+    - name: Verify deployment
+      run: |
+        # Wait for deployment to complete
+        sleep 30
+        
+        # Check app status
+        APP_STATUS=$(doctl apps get ${{ secrets[format('DO_{0}_APP_ID', github.event.inputs.environment)] }} --format status --no-header)
+        
+        if [[ "$APP_STATUS" == "ACTIVE" ]]; then
+          echo "✓ Deployment successful"
+          exit 0
+        else
+          echo "✗ Deployment failed with status: $APP_STATUS"
+          exit 1
+        fi

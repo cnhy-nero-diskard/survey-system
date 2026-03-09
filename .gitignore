@@ -1,1 +1,57 @@
-.github
+# Prompts and internal docs (optional)
+.github/prompts/
+
+# Secrets and credentials (CRITICAL)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.key
+*.pem
+private-key.gpg
+
+# Database backups and migrations
+*.sql
+*.sql.gz
+*.sql.gpg
+
+# Dependencies
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+build/
+dist/
+*/build/
+*/dist/
+*.tgz
+
+# Logs
+logs/
+*.log
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+coverage/
+.nyc_output/
+
+# Production artifacts
+.next/
+.nuxt/
+.cache/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
