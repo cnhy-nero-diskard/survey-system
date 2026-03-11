@@ -24,7 +24,10 @@ This document explains folder organization and what can be archived or removed.
 - Batch operations
 
 **`survey-system-unified/context/`** - Database schema
-- `db_template_survey.sql` - Single source of truth for schema
+- `db_template_survey.sql` - Development reference schema
+
+**Root directory** - Database templates and backups
+- `MARCH_2025_TEMPLATEBACKUP.sql` - Primary template database backup (use for initialization)
 
 **`survey-system-unified/scripts/`** - Development setup scripts
 - `setup-dev.sh` / `setup-dev.bat` - Initialize development environment

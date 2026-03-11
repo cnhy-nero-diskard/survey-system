@@ -108,12 +108,17 @@ psql -U postgres -d survey_system -c "SELECT 1"
 
 ## Step 4: Initialize Database Schema (5 min)
 
+The template database is located in **MARCH_2025_TEMPLATEBACKUP.sql** (root directory backup).
+
 ```bash
 # From your survey-system directory
 cd survey-system-unified
 
-# Initialize the schema
-psql -U postgres -d survey_system < context/db_template_survey.sql
+# Initialize the schema using the template backup
+psql -U postgres -d survey_system < ../MARCH_2025_TEMPLATEBACKUP.sql
+
+# Or use the context template file if the backup is not available:
+# psql -U postgres -d survey_system < context/db_template_survey.sql
 
 # Verify tables were created
 psql -U postgres -d survey_system -c "\dt"

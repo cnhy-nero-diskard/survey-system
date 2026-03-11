@@ -53,7 +53,7 @@ See [HANDOFF.md](HANDOFF.md) for detailed list of:
 2. Explore codebase structure
 3. Submit a test survey
 4. Test admin login and dashboard
-5. Review database schema: `context/db_template_survey.sql`
+5. Review database schema: `MARCH_2025_TEMPLATEBACKUP.sql` (root directory) or `context/db_template_survey.sql`
 
 **Time estimate:** 3-4 hours
 
@@ -78,7 +78,8 @@ See [HANDOFF.md](HANDOFF.md) for detailed list of:
 
 ### Database
 - **Location:** PostgreSQL 12+
-- **Schema:** `context/db_template_survey.sql`
+- **Schema:** `MARCH_2025_TEMPLATEBACKUP.sql` (root directory - primary template backup)
+- **Schema (Context):** `context/db_template_survey.sql` (development reference)
 - **Size estimate:** Starts small, plan for growth as you collect responses
 - **Backup:** Critical for production - set up automated backups immediately
 

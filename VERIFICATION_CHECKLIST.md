@@ -27,7 +27,7 @@ Comprehensive checklist to verify the survey system is ready for team handoff. C
 - [ ] `survey-system-unified/scripts/` has README explaining setup
 - [ ] `.github/workflows/` has README explaining CI/CD
 - [ ] Code comments present for complex logic
-- [ ] SQL schema properly commented in `context/db_template_survey.sql`
+- [ ] SQL schema properly commented in `MARCH_2025_TEMPLATEBACKUP.sql` (or `context/db_template_survey.sql`)
 
 ### ✅ Docs Accuracy Check
 
@@ -70,7 +70,11 @@ cp .env.example .env
 ### ✅ Database Setup
 
 ```bash
-psql -U postgres -d survey_system < context/db_template_survey.sql
+# Use template backup from root directory
+psql -U postgres -d survey_system < ../MARCH_2025_TEMPLATEBACKUP.sql
+
+# Or use context template if needed:
+# psql -U postgres -d survey_system < context/db_template_survey.sql
 ```
 
 - [ ] Schema initializes without errors

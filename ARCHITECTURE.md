@@ -129,7 +129,9 @@ Business logic:
 - Analytics calculations
 - Error handling
 
-### Database Tables (context/db_template_survey.sql)
+### Database Tables (MARCH_2025_TEMPLATEBACKUP.sql)
+**Template Database Location:** The template database schema is defined in `MARCH_2025_TEMPLATEBACKUP.sql` (root directory backup file)
+
 Core tables:
 - `surveys`: Survey templates/definitions
 - `responses`: Individual survey responses (responses submitted by users)
@@ -138,6 +140,8 @@ Core tables:
 - `questions`: Individual questions
 - `localization`: Translations
 - And related tables for analytics/metrics
+
+For development reference, the context directory also contains `context/db_template_survey.sql`
 
 ## API Endpoints
 

@@ -79,9 +79,9 @@ gcloud sql users create postgres \
   --instance=survey-system-db \
   --password=[STRONG_PASSWORD]
 
-# Initialize schema
+# Initialize schema (using template backup from MARCH_2025_TEMPLATEBACKUP.sql)
 gcloud sql connect survey-system-db \
-  --user=postgres < context/db_template_survey.sql
+  --user=postgres < ../MARCH_2025_TEMPLATEBACKUP.sql
 ```
 
 ### Step 2: Create Cloud Storage Bucket (Optional, for logs/backups)

@@ -178,8 +178,11 @@ PORT=3001 npm run dev:client
 # Create database if it doesn't exist
 psql -U postgres -c "CREATE DATABASE survey_system;"
 
-# Initialize schema
-psql -U postgres -d survey_system < context/db_template_survey.sql
+# Initialize schema using the template backup file
+psql -U postgres -d survey_system < ../MARCH_2025_TEMPLATEBACKUP.sql
+
+# Or use the context template if backup unavailable:
+# psql -U postgres -d survey_system < context/db_template_survey.sql
 
 # Verify tables were created
 psql -U postgres -d survey_system -c "\dt"
@@ -200,8 +203,11 @@ pg_dump -U postgres survey_system > backup.sql
 psql -U postgres -c "DROP DATABASE survey_system;"
 psql -U postgres -c "CREATE DATABASE survey_system;"
 
-# Reinitialize
-psql -U postgres -d survey_system < context/db_template_survey.sql
+# Reinitialize using template backup
+psql -U postgres -d survey_system < ../MARCH_2025_TEMPLATEBACKUP.sql
+
+# Or use the context template:
+# psql -U postgres -d survey_system < context/db_template_survey.sql
 ```
 
 ---

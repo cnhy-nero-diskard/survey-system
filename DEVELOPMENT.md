@@ -85,8 +85,14 @@ CREATE DATABASE survey_system;
 
 ### Initialize Database Schema
 
+**Template Database Location:** The template database schema is located in `MARCH_2025_TEMPLATEBACKUP.sql` (see [MARCH_2025_TEMPLATEBACKUP.sql](MARCH_2025_TEMPLATEBACKUP.sql))
+
 ```bash
 # From the survey-system-unified directory
+# Using the template backup file
+psql -U postgres -d survey_system < ../MARCH_2025_TEMPLATEBACKUP.sql
+
+# Or using the context template
 psql -U postgres -d survey_system < context/db_template_survey.sql
 ```
 
