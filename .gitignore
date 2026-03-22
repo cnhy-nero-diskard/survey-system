@@ -1,7 +1,7 @@
 # Prompts and internal docs (optional)
 .github/prompts/
 .github/workflows/
-
+.github/agents/
 # Secrets and credentials (CRITICAL)
 .env
 .env.local
