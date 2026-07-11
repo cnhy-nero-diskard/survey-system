@@ -7,7 +7,7 @@ import { addHFToken, getHFTokenByLabel, getHFTokens } from '../services/hfTokenS
 import { queryHuggingFace } from '../services/huggingFaceService.js';
 import { logEmitter } from '../middleware/logger.js';
 import dotenv from 'dotenv';
-import { createEstablishmentService, createLocalizationService, createSentimentAnalysisService, createSurveyFeedbackService, createTourismAttractionService, deleteEstablishmentService, deleteLocalizationService, deleteSentimentAnalysisService, deleteSurveyFeedbackService, deleteSurveyResponseService, deleteTourismAttractionService, fetchAllTouchpointsService, fetchEstablishmentsService, fetchEstTypes, fetchLocalizationsService, fetchLocationsWithFilterService, fetchSentimentAnalysisService, fetchSurveyFeedbackService, fetchSurveyResponsesService, fetchTourismAttractionsService, fetchTranslatedTouchpointService, insertTopicDataService, updateEstablishmentService, updateLocalizationService, updateSentimentAnalysisService, updateSurveyFeedbackService, updateSurveyResponseService, updateTourismAttractionService } from '../services/adminCRUD.js';
+import { createEstablishmentService, createLocalizationService, createSentimentAnalysisService, createSurveyFeedbackService, createSurveyResponseService, createTourismAttractionService, deleteEstablishmentService, deleteLocalizationService, deleteSentimentAnalysisService, deleteSurveyFeedbackService, deleteSurveyResponseService, deleteTourismAttractionService, fetchAllTouchpointsService, fetchEstablishmentsService, fetchEstTypes, fetchLocalizationsService, fetchLocationsWithFilterService, fetchSentimentAnalysisService, fetchSurveyFeedbackService, fetchSurveyResponsesService, fetchTourismAttractionsService, fetchTranslatedTouchpointService, insertTopicDataService, updateEstablishmentService, updateLocalizationService, updateSentimentAnalysisService, updateSurveyFeedbackService, updateSurveyResponseService, updateTourismAttractionService } from '../services/adminCRUD.js';
 import { calculateAverageCompletionTimeService, fetchAllFinishedRows, fetchAndGroupFinishedSurveyResponsesByMonthService, fetchByAgeGroup, fetchByCountryResidence, fetchByGender, fetchByNationality, fetchByTimeOfDay, fetchEntityinSurveyFeedbackService, fetchTouchpointsService, fetchUnfinishedSurveys, getAllSurveyTally, getAllSurveyTallyPaginated, getSentimentAnalysis, getSentimentLocation, getSurveyResponseByTopic, groupByLikertRatingService } from '../services/analyticsCRUD.js';
 dotenv.config();
 
@@ -207,13 +207,16 @@ export const autoAnalyzeSentimentController = async (req, res) => {
       }
     });
 
-    // Start a transaction
-    await pool.query('BEGIN');
-
+    // Start a transaction on a dedicated client so BEGIN/COMMIT/ROLLBACK all run
+    // on the same physical connection (pool.query() may otherwise use different
+    // connections per call, giving no real atomicity).
+    const client = await pool.connect();
     try {
+      await client.query('BEGIN');
+
       // Update survey_feedback (only is_analyzed)
       const updateFeedbackPromises = relevantFeedback.rows.map((row) => {
-        return pool.query(
+        return client.query(
           'UPDATE survey_feedback SET is_analyzed = true WHERE response_id = $1',
           [row.response_id]
         );
@@ -222,19 +225,21 @@ export const autoAnalyzeSentimentController = async (req, res) => {
       // Insert into sentiment_analysis
       const insertSentimentPromises = relevantFeedback.rows.map((row, index) => {
         const result = analysisResults[index];
-        return pool.query(
-          `INSERT INTO sentiment_analysis 
-           (user_id, sqref, sentiment, confidence, response_id) 
+        return client.query(
+          `INSERT INTO sentiment_analysis
+           (user_id, sqref, sentiment, confidence, response_id)
            VALUES ($1, $2, $3, $4, $5)`,
           [row.anonymous_user_id, row.surveyquestion_ref, result.sentiment, result.confidence, row.response_id]
         );
       });
 
       await Promise.all([...updateFeedbackPromises, ...insertSentimentPromises]);
-      await pool.query('COMMIT');
+      await client.query('COMMIT');
     } catch (err) {
-      await pool.query('ROLLBACK');
+      await client.query('ROLLBACK');
       throw err;
+    } finally {
+      client.release();
     }
 
     res.json({
@@ -623,10 +628,10 @@ export const createSurveyResponseController = async (req, res, next) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const result = await createSurveyResponse(anonymous_user_id, surveyquestion_ref, response_value);
+    const result = await createSurveyResponseService(anonymous_user_id, surveyquestion_ref, response_value);
     res.status(201).json(result);
   } catch (err) {
-    next(`ERROR ON CREATING SURVEY RESPONSE: ${err}`);
+    next(err);
   }
 };
 

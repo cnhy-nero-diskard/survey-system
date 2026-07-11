@@ -2,8 +2,6 @@
 import express from 'express';
 import { getAdminData, getAdminSessionData, updateTourismAttractionController, addTourismAttractionController, deleteTourismAttractionController, posthftokens, gethftokens, analyzeSentiment, analyzeTopics, fetchAnonymousUsersController, logstream, getEstablishmentEnglishNamesController, getOpenEndedSurveyResponses, createLocalization, fetchLocalization, updateLocalization, deleteLocalization, createEstablishment, fetchEstablishments, updateEstablishment, deleteEstablishment, createTourismAttractionController, fetchTourismAttractionController, createSurveyResponseController, fetchSurveyResponsesController, updateSurveyResponseController, deleteSurveyResponseController, fetchSurveyQuestionsController, createSentimentAnalysisController, updateSentimentAnalysisController, fetchSentimentAnalysisController, deleteSentimentAnalysisController, insertTopicDataController, fetchAllTouchpointsController, fetchTranslatedTouchpointController, groupByLikertRatingController, getSurveyMetricsAnalyticsController, getSurveyFeedbackController, getAllByTallyController, getAllByTallyPaginatedController, getSentimentAnalysisController, getSurveyByTopicController, getSentimentLocationController, createSurveyFeedbackController, fetchSurveyFeedbackController, updateSurveyFeedbackController, deleteSurveyFeedbackController, autoAnalyzeSentimentController, autoClassifyRelevanceController, obtainSpamAnonymousUsersController, fetchLocationsWithFilterController, fetchEstTypesController } from '../controllers/adminController.js';
 import { authenticate, authorizeAdmin } from '../middleware/authMiddleware.js';
-import { submitSurveyResponseController } from '../controllers/surveyController.js';
-import { validateSurveyResponse } from '../middleware/validationMiddleware.js';
 import { validateTourismAttraction } from '../middleware/validationMiddleware.js';
 import { getEstablishmentEnglishNames, purgeAnonymousUsers } from '../services/adminService.js';
 import { getMetrics } from '../metrics/metricsController.js';
@@ -19,17 +17,16 @@ router.get('/api/admin/data', authenticate, getAdminData);
 // router.put('/api/admin/update/:id', authenticate, updateTourismAttractionController);
 
 router.post('/api/admin/add', authenticate, validateTourismAttraction, addTourismAttractionController);
-router.post('/api/survey/submit', validateSurveyResponse, submitSurveyResponseController);
 router.get('/api/admin/session-data', authenticate, getAdminSessionData);
 router.get('/metrics', getMetrics);
 router.get('/api/admin/establishments', authenticate, getEstablishmentEnglishNamesController);
 router.get('/api/admin/survey-responses/open-ended', authenticate, getOpenEndedSurveyResponses);
 
-router.post('/api/hf-tokens', posthftokens);
+router.post('/api/hf-tokens', authenticate, authorizeAdmin, posthftokens);
 router.get('/api/hf-tokens', authenticate, gethftokens);
-router.post('/api/analyzesentiment', analyzeSentiment);
-router.post('/api/analyzetopics', analyzeTopics);
-router.post('/api/storetopics', insertTopicDataController);
+router.post('/api/analyzesentiment', authenticate, analyzeSentiment);
+router.post('/api/analyzetopics', authenticate, analyzeTopics);
+router.post('/api/storetopics', authenticate, insertTopicDataController);
 
 router.post('/api/admin/localization', authenticate, createLocalization);
 router.get('/api/admin/localization', authenticate, fetchLocalization);
@@ -74,13 +71,13 @@ router.post('/api/touchpointlocal', fetchTranslatedTouchpointController);
 
 router.get('/api/admin/getsurveymetrics', authenticate, getSurveyMetricsAnalyticsController);
 router.get('/api/admin/getEntityMetrics', authenticate, getSurveyFeedbackController )
-router.get('/api/admin/getAllByTally', getAllByTallyController); //NOTE: FRONTEND THAT USES THIS NEEDS TO ATTACH COOKIES FOR AUTHENTICATION, THEN YOU CAN INCLUDE authenticate MIDDLEWARE
+router.get('/api/admin/getAllByTally', authenticate, getAllByTallyController);
 router.get('/api/admin/getAllByTallyPaginated', authenticate, getAllByTallyPaginatedController);
 
-router.get('/api/admin/getsentimenttable', getSentimentAnalysisController); //NOTE: FRONTEND THAT USES THIS NEEDS TO ATTACH COOKIES FOR AUTHENTICATION, THEN YOU CAN INCLUDE authenticate MIDDLEWARE
+router.get('/api/admin/getsentimenttable', authenticate, getSentimentAnalysisController);
 router.post('/api/admin/getsentimenttableforlocation', authenticate, getSentimentLocationController);
 
-router.get('/api/admin/surveytopics', getSurveyByTopicController); //NOTE: FRONTEND THAT USES THIS NEEDS TO ATTACH COOKIES FOR AUTHENTICATION, THEN YOU CAN INCLUDE authenticate MIDDLEWARE
+router.get('/api/admin/surveytopics', authenticate, getSurveyByTopicController);
 
 router.get('/api/admin/automateclassification', authenticate, autoClassifyRelevanceController)
 router.get('/api/admin/automatesentiment', authenticate, autoAnalyzeSentimentController);

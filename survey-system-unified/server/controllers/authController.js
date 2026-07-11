@@ -31,17 +31,13 @@ export const login = async (req, res, next) => {
 
         const cookieOptions = {
             httpOnly: true,
-            secure: false,     //TRUE IF IN PRODUCTION
-            // sameSite: 'none', // UNCOMMENT THIS WHEN YOU'RE DEPLOYING THIS in production
+            secure: process.env.NODE_ENV === 'production', // HTTPS-only in production
+            sameSite: 'lax',
             maxAge: 18000000, // 5 hours expiration
             path: '/',
         };
 
-        logger.info('Cookie options:', cookieOptions);
-
         res.cookie('token', token, cookieOptions).status(200).send('Logged in successfully');
-
-        logger.info('Response Headers:', res.getHeaders());
     } catch (err) {
         logger.error('Error during login:', err);
         next(err);
@@ -59,12 +55,13 @@ export const logout = async (req, res, next) => {
 
         await pool.query('UPDATE admin_table SET last_logout = NOW(), session_duration = $1, is_logged_in = FALSE WHERE username = $2', [sessionDuration, username]);
 
-        // Clear the token cookie
+        // Clear the token cookie using the SAME attributes it was set with,
+        // otherwise some browsers will not remove it.
         res.clearCookie('token', {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
         }).status(200).send('Logged out successfully');
 
     } catch (err) {

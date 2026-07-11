@@ -23,20 +23,15 @@ export const submitSurveyResponseController = async (req, res, next) => {
         // Process each response in the array
         const responses = surveyResponses.map(async (response) => {
             try {
-                // Validate individual response objects
-                // if (!response.surveyId || !response.questionId || response.response === undefined) {
-                //     throw new Error("Invalid response object");
-                // }
-
                 // Submit individual response
                 const a = await submitSurveyResponse(response, anonymousUserId);
                 logger.database(`Successfully submitted response for survey ${JSON.stringify(a)}`);
-                
-                // return a
+                return a;
             } catch (responseError) {
+                // Log per-item, but do NOT respond here — a single response is
+                // sent by the outer handler to avoid "headers already sent".
                 logger.error(`Error submitting response <${JSON.stringify(response)}>: ${responseError.message}`);
-                res.status(404).json({error: responseError})
-                throw responseError; // Re-throw to be caught by the main try/catch
+                throw responseError;
             }
         });
 
@@ -53,11 +48,16 @@ export const submitSurveyResponseController = async (req, res, next) => {
 
 
 export const fetchSurveyResponsesController = async (req, res, next) => {
-    logger.info("GET /api/survey/responses/:user_id");
+    logger.info("GET /api/survey/responses");
     try {
-        const { user_id } = req.params;
-        const anonymousUserId = req.cookies.anonymousUserId;
-        const responses = await fetchSurveyResponsesByUser(user_id, anonymousUserId);
+        // Scope strictly to the caller's own server-side session identity. The
+        // `:user_id` URL param is untrusted and intentionally ignored — trusting
+        // it previously allowed any client to read another user's responses (IDOR).
+        const anonymousUserId = req.session?.anonymousUserId || req.cookies?.anonymousUserId;
+        if (!anonymousUserId) {
+            return res.status(401).json({ error: 'No session identity' });
+        }
+        const responses = await fetchSurveyResponsesByUser(anonymousUserId);
         res.status(201).json(responses);
     } catch (err) {
         next(err);

@@ -2,7 +2,6 @@ import logger from "../middleware/logger.js";
 export const queryHuggingFace = async (data, apiToken, modelUrl) => {
     logger.info("Querying Hugging Face model");
     logger.info(`Data: ${JSON.stringify(data)}`);
-    logger.info(`API Token: ${apiToken}`);
     logger.info(`Model URL: ${modelUrl}`);
     data = {inputs: data};
     const queryModel = async () => {

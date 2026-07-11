@@ -59,15 +59,15 @@ export const submitSurveyResponse = async (response, anonymousUserId) => {
     }
 };
 
-export const fetchSurveyResponsesByUser = async (user_id, anonymousUserId) => {
+export const fetchSurveyResponsesByUser = async (anonymousUserId) => {
     const query = `
-        SELECT 
-            sr.*, 
+        SELECT
+            sr.*,
             au.created_at AS anonymous_user_created_at
         FROM survey_responses sr
         LEFT JOIN anonymous_users au ON sr.anonymous_user_id = au.anonymous_user_id
-        WHERE sr.user_id = $1 OR sr.anonymous_user_id = $2;
+        WHERE sr.anonymous_user_id = $1;
     `;
-    const result = await pool.query(query, [user_id, anonymousUserId]);
+    const result = await pool.query(query, [anonymousUserId]);
     return result.rows;
 };

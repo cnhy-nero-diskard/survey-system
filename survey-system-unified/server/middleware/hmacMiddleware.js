@@ -15,16 +15,13 @@ export const verifyHMAC = (req, res, next) => {
     const hmac = req.headers['x-hmac-signature']; // HMAC signature from the client
     const payload = req.body ? JSON.stringify(req.body) : ''; // Request payload
 
-    // Log the payload and HMAC for debugging (redact sensitive data if necessary)
-    logger.info(`Payload: ${payload}`);
-    logger.info(`Received HMAC: ${hmac}`);
+    // Do NOT log the raw payload — auth request bodies contain plaintext
+    // credentials (e.g. admin registration passwords).
+    logger.info('Verifying HMAC signature for incoming request');
 
     try {
         // Recalculate the HMAC signature using CryptoJS
         const expectedHmac = CryptoJS.HmacSHA256(payload, process.env.HMAC_SECRET).toString(CryptoJS.enc.Hex);
-
-        // Log the expected HMAC for debugging
-        logger.info(`Expected HMAC: ${expectedHmac}`);
 
         // Compare the HMAC signatures using a timing-safe function
         if (!timingSafeEqual(hmac, expectedHmac)) {

@@ -20,6 +20,7 @@ import pool from './config/db.js';
 import pgSession from 'connect-pg-simple';
 import { logstream } from './controllers/adminController.js';
 import { spamThrottle } from './middleware/spamthrottle.js';
+import { authenticate, authorizeAdmin } from './middleware/authMiddleware.js';
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -45,18 +46,30 @@ const app = express();
 // Middleware setup
 app.use(express.json());
 
-// CORS setup - allow both external frontend and unified deployment
+// Security headers must be registered before any route so they apply to every request
+app.use(helmet());
+
+// CORS setup - fail closed: only allow the configured frontend origin.
+// In unified deployment the frontend is served from the same origin, so no
+// cross-origin allowance is needed; defaulting to `true` would reflect any
+// origin while credentials are enabled, defeating same-origin protection.
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || true, // Allow all origins in unified mode or specific frontend URL
+  origin: process.env.FRONTEND_URL || false,
   credentials: true, // Allow cookies to be sent
 };
 app.use(cors(corsOptions));
+
+// Rate limiting must be registered before routes so it applies to every request
+const limiter = rateLimit({
+  windowMs: 3 * 60 * 1000, // 3 minutes
+  max: 10000 // limit each IP per windowMs
+});
+app.use(limiter);
 
 // Serve static files from the React app build directory in production
 app.use(express.static(clientBuildPath));
 
 app.use(cookieParser());
-app.use('/api/log-stream', logstream)
 app.use(
   session({
     store: new PgSession({
@@ -68,12 +81,16 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 day
-      secure: false // Set to true if using HTTPS
+      secure: process.env.NODE_ENV === 'production', // HTTPS-only in production
     },
   })
 );
 app.use(handleAnonymousUser);
 app.use(spamThrottle);
+
+// Log stream must be authenticated (admin-only) and registered after session/auth
+// setup — it broadcasts every application log line via SSE.
+app.use('/api/log-stream', authenticate, authorizeAdmin, logstream);
 
 // Serve static files from React build (in production)
 if (process.env.NODE_ENV === 'production') {
@@ -86,33 +103,9 @@ app.use('/', clientRoutes);
 
 // Use admin routes
 app.use('/', adminRoutes);
-app.use(errorHandler);
 
 //authentication routes
 app.use(authRoutes);
-
-
-
-app.use(helmet());
-
-//rate limiting
-const limiter = rateLimit({
-  windowMs: 3 * 60 * 1000, // 3 minutes
-  max: 10000 // limit each IP to 100 requests per windowMs
-});
-
-app.use(limiter);
-app.get('/verify-cookie', (req, res) => {
-  logger.info('Cookies: ', req.cookies);
-  const token = req.cookies.token; // Access the cookie
-  if (token) {
-      logger.info('Token found in cookie:', token);
-      res.send('Cookie is present and contains data.');
-  } else {
-      logger.info('No token found in cookie.');
-      res.status(400).send('Cookie is missing or empty.');
-  }
-});
 
 // Health check endpoint for Docker and monitoring
 app.get('/api/health', (req, res) => {
@@ -138,6 +131,10 @@ app.get('*', (req, res) => {
     }
   });
 });
+
+// Central error handler must be registered last so it catches errors thrown by
+// every route above it (including auth routes).
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000; // Use environment variable PORT or default to 5000
 app.listen(PORT, () => {

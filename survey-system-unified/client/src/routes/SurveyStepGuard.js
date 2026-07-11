@@ -25,7 +25,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
         console.log(`SSGUARD VERIFYING with active blocks ${JSON.stringify(activeBlocks)}`);
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
         let currentStep = response.data.currentStep;
-        const parentPath = getParentPath(location.pathname)
+        let parentPath = getParentPath(location.pathname)
         console.log(`PARENT PATH of ${location.pathname} --> ${parentPath}`);
         if (parentPath ===""){
           parentPath = location.pathname
@@ -35,38 +35,38 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
         } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
           removeActiveBlocks("surveytpms");
         }
-        // Redirect to the first step if currentStep is 0 and the user is not on the first step
+        // Redirect to the first step if currentStep is 0 and the user is trying
+        // to skip ahead of it.
         if (currentStep === 0 && index !== 0) {
           console.log("SSGUARD detected zero currentStep")
-          // (comment this so you don't get redirected when debugging)👇👇👇
-          // navigate(parentPath);
+          navigate(parentPath);
           return;
         }
 
-        // Handle conditional blocks 
-
+        // Handle conditional blocks: if this route belongs to a conditional
+        // block the user hasn't activated, walk back to the nearest universal
+        // step and send them there instead of accepting wherever they landed.
         if (route.conditionalBlock && !activeBlocks.includes(route.conditionalBlock)) {
           console.log(`SSGUARD conditional block ${route.conditionalBlock} not found`);
           let newindex = index;
 
-          // (comment this so you don't get redirected when debugging)👇👇👇
-          // while (routes[newindex].conditionalBlock !== 'universal') {
-          //   console.log(`SSGUARD route -> ${index}`);
-          //   newindex--;
-          // }
+          while (newindex > 0 && routes[newindex].conditionalBlock !== 'universal') {
+            console.log(`SSGUARD walking back route -> ${newindex}`);
+            newindex--;
+          }
 
           await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
             currentStep: newindex,
           }, { withCredentials: true });
 
-
-          // navigate(`${parentPath}/${routes[newindex].path}`);
+          navigate(`${parentPath}/${routes[newindex].path}`);
           return;
         }
 
-        // Strict validation: Ensure the user is on the correct step
-        if (index !== currentStep) {
-          console.log(`SSGUARD invalid entry index of ${index} not matching with currentStep ${currentStep}`);
+        // Block forward-skipping only. Revisiting a completed step
+        // (index <= currentStep) is allowed without redirect.
+        if (index > currentStep) {
+          console.log(`SSGUARD forward-skip blocked: index ${index} is ahead of currentStep ${currentStep}`);
 
           setRedirectCount(prevCount => prevCount + 1);
 
@@ -76,10 +76,9 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
             navigate("/404");
             return;
           }
-          
-          // Redirect to the correct step immediately
-          // (comment this so you don't get redirected when debugging)👇👇👇
-          // navigate(`${parentPath}/${surveyRoutes[currentStep].path}`);
+
+          // Redirect to the correct current step immediately
+          navigate(`${parentPath}/${surveyRoutes[currentStep].path}`);
           return;
         }
 
