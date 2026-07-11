@@ -4,7 +4,9 @@ import pool from "../config/db.js";
 import logger from "../middleware/logger.js";
 
 export const getAdminDataFromDB = async () => {
-  const result = await pool.query('SELECT * FROM admin_table'); // Replace with your actual admin table
+  const result = await pool.query(
+    'SELECT id, username, gmail, last_login, last_logout, session_duration, is_logged_in FROM admin_table'
+  );
   return result.rows;
 };
 
@@ -91,59 +93,26 @@ export const getEstablishmentEnglishNames = async () => {
 
 export const fetchOpenEndedSurveyResponses = async () => {
   try {
-    // Query for survey feedback responses
-    const surveyFeedbackQuery = `
-      SELECT sf.response_id, sf.is_analyzed, sf.anonymous_user_id, sf.surveyquestion_ref, sf.created_at AS created_at, sf.response_value, sf.touchpoint, sf.entity 
-      FROM survey_feedback sf;
+    // Single query: join survey_feedback against all four entity tables via UNION
+    const query = `
+      SELECT
+        sf.response_id, sf.is_analyzed, sf.anonymous_user_id, sf.surveyquestion_ref,
+        sf.created_at, sf.response_value, sf.touchpoint, sf.entity,
+        entities.name
+      FROM survey_feedback sf
+      LEFT JOIN (
+        SELECT short_id, est_name AS name FROM establishments
+        UNION ALL
+        SELECT short_id, ta_name AS name FROM tourismattractions
+        UNION ALL
+        SELECT short_id, ta_name AS name FROM tourismactivities
+        UNION ALL
+        SELECT short_id, name FROM locations
+      ) entities ON entities.short_id = sf.entity;
     `;
-
-    // Execute the query
-    const surveyFeedbackResult = await pool.query(surveyFeedbackQuery);
-
-    // Function to fetch name based on entity (short_id)
-    const fetchNameByEntity = async (entity) => {
-      // Check in establishments table
-      const estQuery = `
-        SELECT est_name AS name FROM establishments WHERE short_id = $1;
-      `;
-      const estResult = await pool.query(estQuery, [entity]);
-      if (estResult.rows.length > 0) return estResult.rows[0].name;
-
-      // Check in tourismattractions table
-      const taQuery = `
-        SELECT ta_name AS name FROM tourismattractions WHERE short_id = $1;
-      `;
-      const taResult = await pool.query(taQuery, [entity]);
-      if (taResult.rows.length > 0) return taResult.rows[0].name;
-
-      // Check in tourismactivities table
-      const tacQuery = `
-        SELECT ta_name AS name FROM tourismactivities WHERE short_id = $1;
-      `;
-      const tacResult = await pool.query(tacQuery, [entity]);
-      if (tacResult.rows.length > 0) return tacResult.rows[0].name;
-
-      // Check in locations table
-      const locQuery = `
-        SELECT name FROM locations WHERE short_id = $1;
-      `;
-      const locResult = await pool.query(locQuery, [entity]);
-      if (locResult.rows.length > 0) return locResult.rows[0].name;
-
-      // If no match is found, return null
-      return null;
-    };
-
-    // Add the 'name' key to each response
-    const combinedResults = await Promise.all(
-      surveyFeedbackResult.rows.map(async (row) => {
-        const name = await fetchNameByEntity(row.entity);
-        return { ...row, name };
-      })
-    );
-
-    logger.warn(`OPEN-ENDED SURVEY RESPONSES AND FEEDBACK: ${combinedResults.length}`);
-    return combinedResults;
+    const result = await pool.query(query);
+    logger.warn(`OPEN-ENDED SURVEY RESPONSES AND FEEDBACK: ${result.rows.length}`);
+    return result.rows;
   } catch (err) {
     logger.error(err.message);
   }

@@ -35,15 +35,16 @@ export const handleAnonymousUser = async (req, res, next) => {
     }
 
     // Schedule a task to mark the user as inactive after 1 minute
+    const userId = req.session.anonymousUserId;
     setTimeout(async () => {
       try {
         await pool.query(
           'UPDATE anonymous_users SET is_active = FALSE WHERE anonymous_user_id = $1',
-          [req.session.anonymousUserId]
+          [userId]
         );
 
       } catch (error) {
-        logger.error(`Error marking anonymous user ID ${req.session.anonymousUserId} as inactive:`, error);
+        logger.error(`Error marking anonymous user ID ${userId} as inactive:`, error);
       }
     }, 60000); // 1 minute
 

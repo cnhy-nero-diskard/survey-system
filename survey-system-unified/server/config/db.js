@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 // Load environment variables from parent directory
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
-const requiredEnvVars = ['PG_USER', 'PG_HOST', 'PG_DATABASE', 'PG_PASSWORD', 'PG_PORT', 'JWT_SECRET'];
+const requiredEnvVars = ['PG_USER', 'PG_HOST', 'PG_DATABASE', 'PG_PASSWORD', 'PG_PORT', 'JWT_SECRET', 'CRYPTO_SECRET'];
 
 // Check for required environment variables
 try {
@@ -37,6 +37,7 @@ try {
     database: process.env.PG_DATABASE,
     password: process.env.PG_PASSWORD,
     port: process.env.PG_PORT,
+    max: 10,
     connectionTimeoutMillis: 5000,
   };
   

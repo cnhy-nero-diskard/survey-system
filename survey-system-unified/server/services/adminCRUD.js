@@ -1,5 +1,4 @@
 // services/adminCRUD.js
-import { query } from "express";
 import pool from "../config/db.js";
 import logger from "../middleware/logger.js";
 
@@ -987,8 +986,12 @@ export const fetchTranslatedTouchpointService = async (entityName, languageCode)
 
   // Fallback: query the establishments table using the 2-char language code as the column name
   try {
-    // Make sure to sanitize or validate this if necessary
+    // Allowlist of valid language column names to prevent SQL injection
+    const ALLOWED_LANGUAGE_COLUMNS = ['en', 'ko', 'zh', 'ja', 'es', 'fr', 'ru', 'hi'];
     const columnName = languageCode.toLowerCase().trim();
+    if (!ALLOWED_LANGUAGE_COLUMNS.includes(columnName)) {
+      throw new Error(`Invalid language code: ${languageCode}`);
+    }
     const queryEstablishments = `
       SELECT ${columnName} AS translation
       FROM public.establishments

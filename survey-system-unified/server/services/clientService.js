@@ -13,8 +13,8 @@ export const getLanguagesFromDB = async () => {
 };
 
 export const getTextsFromDB = async (language, component) => {
-  const query = `SELECT key, textcontent FROM ${process.env.PG_LOCALIZATION} WHERE language_code = '${language}' AND component = '${component}'`;
-  const result = await pool.query(query);
+  const query = `SELECT key, textcontent FROM ${process.env.PG_LOCALIZATION} WHERE language_code = $1 AND component = $2`;
+  const result = await pool.query(query, [language, component]);
   return result.rows;
 };
 
@@ -108,8 +108,9 @@ export const getTourismAttractionLocalizations = async (languageCode) => {
 
 // pseudo-spam protection code to prevent duplicate entries to be inserted into survey_feedback table
 export const submitSurveyFeedback = async ({ entity, rating, review, touchpoint, anonid, language }) => {
-  
+  const client = await pool.connect();
   try {
+    await client.query('BEGIN');
 
     // First, insert/update the survey feedback
     const surveyQuery = `
@@ -128,7 +129,7 @@ export const submitSurveyFeedback = async ({ entity, rating, review, touchpoint,
       RETURNING response_id, created_at, (xmax::text::int > 0) AS was_update;
     `;
 
-    const surveyResult = await pool.query(surveyQuery, [
+    const surveyResult = await client.query(surveyQuery, [
       entity, 
       rating, 
       review, 
@@ -146,21 +147,22 @@ export const submitSurveyFeedback = async ({ entity, rating, review, touchpoint,
         SET spamcounter = COALESCE(spamcounter, 0) + 2 
         WHERE anonymous_user_id = $1
       `;
-      await pool.query(updateUserQuery, [anonid]);
+      await client.query(updateUserQuery, [anonid]);
 
       // Delete matching sentiment analysis record
       const deleteSentimentQuery = `
         DELETE FROM sentiment_analysis 
         WHERE response_id = $1
       `;
-      await pool.query(deleteSentimentQuery, [surveyResult.rows[0].response_id]);
+      await client.query(deleteSentimentQuery, [surveyResult.rows[0].response_id]);
     }
 
-    await pool.query('COMMIT');
+    await client.query('COMMIT');
     return surveyResult.rows[0];
   } catch (error) {
-    await pool.query('ROLLBACK');
+    await client.query('ROLLBACK');
     throw error;
   } finally {
+    client.release();
   }
 };

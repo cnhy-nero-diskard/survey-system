@@ -279,7 +279,7 @@ export const appendNewFeedback = async (req, res, next) => {
 
 export const getUserFeedback = async (req, res, next) => {
   logger.database('GET /api/survey/feedback');
-  const { anonid } = req.query; 
+  const anonid = req.session.anonymousUserId;
   logger.warn(`GET TPENT from user ${anonid}`);
 
   try {

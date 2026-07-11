@@ -23,7 +23,7 @@ export const login = async (req, res, next) => {
             return res.status(400).json({ error: 'Invalid username or password.' });
         }
 
-        const token = jwt.sign({ username: admin.username }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ username: admin.username, role: 'admin' }, process.env.JWT_SECRET, {
             expiresIn: '3h',
         });
 
@@ -72,7 +72,7 @@ export const logout = async (req, res, next) => {
     }
 }; export const registerAdmin = async (req, res) => {
     const { username, password, email } = req.body;
-    logger.info(`POST /api/auth/register for password: ${password} and username: ${username}    email: ${email}`);
+    logger.info(`POST /api/auth/register for username: ${username}  email: ${email}`);
     try {
         // Hash the password
         logger.info('Hashing password');
@@ -94,10 +94,11 @@ export const logout = async (req, res, next) => {
 
         } catch (error) {
             logger.error('Error registering admin:', error);
+            return res.status(500).json({ error: 'Failed to register admin.' });
         }
     } catch (err) {
-        logger.error('Error registering admin:', err);
-        throw err; // Pass the error to the caller
+        logger.error('Error hashing password:', err);
+        return res.status(500).json({ error: 'Failed to register admin.' });
     }
 };
 

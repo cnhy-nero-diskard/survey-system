@@ -1,5 +1,4 @@
 // services/adminCRUD.js
-import { query } from "express";
 import pool from "../config/db.js";
 import logger from "../middleware/logger.js";
 //EACH ONE OF THESE ARE HELPER FUNCTIONS. A CONTROLLER MAY CHOOSE TO AGGREGATE THEM

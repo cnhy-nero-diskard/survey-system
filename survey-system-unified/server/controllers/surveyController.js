@@ -52,13 +52,13 @@ export const submitSurveyResponseController = async (req, res, next) => {
 };
 
 
-export const fetchSurveyResponsesController = async (req, res) => {
+export const fetchSurveyResponsesController = async (req, res, next) => {
     logger.info("GET /api/survey/responses/:user_id");
     try {
         const { user_id } = req.params;
         const anonymousUserId = req.cookies.anonymousUserId;
         const responses = await fetchSurveyResponsesByUser(user_id, anonymousUserId);
-        res.send(201).json(responses);
+        res.status(201).json(responses);
     } catch (err) {
         next(err);
     }

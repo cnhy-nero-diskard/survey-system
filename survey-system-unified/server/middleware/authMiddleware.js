@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import logger from './logger.js';
+import pool from '../config/db.js';
 
 export const authenticate = (req, res, next) => {
     const token = req.cookies?.token;
@@ -12,15 +13,14 @@ export const authenticate = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded; // Attach the decoded user to the request object
-        next();
+        logger.admin('Token found in cookie. AUTHENTICATED');
+        return next();
     } catch (err) {
         if (err.name === 'TokenExpiredError') {
             return res.status(401).json({ error: 'Token expired.' });
         }
-        res.status(400).json({ error: 'YOU R Unauthorized' });
+        return res.status(400).json({ error: 'YOU R Unauthorized' });
     }
-    logger.admin('Token found in cookie. AUTHENTICATED');
-    next
 };
 
 export const authorizeAdmin = (req, res, next) => {
@@ -35,7 +35,7 @@ export const authorizeAdmin = (req, res, next) => {
     next();
 };
 export const validateSurveyStep = async (req, res, next) => {
-    const { user_id } = req.session.anonymousUserId;
+    const user_id = req.session.anonymousUserId;
     logger.warn(`[MID] validateSurveyStep for user ${user_id}`);
     const requestedStep = parseInt(req.path.split("/").pop()); // Extract step number from URL
     try {
