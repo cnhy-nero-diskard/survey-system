@@ -87,6 +87,7 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
+    "axios-mock-adapter": "^2.1.0",
     "puppeteer": "^24.4.0"
   }
 }
