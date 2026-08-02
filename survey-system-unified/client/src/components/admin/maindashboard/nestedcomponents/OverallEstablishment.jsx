@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Skeleton, Fade, Typography } from '@mui/material';
+import { Box, Skeleton, CircularProgress, Fade, Typography } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import styled from 'styled-components';
 import { ChartContainer, MainContent } from '../../shared/styledComponents';
@@ -131,6 +131,7 @@ const OverallOneBarangay = ({ year, quarter }) => {
       <MainContent>
         <LoadingContainer>
           <Skeleton variant="text" width="60%" height={32} />
+          <CircularProgress size={28} thickness={4} sx={{ color: '#667eea', alignSelf: 'center' }} aria-label="Loading establishment analytics" />
           <Skeleton variant="rectangular" width="100%" height={280} />
           <Box display="flex" gap={2} mt={2}>
             <Skeleton variant="rectangular" width={100} height={20} />

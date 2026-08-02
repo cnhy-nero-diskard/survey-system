@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaUser, FaSignInAlt, FaSignOutAlt, FaClock, FaCircle } from 'react-icons/fa';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import WarningMessage from '../../partials/WarningMessage';
 // Keyframes for animations
 const fadeIn = keyframes`
@@ -86,6 +87,7 @@ const StatusIndicator = styled(FaCircle).withConfig({
 const AdminSessionDashboard = () => {
     const [sessionData, setSessionData] = useState([]);
     const [isUnauthorized, setIsUnauthorized] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchSessionData = async () => {
@@ -111,6 +113,8 @@ const AdminSessionDashboard = () => {
                 setIsUnauthorized(false); // Reset unauthorized state if request succeeds
             } catch (error) {
                 console.error('Error fetching session data:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -124,6 +128,11 @@ const AdminSessionDashboard = () => {
         <Container>
             {isUnauthorized ? (
                 <WarningMessage message="YOU ARE NOT ALLOWED TO VIEW THIS PAGE" />
+            ) : isLoading ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, minHeight: 180 }} role="status" aria-live="polite">
+                    <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} />
+                    <Typography sx={{ color: '#4a5568', fontWeight: 500 }}>Loading admin sessions…</Typography>
+                </Box>
             ) : (
                 <Table>
                     <TableHeader>

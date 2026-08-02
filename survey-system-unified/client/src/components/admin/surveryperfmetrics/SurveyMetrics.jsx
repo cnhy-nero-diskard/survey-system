@@ -20,7 +20,8 @@ import {
     Backdrop,
     Chip,
     IconButton,
-    Skeleton
+    Skeleton,
+    CircularProgress
 } from '@mui/material';
 import {
     PieChart,
@@ -345,6 +346,10 @@ const SurveyMetrics = () => {
     if (loadError) {
         return (
             <StyledDashboardContainer>
+                <Box display="flex" alignItems="center" gap={1.5} mb={2} role="status" aria-live="polite">
+                    <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} />
+                    <Typography sx={{ color: '#4a5568', fontWeight: 500 }}>Loading survey metrics…</Typography>
+                </Box>
                 <StyledHeaderCard elevation={0}>
                     <CardContent>
                         <Typography variant="h5" sx={{ fontWeight: 700 }}>

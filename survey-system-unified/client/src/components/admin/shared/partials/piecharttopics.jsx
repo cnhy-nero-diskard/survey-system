@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Box, Typography, Skeleton } from "@mui/material";
+import { Box, Typography, Skeleton, CircularProgress } from "@mui/material";
 import axios from "axios";
 import { fontFamily } from "../../../../config/fontConfig";
 import { sentimentPalette, text } from "../designTokens";
@@ -168,6 +168,7 @@ const LocSpecificTopic = ({ short_id }) => {
     if (loading) {
         return (
             <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                <CircularProgress size={28} thickness={4} sx={{ color: sentimentPalette.positive }} aria-label="Loading topic sentiment" />
                 <Skeleton variant="circular" width={160} height={160} />
                 <Box display="flex" gap={1}>
                     <Skeleton variant="rectangular" width={64} height={14} />

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Box, Typography, Skeleton, Fade } from '@mui/material';
+import { Box, Typography, Skeleton, CircularProgress, Fade } from '@mui/material';
 import styled from 'styled-components';
 import { MainContent, ChartContainer } from '../../shared/styledComponents';
 import { fontFamily } from '../../../../config/fontConfig';
@@ -131,6 +131,7 @@ const OverallSurveyTopic = ({ year, quarter }) => {
       <MainContent>
         <LoadingContainer>
           <Skeleton variant="text" width="60%" height={32} />
+          <CircularProgress size={28} thickness={4} sx={{ color: '#667eea', alignSelf: 'center' }} aria-label="Loading topic analytics" />
           <Skeleton variant="rectangular" width="100%" height={280} />
           <Box display="flex" gap={2} mt={2}>
             <Skeleton variant="rectangular" width={100} height={20} />

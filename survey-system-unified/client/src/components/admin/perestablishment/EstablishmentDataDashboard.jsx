@@ -5,7 +5,6 @@ import DataDashboard from '../xdatadashboard/DataDashboard';
 import { fetchEntityMetrics } from '../../utils/getSurveyFeedbackApi';
 import { fontFamily } from '../../../config/fontConfig';
 import FetchingDataLoader from '../../partials/FetchingDataLoader';
-import useGlobalLoadingStore from '../../../utils/globalLoadingStore';
 
 // Enhanced loading and error components
 const fadeIn = keyframes`
@@ -51,18 +50,6 @@ const EstablishmentsDashboard = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [quarter, setQuarter] = useState(Math.floor((new Date().getMonth() + 3) / 3));
   
-  // Safe loading store access with fallback
-  let setFetchingData, clearGlobalLoading;
-  try {
-    const loadingStore = useGlobalLoadingStore();
-    setFetchingData = loadingStore.setFetchingData;
-    clearGlobalLoading = loadingStore.clearGlobalLoading;
-  } catch (error) {
-    console.warn('GlobalLoadingProvider not found, using fallback functions');
-    setFetchingData = () => {};
-    clearGlobalLoading = () => {};
-  }
-
   const handleYearChange = (event) => {
     setYear(event.target.value);
   };
@@ -74,8 +61,6 @@ const EstablishmentsDashboard = () => {
   useEffect(() => {
     const getMetrics = async () => {
       setIsLoading(true);
-      // Show global loading with establishment-specific message
-      setFetchingData('Loading establishment survey data including hotels, restaurants, and business feedback analytics...');
       
       try {
         const data = await fetchEntityMetrics(year, quarter);
@@ -103,7 +88,6 @@ const EstablishmentsDashboard = () => {
         setError(err);
       } finally {
         setIsLoading(false);
-        clearGlobalLoading();
       }
     };
     getMetrics();

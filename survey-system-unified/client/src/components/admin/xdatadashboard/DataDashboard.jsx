@@ -26,6 +26,7 @@ import {
   TableHead,
   TableRow,
   Skeleton,
+  CircularProgress,
   Fade,
   Chip,
   Select,
@@ -523,6 +524,7 @@ const DataDashboard = ({
     return (
       <MainContainer>
         <LoadingContainer>
+          <CircularProgress size={32} thickness={4} sx={{ color: '#667eea' }} aria-label="Loading analytics dashboard" />
           <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 2 }} />
           <Grid container spacing={3} sx={{ mt: 2 }}>
             {[1, 2, 3, 4].map((item) => (

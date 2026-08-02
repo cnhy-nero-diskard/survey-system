@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Typography, Box, Skeleton, Fade } from "@mui/material";
+import { Typography, Box, Skeleton, CircularProgress, Fade } from "@mui/material";
 import styled from 'styled-components';
 import { ChartContainer, MainContent } from '../../shared/styledComponents';
 import { fontFamily } from "../../../../config/fontConfig";
@@ -193,6 +193,7 @@ const OverallMun = ({ year, quarter }) => {
       <MainContent>
         <LoadingContainer>
           <Skeleton variant="text" width="60%" height={32} />
+          <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} aria-label="Loading municipality analytics" />
           <Skeleton variant="circular" width={200} height={200} />
           <Box display="flex" gap={2} mt={2}>
             <Skeleton variant="rectangular" width={80} height={20} />

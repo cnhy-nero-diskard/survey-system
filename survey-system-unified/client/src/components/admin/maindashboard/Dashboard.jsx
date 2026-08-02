@@ -8,6 +8,7 @@ import {
   FormControl,
   Chip,
   Skeleton,
+  CircularProgress,
   Fade,
   Paper
 } from '@mui/material';
@@ -228,6 +229,8 @@ const ContentBox = styled(Box)`
 `;
 
 const LoadingCard = styled(CardContainer)`
+  pointer-events: none;
+
   &::after {
     content: '';
     position: absolute;
@@ -238,6 +241,21 @@ const LoadingCard = styled(CardContainer)`
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     animation: ${shimmer} 1.2s ease-in-out infinite;
   }
+`;
+
+const DashboardLoadingStatus = styled(Box)`
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 20px;
+  padding: 10px 14px;
+  border: 1px solid rgba(102, 126, 234, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #4a5568;
+  font-family: ${fontFamily};
+  font-size: 14px;
+  font-weight: 500;
 `;
 
 /* The MUI `color` prop was being overridden by these rules, so every state
@@ -469,6 +487,13 @@ const Dashboard = () => {
             </HeaderContent>
           </HeaderContainer>
         </Fade>
+
+        {isLoading && (
+          <DashboardLoadingStatus aria-live="polite" aria-busy="true" role="status">
+            <CircularProgress size={20} thickness={4} sx={{ color: '#667eea' }} />
+            Loading dashboard resources…
+          </DashboardLoadingStatus>
+        )}
 
         <Grid container spacing={3}>
           {cardConfigs.map((config, index) => (

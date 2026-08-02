@@ -14,6 +14,7 @@ import {
   Grid,
   Button,
   Modal,
+  CircularProgress,
 } from "@mui/material";
 
 import { Circle, VerifiedUserOutlined as UserIcon } from "@mui/icons-material";
@@ -63,6 +64,7 @@ const GlassCard = styled(Card)`
 const UsersDashboard = () => {
   const [anonymousUsers, setAnonymousUsers] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch anonymous users data from the backend every 5 seconds
   useEffect(() => {
@@ -80,6 +82,8 @@ const UsersDashboard = () => {
         setAnonymousUsers(data);
       } catch (error) {
         console.error("Error fetching anonymous users:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -125,6 +129,13 @@ const UsersDashboard = () => {
               <Typography variant="h6" gutterBottom sx={{ fontFamily, fontWeight: 600, color: '#2d3748' }}>
                 Active Users
               </Typography>
+              {isLoading ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minHeight: 112 }} role="status" aria-live="polite">
+                  <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} />
+                  <Typography sx={{ fontFamily, color: '#4a5568', fontWeight: 500 }}>Loading active users…</Typography>
+                </Box>
+              ) : (
+                <>
               <Typography variant="h3" sx={{ fontFamily, fontWeight: 700, color: '#667eea', my: 1 }}>
                 {activeUsers}
               </Typography>
@@ -134,6 +145,8 @@ const UsersDashboard = () => {
               <Button variant="contained" onClick={() => setOpenModal(true)} sx={{ textTransform: 'none' }}>
                 View All Users
               </Button>
+                </>
+              )}
             </CardContent>
           </GlassCard>
         </Grid>

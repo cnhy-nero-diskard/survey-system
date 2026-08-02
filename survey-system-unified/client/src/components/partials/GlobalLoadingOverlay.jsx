@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, CircularProgress, Fade, Backdrop } from '@mui/material';
+import { Box, Typography, CircularProgress, Fade } from '@mui/material';
 import styled, { keyframes } from 'styled-components';
 import useGlobalLoadingStore from '../../utils/globalLoadingStore';
 import { fontFamily } from '../../config/fontConfig';
@@ -32,11 +32,14 @@ const pulse = keyframes`
 `;
 
 // Styled components
-const LoadingOverlay = styled(Backdrop)`
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
-  backdrop-filter: blur(10px);
+const LoadingOverlay = styled(Box)`
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 9999;
-  color: white;
+  pointer-events: none;
 `;
 
 const LoadingContainer = styled(Box)`
@@ -47,14 +50,18 @@ const LoadingContainer = styled(Box)`
   text-align: center;
   animation: ${fadeIn} 0.6s ease-out;
   max-width: 400px;
-  padding: 40px;
+  padding: 24px 32px;
+  border: 1px solid rgba(102, 126, 234, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 40px rgba(45, 55, 72, 0.18);
 `;
 
 const LoadingTitle = styled(Typography)`
   font-family: ${fontFamily};
   font-weight: 600;
   font-size: 28px;
-  color: white;
+  color: #2d3748;
   margin: 0;
   animation: ${pulse} 2s ease-in-out infinite;
 `;
@@ -63,7 +70,7 @@ const LoadingSubtitle = styled(Typography)`
   font-family: ${fontFamily};
   font-weight: 400;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
+  color: #718096;
   line-height: 1.5;
   margin: 0;
 `;
@@ -76,7 +83,7 @@ const CircularLoaderContainer = styled(Box)`
 `;
 
 const StyledCircularProgress = styled(CircularProgress)`
-  color: white;
+  color: #667eea;
   animation: ${pulse} 2s ease-in-out infinite;
   
   & .MuiCircularProgress-circle {
@@ -94,7 +101,7 @@ const Dot = styled.div`
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(102, 126, 234, 0.65);
   animation: ${pulse} 1.5s ease-in-out infinite;
   animation-delay: ${props => props.delay}s;
 `;
@@ -110,7 +117,7 @@ const GlobalLoadingOverlay = () => {
   if (!isGlobalLoading) return null;
 
   return (
-    <LoadingOverlay open={isGlobalLoading}>
+    <LoadingOverlay aria-live="polite" aria-busy="true" role="status">
       <Fade in={isGlobalLoading} timeout={300}>
         <LoadingContainer>
           {showCircularLoader && (

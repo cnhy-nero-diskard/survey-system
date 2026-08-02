@@ -10,6 +10,7 @@ import {
   Snackbar,
   Button,
   Skeleton,
+  CircularProgress,
   Alert,
   IconButton,
   TextField,
@@ -300,7 +301,10 @@ const SurveyTouchpoints = () => {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   {loading ? (
-                    <Skeleton variant="rectangular" width="100%" height={56} />
+                    <Box display="flex" alignItems="center" gap={1.5}>
+                      <CircularProgress size={24} thickness={4} sx={{ color: '#667eea' }} aria-label="Loading touchpoints" />
+                      <Skeleton variant="rectangular" width="100%" height={56} />
+                    </Box>
                   ) : (
                     <Autocomplete
                       options={getTouchpointItems()}

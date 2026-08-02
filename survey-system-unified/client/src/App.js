@@ -55,7 +55,7 @@ const App = () => {
           <style>
             {`
               body {
-                background-color:#00a2ff ;
+                background-color: #f5f7fa;
                 height: 100vh;
                 margin: 0;
               }

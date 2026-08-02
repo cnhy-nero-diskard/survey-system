@@ -17,6 +17,7 @@ import {
   Paper,
   Chip,
   Skeleton,
+  CircularProgress,
   Alert,
   Pagination,
   Card,
@@ -350,6 +351,10 @@ const SurveyTally = () => {
   if (loading && !hasLoadedOnce) {
     return (
       <Container>
+        <Box display="flex" alignItems="center" gap={1.5} mb={2} role="status" aria-live="polite">
+          <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} />
+          <Typography sx={{ color: '#4a5568', fontWeight: 500 }}>Loading survey statistics…</Typography>
+        </Box>
         <HeaderSection>
           <Skeleton variant="text" width="60%" height={40} sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
           <Skeleton variant="text" width="40%" height={24} sx={{ bgcolor: 'rgba(255,255,255,0.1)', mt: 1 }} />

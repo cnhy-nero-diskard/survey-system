@@ -60,12 +60,6 @@ const slideIn = keyframes`
   }
 `;
 
-const pulse = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(0, 119, 182, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(0, 119, 182, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 119, 182, 0); }
-`;
-
 // Styled Components
 const SidebarDrawer = styled(Drawer).withConfig({
   shouldForwardProp: (prop) => !['drawerWidth', 'collapsed'].includes(prop),
@@ -93,24 +87,12 @@ const SidebarHeader = styled(Box).withConfig({
   flex-direction: column;
   align-items: center;
   padding: ${({ collapsed }) => collapsed ? '12px 8px 16px 8px' : '24px 16px'};
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #4f46e5;
   color: white;
   font-family: "Poppins", sans-serif;
   position: relative;
-  overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-height: ${({ collapsed }) => collapsed ? '80px' : 'auto'};
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: ${pulse} 4s infinite;
-  }
 `;
 
 const UserProfile = styled(Box).withConfig({
@@ -121,15 +103,14 @@ const UserProfile = styled(Box).withConfig({
   gap: 12px;
   padding: ${({ collapsed }) => collapsed ? '8px' : '16px'};
   margin: 16px;
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(79, 70, 229, 0.08);
   border-radius: 16px;
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  transition: all 0.3s ease;
-  animation: ${slideIn} 0.6s ease-out;
+  border: 1px solid rgba(79, 70, 229, 0.15);
+  transition: background 0.2s ease;
+  animation: ${slideIn} 0.4s ease-out;
 
   &:hover {
-    background: rgba(102, 126, 234, 0.15);
-    transform: translateY(-2px);
+    background: rgba(79, 70, 229, 0.12);
   }
 `;
 
@@ -181,55 +162,32 @@ const StyledListItem = styled(ListItem).withConfig({
   // <li>, which React rejects as an unknown attribute.
   shouldForwardProp: (prop) => prop !== 'collapsed',
 })`
-  margin: ${({ collapsed }) => collapsed ? '2px 0' : '2px 8px'};
+  margin: ${({ collapsed }) => collapsed ? '6px 0' : '2px 8px'};
   border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 4px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-    display: ${({ collapsed }) => collapsed ? 'none' : 'block'};
-  }
+  border-left: 3px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 
   &.active {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    color: #667eea;
+    background: rgba(79, 70, 229, 0.08);
+    color: #4f46e5;
     font-weight: 600;
-
-    &::before {
-      transform: scaleX(1);
-    }
+    border-left-color: ${({ collapsed }) => collapsed ? 'transparent' : '#4f46e5'};
 
     & .MuiListItemIcon-root {
-      color: #667eea;
+      color: #4f46e5;
     }
   }
 
   &:hover {
-    background: rgba(102, 126, 234, 0.06);
-    transform: ${({ collapsed }) => collapsed ? 'none' : 'translateX(4px)'};
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-
-    &::before {
-      transform: scaleX(0.5);
-    }
+    background: rgba(79, 70, 229, 0.05);
 
     & .MuiListItemIcon-root {
-      color: #667eea;
+      color: #4f46e5;
     }
   }
 
   &:focus-visible {
-    outline: 2px solid #667eea;
+    outline: 2px solid #4f46e5;
     outline-offset: 2px;
   }
 `;
@@ -275,17 +233,15 @@ const CollapseButton = styled(IconButton).withConfig({
 const LogoutButton = styled(Button)`
   margin: 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: #ef4444;
   color: white;
   font-family: "Poppins", sans-serif;
   font-weight: 600;
   padding: 12px 24px;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
 
   &:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+    background: #dc2626;
   }
 `;
 
@@ -466,18 +422,39 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
       {/* No AppBar exists in this layout, so the Toolbar spacer that used to sit
           here just pushed the sidebar 64px below the page content. */}
       <SidebarHeader collapsed={collapsed}>
-        {!collapsed && (
-          <CollapseButton 
-            collapsed={collapsed}
-            onClick={handleToggleCollapse}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed ? <MenuIcon /> : <MenuOpenIcon />}
-          </CollapseButton>
-        )}
-        
-        {!collapsed && (
+        {collapsed ? (
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            gap: 2
+          }}>
+            <CollapseButton
+              collapsed={collapsed}
+              onClick={handleToggleCollapse}
+              aria-label="Expand sidebar"
+            >
+              <MenuIcon />
+            </CollapseButton>
+
+            <Tooltip title="Panglao Tourism Office" placement="right">
+              <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 32, height: 32 }}>
+                <AdminIcon sx={{ fontSize: 18 }} />
+              </Avatar>
+            </Tooltip>
+          </Box>
+        ) : (
           <>
+            <CollapseButton
+              collapsed={collapsed}
+              onClick={handleToggleCollapse}
+              aria-label="Collapse sidebar"
+            >
+              <MenuOpenIcon />
+            </CollapseButton>
+
             <CustomTypography variant="h6" align="center" fontWeight="bold" sx={{ fontSize: '14px', mb: 1, mt: 2 }}>
               MULTILINGUAL SURVEY SYSTEM
             </CustomTypography>
@@ -486,36 +463,11 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
             </CustomTypography>
           </>
         )}
-        
-        {collapsed && (
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            width: '100%',
-            gap: 2
-          }}>
-            <CollapseButton 
-              collapsed={collapsed}
-              onClick={handleToggleCollapse}
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {collapsed ? <MenuIcon /> : <MenuOpenIcon />}
-            </CollapseButton>
-            
-            <Tooltip title="Panglao Tourism Office" placement="right">
-              <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 32, height: 32 }}>
-                <AdminIcon sx={{ fontSize: 18 }} />
-              </Avatar>
-            </Tooltip>
-          </Box>
-        )}
       </SidebarHeader>
 
       {!collapsed && (
         <UserProfile collapsed={collapsed}>
-          <Avatar sx={{ bgcolor: '#667eea', width: 36, height: 36 }}>
+          <Avatar sx={{ bgcolor: '#4f46e5', width: 36, height: 36 }}>
             <AdminIcon />
           </Avatar>
           <Box sx={{ flex: 1 }}>
@@ -553,6 +505,9 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
       <Box sx={{ overflow: "auto", flex: 1 }}>
         {filteredSections.map((section, sectionIndex) => (
           <MenuSection key={section.title}>
+            {collapsed && sectionIndex > 0 && (
+              <Divider sx={{ mx: 2, my: 1 }} />
+            )}
             {!collapsed && (
               <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1 }}>
                 <SectionTitle variant="overline" sx={{ flex: 1 }}>
@@ -607,7 +562,7 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
                           sx={{
                             minWidth: collapsed ? 'auto' : 40,
                             justifyContent: 'center',
-                            color: isActiveRoute(item.to) ? '#667eea' : '#64748b',
+                            color: isActiveRoute(item.to) ? '#4f46e5' : '#64748b',
                             transition: 'color 0.3s ease',
                           }}
                         >
