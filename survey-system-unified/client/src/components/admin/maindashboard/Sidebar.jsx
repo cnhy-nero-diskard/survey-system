@@ -1,8 +1,7 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Drawer,
   Box,
-  Toolbar,
   List,
   ListItem,
   ListItemIcon,
@@ -48,8 +47,6 @@ import "@fontsource/poppins/300.css"; // Light
 import "@fontsource/poppins/400.css"; // Regular
 import "@fontsource/poppins/500.css"; // Medium
 import "@fontsource/poppins/700.css"; // Bold
-
-import UsersDashboard from "../usersdashboard/UsersDashboard";
 
 // Animations
 const slideIn = keyframes`
@@ -179,7 +176,11 @@ const SectionTitle = styled(Typography)`
   margin-bottom: 4px;
 `;
 
-const StyledListItem = styled(ListItem)`
+const StyledListItem = styled(ListItem).withConfig({
+  // `collapsed` is styling-only; ListItem would otherwise spread it onto the
+  // <li>, which React rejects as an unknown attribute.
+  shouldForwardProp: (prop) => prop !== 'collapsed',
+})`
   margin: ${({ collapsed }) => collapsed ? '2px 0' : '2px 8px'};
   border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -345,14 +346,18 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
   });
   
   const [expandedSections, setExpandedSections] = useState(() => {
+    // Default every section open, keyed off menuSections itself. The old
+    // literal listed "Administration", which is not a real section title, so
+    // "System Management" fell through as undefined and its three items
+    // (Data Manager, System Performance, Log Stream) were collapsed on load.
+    const defaults = Object.fromEntries(menuSections.map((s) => [s.title, true]));
     const saved = localStorage.getItem('sidebar-expanded-sections');
-    return saved ? JSON.parse(saved) : {
-      "Overview": true,
-      "Data Analytics": true,
-      "Survey Management": true,
-      "AI & Analytics": true,
-      "Administration": false,
-    };
+    if (!saved) return defaults;
+    try {
+      return { ...defaults, ...JSON.parse(saved) };
+    } catch {
+      return defaults;
+    }
   });
 
   function getBasename(pathname) {
@@ -458,8 +463,8 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
 
   return (
     <SidebarDrawer variant="permanent" drawerWidth={drawerWidth} collapsed={collapsed}>
-      <Toolbar />
-      
+      {/* No AppBar exists in this layout, so the Toolbar spacer that used to sit
+          here just pushed the sidebar 64px below the page content. */}
       <SidebarHeader collapsed={collapsed}>
         {!collapsed && (
           <CollapseButton 
@@ -573,7 +578,10 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
               </Box>
             )}
             
-            <Collapse in={collapsed || expandedSections[section.title]} timeout={300}>
+            {/* An active search must reveal its matches even inside a section
+                the user had collapsed, otherwise search appears to return
+                nothing. */}
+            <Collapse in={collapsed || !!searchTerm.trim() || expandedSections[section.title]} timeout={300}>
               <List dense>
                 {section.items.map((item, index) => (
                   <Tooltip 
@@ -585,7 +593,6 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
                   >
                     <Box>
                       <StyledListItem
-                        button
                         component={Link}
                         to={item.to}
                         collapsed={collapsed}

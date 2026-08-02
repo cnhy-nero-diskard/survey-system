@@ -3,7 +3,6 @@ import {
   Box,
   Select,
   FormControl,
-  InputLabel,
   MenuItem,
   Typography
 } from '@mui/material';

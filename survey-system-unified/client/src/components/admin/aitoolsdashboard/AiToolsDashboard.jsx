@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
   Typography,
   Button,
   Paper,
@@ -9,10 +8,6 @@ import {
   CircularProgress,
   Select,
   MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Fade,
   Slide,
   Snackbar,
@@ -23,17 +18,11 @@ import {
   ListItemText,
   Chip,
 } from '@mui/material';
-import { Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { ApiRounded as AiToolsIcon } from '@mui/icons-material';
+import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
+import { fontFamily } from '../../../config/fontConfig';
+import { gradients } from '../shared/designTokens';
 
 // ----------------------------------
 // NEW IMPORTS FOR DATE PICKERS
@@ -44,7 +33,39 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 // ----------------------------------
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+// This page was the odd one out: a plain white MUI Container while every other
+// admin route renders the gradient page shell with a purple header card.
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+`;
+
+const PageShell = styled(Box)`
+  background: ${gradients.page};
+  min-height: 100vh;
+  padding: 32px;
+  font-family: ${fontFamily};
+  animation: ${fadeIn} 0.6s ease-out;
+  box-sizing: border-box;
+`;
+
+const HeaderContainer = styled(Box)`
+  background: ${gradients.brand};
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: white;
+`;
+
+const HeaderTitle = styled(Typography)`
+  font-family: ${fontFamily};
+  font-weight: 600;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
 
 const AIToolsDashboard = () => {
   const [startDate, setStartDate] = useState(null);
@@ -55,9 +76,6 @@ const AIToolsDashboard = () => {
   const [topicModelingError, setTopicModelingError] = useState(null);
 
   const [openEndedResponses, setOpenEndedResponses] = useState([]);
-  const isActive = true;
-  const createdAt = new Date();
-  const isRecentlyCreated = (new Date() - new Date(createdAt)) < 5 * 60 * 1000;
 
   // State for API Configuration
   const [hfTokens, setHfTokens] = useState([]);
@@ -68,10 +86,6 @@ const AIToolsDashboard = () => {
   const [isSentimentAnalyzing, setIsSentimentAnalyzing] = useState(false);
   const [sentimentResults, setSentimentResults] = useState(null);
   const [sentimentError, setSentimentError] = useState(null);
-
-  // State for Dialogs
-  const [openMetricsDialog, setOpenMetricsDialog] = useState(false);
-  const [selectedMetrics, setSelectedMetrics] = useState(null);
 
   // State for Snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -88,24 +102,9 @@ const AIToolsDashboard = () => {
   ).map((response) => ({
     entity: response.entity,
     name: response.name,
-  }));  const [uniqueDates, setUniqueDates] = useState(new Set());
+  }));
 
-  // State for API Usage Data
-  const [apiUsageData, setApiUsageData] = useState({
-    labels: ['Sentiment Analysis', 'Topic Modeling'],
-    datasets: [
-      {
-        label: 'API Calls',
-        data: [0, 0],
-        backgroundColor: [
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-        ],
-        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
-        borderWidth: 1,
-      },
-    ],
-  });
+  const [uniqueDates, setUniqueDates] = useState(new Set());
 
   useEffect(() => {
     const fetchHFTokens = async () => {
@@ -389,33 +388,25 @@ const AIToolsDashboard = () => {
     }
   };
 
-  const handleOpenMetricsDialog = (metrics) => {
-    setSelectedMetrics(metrics);
-    setOpenMetricsDialog(true);
-  };
-
-  const handleCloseMetricsDialog = () => {
-    setOpenMetricsDialog(false);
-  };
-
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
 
   return (
-    <Container
-      style={{ minHeight: '100vh' }}
-      maxWidth="lg"
-      sx={{ mt: 4, mb: 4, backgroundColor: 'rgba(0, 0, 0, 0)' }}
-    >
-      <Fade in timeout={1000}>
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{ fontWeight: 'bold', color: 'primary.main' }}
-        >
-          AI Tools Dashboard
-        </Typography>
+    <PageShell>
+      <Fade in timeout={600}>
+        <HeaderContainer>
+          <HeaderTitle>
+            <AiToolsIcon sx={{ fontSize: 32 }} />
+            AI Tools Dashboard
+          </HeaderTitle>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontFamily, opacity: 0.9, fontWeight: 400, mt: 0.5 }}
+          >
+            Sentiment analysis and topic modelling over open-ended survey responses
+          </Typography>
+        </HeaderContainer>
       </Fade>
 
       <Grid container spacing={3}>
@@ -446,13 +437,25 @@ const AIToolsDashboard = () => {
                   API Token Manager
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  {/* displayEmpty + a placeholder: both analysis buttons stay
+                      disabled until a token is chosen, so an empty unlabelled
+                      box gave no hint about why nothing worked. */}
                   <Select
                     fullWidth
+                    displayEmpty
                     value={selectedHFToken}
                     onChange={(e) => setSelectedHFToken(e.target.value)}
                     sx={{ mb: 2 }}
                     aria-label="Select API Token"
+                    renderValue={(value) =>
+                      hfTokens.find((t) => t.id === value)?.label || 'Select an API token to enable analysis'
+                    }
                   >
+                    {hfTokens.length === 0 && (
+                      <MenuItem disabled value="">
+                        No API tokens available
+                      </MenuItem>
+                    )}
                     {hfTokens.map((token) => (
                       <MenuItem key={token.id} value={token.id}>
                         {token.label}
@@ -508,6 +511,8 @@ const AIToolsDashboard = () => {
                   variant="outlined"
                   sx={{ mb: 2 }}
                 />
+                {/* One spinner, inside the button. The previous markup rendered a
+                    spinner in the button *and* a second one beside it. */}
                 <Button
                   variant="contained"
                   color="primary"
@@ -515,15 +520,11 @@ const AIToolsDashboard = () => {
                   disabled={
                     isSentimentAnalyzing || !sentimentText || !selectedHFToken
                   }
+                  startIcon={isSentimentAnalyzing ? <CircularProgress size={18} color="inherit" /> : null}
                   sx={{ textTransform: 'none' }}
                 >
-                  {isSentimentAnalyzing ? (
-                    <CircularProgress size={24} />
-                  ) : (
-                    'ANALYZE SENTIMENT'
-                  )}
+                  {isSentimentAnalyzing ? 'Analyzing…' : 'Analyze Sentiment'}
                 </Button>
-                {isSentimentAnalyzing && <CircularProgress sx={{ ml: 2 }} />}
               </Box>
               {sentimentResults && (
                 <Box
@@ -733,13 +734,15 @@ const AIToolsDashboard = () => {
                       mb: 2,
                     }}
                   >
+                    {/* `renderInput` was removed in @mui/x-date-pickers v7, so the
+                        fullWidth it carried was silently dropped. slotProps is the
+                        supported replacement. */}
                     <DatePicker
                       label="Start Date"
                       value={startDate}
                       onChange={(newVal) => setStartDate(newVal)}
-                      renderInput={(params) => (
-                        <TextField fullWidth {...params} />
-                      )}
+                      maxDate={endDate || undefined}
+                      slotProps={{ textField: { fullWidth: true } }}
                       shouldDisableDate={(date) => {
                         const dateString = dayjs(date).format('YYYY-MM-DD');
                         // Grey out if date is not in uniqueDates set
@@ -751,9 +754,8 @@ const AIToolsDashboard = () => {
                       label="End Date"
                       value={endDate}
                       onChange={(newVal) => setEndDate(newVal)}
-                      renderInput={(params) => (
-                        <TextField fullWidth {...params} />
-                      )}
+                      minDate={startDate || undefined}
+                      slotProps={{ textField: { fullWidth: true } }}
                       shouldDisableDate={(date) => {
                         const dateString = dayjs(date).format('YYYY-MM-DD');
                         return !uniqueDates.has(dateString);
@@ -763,30 +765,34 @@ const AIToolsDashboard = () => {
                 </LocalizationProvider>
 
                 <Box sx={{ mb: 2 }}>
-  <Typography
-    variant="subtitle2"
-    sx={{ color: 'text.secondary', mb: 1 }}
-  >
-    Filter by Entity
-  </Typography>
-  <Select
-    fullWidth
-    multiple
-    value={selectedEntities}
-    onChange={(e) => setSelectedEntities(e.target.value)}
-    renderValue={(selected) => selected.join(', ')}
-  >
-    {uniqueEntities.map((entityObj) => {
-      console.log(entityObj);
-      const displayLabel = `[${entityObj.name}] - [${entityObj.entity}]`;
-      return (
-        <MenuItem key={entityObj.entity} value={entityObj.entity}>
-          {displayLabel}
-        </MenuItem>
-      );
-    })}
-  </Select>
-</Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ color: 'text.secondary', mb: 1 }}
+                  >
+                    Filter by Entity
+                  </Typography>
+                  <Select
+                    fullWidth
+                    multiple
+                    displayEmpty
+                    value={selectedEntities}
+                    onChange={(e) => setSelectedEntities(e.target.value)}
+                    renderValue={(selected) =>
+                      selected.length === 0 ? 'All entities' : selected.join(', ')
+                    }
+                  >
+                    {uniqueEntities.length === 0 && (
+                      <MenuItem disabled value="">
+                        Scan for open-ended responses first
+                      </MenuItem>
+                    )}
+                    {uniqueEntities.map((entityObj) => (
+                      <MenuItem key={entityObj.entity} value={entityObj.entity}>
+                        {`${entityObj.name} — ${entityObj.entity}`}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
                 <Button
                   variant="contained"
                   color="primary"
@@ -820,15 +826,11 @@ const AIToolsDashboard = () => {
                   color="primary"
                   onClick={handleTopicModeling}
                   disabled={isTopicModeling || !topicText || !selectedHFToken}
+                  startIcon={isTopicModeling ? <CircularProgress size={18} color="inherit" /> : null}
                   sx={{ textTransform: 'none' }}
                 >
-                  {isTopicModeling ? (
-                    <CircularProgress size={24} />
-                  ) : (
-                    'Analyze Topics'
-                  )}
+                  {isTopicModeling ? 'Analyzing…' : 'Analyze Topics'}
                 </Button>
-                {isTopicModeling && <CircularProgress sx={{ ml: 2 }} />}
               </Box>
 
               {topicModelingResult && (
@@ -903,42 +905,8 @@ const AIToolsDashboard = () => {
         </Grid>
       </Grid>
 
-      {/* Metrics Dialog */}
-      <Dialog open={openMetricsDialog} onClose={handleCloseMetricsDialog}>
-        <DialogTitle>API Call Metrics</DialogTitle>
-        <DialogContent>
-          {selectedMetrics && (
-            <Bar
-              data={{
-                labels: ['Sentiment Analysis', 'Topic Modeling'],
-                datasets: [
-                  {
-                    label: 'API Calls',
-                    data: [
-                      selectedMetrics.sentiment,
-                      selectedMetrics.topicModeling,
-                    ],
-                    backgroundColor: [
-                      'rgba(75, 192, 192, 0.2)',
-                      'rgba(153, 102, 255, 0.2)',
-                    ],
-                    borderColor: [
-                      'rgba(75, 192, 192, 1)',
-                      'rgba(153, 102, 255, 1)',
-                    ],
-                    borderWidth: 1,
-                  },
-                ],
-              }}
-            />
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseMetricsDialog} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Removed the "API Call Metrics" dialog: nothing ever called its opener,
+          so it was unreachable UI pulling in chart.js for no reason. */}
 
       {/* Snackbar for Messages */}
       <Snackbar
@@ -955,7 +923,7 @@ const AIToolsDashboard = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </Container>
+    </PageShell>
   );
 };
 

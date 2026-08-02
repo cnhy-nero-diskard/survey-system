@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Box, Skeleton, Fade, Typography } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import styled from 'styled-components';
-import { sentimentColors } from '../../../../config/sentimentConfig';
 import { ChartContainer, MainContent } from '../../shared/styledComponents';
 import { fetchEntityMetrics } from '../../../utils/getSurveyFeedbackApi';
 import { fontFamily } from '../../../../config/fontConfig';
@@ -40,14 +39,6 @@ const StatBox = styled(Box)`
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   margin-top: ${({ mt }) => (mt ? '16px' : '0')};
 `;
-
-// Modern color palette
-const modernColors = {
-  VerySatisfied: '#10B981',  // Emerald
-  Satisfied: '#34D399',      // Light emerald
-  Neutral: '#F59E0B',        // Amber
-  Dissatisfied: '#EF4444'    // Red
-};
 
 // Custom tooltip
 const CustomTooltip = ({ active, payload, label }) => {

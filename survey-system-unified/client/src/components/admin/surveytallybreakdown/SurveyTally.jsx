@@ -7,8 +7,7 @@ import {
   Tooltip,
   Legend,
   CartesianGrid,
-  ResponsiveContainer,
-  Cell
+  ResponsiveContainer
 } from 'recharts';
 import {
   Box,
@@ -26,7 +25,6 @@ import {
   Fade,
   Slide,
   IconButton,
-  Collapse,
   useTheme,
   alpha,
   LinearProgress
@@ -39,8 +37,7 @@ import {
   ExpandLess as ExpandLessIcon,
   Assessment as AssessmentIcon,
   TrendingUp as TrendingUpIcon,
-  PieChart as PieChartIcon,
-  FilterList as FilterListIcon
+  PieChart as PieChartIcon
 } from '@mui/icons-material';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
@@ -112,8 +109,15 @@ const StatsGrid = styled(Grid)`
   margin-bottom: 24px;
 `;
 
-const StatCard = styled(Card)`
-  background: linear-gradient(135deg, ${props => props.gradient || '#ffffff, #f8fafc'});
+const StatCard = styled(Card).withConfig({
+  // Keep the styling-only props off the DOM node (MUI spreads unknown props
+  // onto the root div, which makes React warn about them).
+  shouldForwardProp: (prop) => !['gradient', 'accentColor'].includes(prop),
+})`
+  /* The gradient prop already carries a full linear-gradient(...) value —
+     don't wrap it in a second one or the declaration is invalid and the card
+     falls back to Paper white, leaving white text on a white card. */
+  background: ${props => props.gradient || 'linear-gradient(135deg, #ffffff, #f8fafc)'};
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -192,6 +196,10 @@ const SurveyTally = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [expandedCards, setExpandedCards] = useState({});
   const [refreshing, setRefreshing] = useState(false);
+  // Distinguishes the very first fetch (full-page skeleton) from later
+  // search/pagination fetches, which must not unmount the search field —
+  // doing so steals focus mid-typing.
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const itemsPerPage = 8;
 
   // Debounce search query to avoid excessive API calls
@@ -223,6 +231,7 @@ const SurveyTally = () => {
       setError(err.response?.data?.error || err.message || 'Failed to fetch data');
     } finally {
       setLoading(false);
+      setHasLoadedOnce(true);
     }
   }, [itemsPerPage]);
 
@@ -337,8 +346,8 @@ const SurveyTally = () => {
     };
   }, [data, totalCount]);
 
-  // Loading skeleton
-  if (loading) {
+  // Full-page skeleton, first load only.
+  if (loading && !hasLoadedOnce) {
     return (
       <Container>
         <HeaderSection>
@@ -388,12 +397,13 @@ const SurveyTally = () => {
       <Fade in timeout={600}>
         <HeaderSection elevation={0}>
           <Box display="flex" alignItems="center" mb={2}>
-            <AssessmentIcon sx={{ fontSize: 40, mr: 2 }} />
+            <AssessmentIcon sx={{ fontSize: 32, mr: 2 }} />
             <Box>
-              <Typography variant="h3" fontWeight="bold" gutterBottom>
+              {/* Sized to match the 28px page titles used by the other admin routes. */}
+              <Typography variant="h4" fontWeight={600} sx={{ fontSize: 28 }} gutterBottom>
                 Survey Statistics Dashboard
               </Typography>
-              <Typography variant="h6" sx={{ opacity: 0.9 }}>
+              <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
                 Comprehensive analysis of survey response patterns and distributions
               </Typography>
             </Box>
@@ -506,9 +516,9 @@ const SurveyTally = () => {
               />
             </Box>
           )}
-          {loading && searchQuery && (
+          {loading && (
             <Box mt={2}>
-              <LinearProgress 
+              <LinearProgress
                 sx={{ 
                   borderRadius: 1,
                   '& .MuiLinearProgress-bar': {
@@ -523,7 +533,13 @@ const SurveyTally = () => {
 
       {/* Survey Data Charts */}
       <Box>
-        {data.length === 0 ? (
+        {loading ? (
+          // Refetch (search / page change): swap only the result list so the
+          // header, stats and search field keep their state and focus.
+          <>
+            {[1, 2, 3].map((i) => <LoadingCard key={i} />)}
+          </>
+        ) : data.length === 0 ? (
           <Fade in timeout={1200}>
             <Alert severity="info" sx={{ borderRadius: 2, mb: 3 }}>
               <Typography variant="h6">No Data Available</Typography>
@@ -571,16 +587,22 @@ const SurveyTally = () => {
                         size="small"
                         variant="outlined"
                       />
-                      <IconButton 
-                        size="small" 
+                      <IconButton
+                        size="small"
                         onClick={() => toggleCardExpansion(index)}
+                        aria-label={expandedCards[index] ? 'Collapse question details' : 'Expand question details'}
+                        aria-expanded={!!expandedCards[index]}
                       >
                         {expandedCards[index] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                       </IconButton>
                     </Box>
                   </Box>
 
-                  <Collapse in={expandedCards[index] || !group.question || group.question.length < 100}>
+                  {/* The chart is always visible; the toggle only controls whether
+                      the (potentially long) question text is clamped to 2 lines.
+                      Previously the chart itself was hidden for any question over
+                      100 characters, which made most cards look empty. */}
+                  <Box>
                     {group.isEmpty ? (
                       <Alert severity="warning" sx={{ borderRadius: 2 }}>
                         <Typography variant="body2">
@@ -625,7 +647,7 @@ const SurveyTally = () => {
                         </ResponsiveContainer>
                       </Box>
                     )}
-                  </Collapse>
+                  </Box>
                 </CardContent>
               </ChartContainer>
             </Slide>

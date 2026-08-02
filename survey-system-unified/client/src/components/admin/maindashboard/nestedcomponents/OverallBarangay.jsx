@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Skeleton, Fade } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import styled from 'styled-components';
-import { sentimentColors } from '../../../../config/sentimentConfig';
 import { MainContent, ChartContainer } from '../../shared/styledComponents';
 import { fetchEntityMetrics } from '../../../utils/getSurveyFeedbackApi';
 import { fontFamily } from '../../../../config/fontConfig';
@@ -31,14 +30,6 @@ const LoadingContainer = styled(Box)`
   gap: 16px;
   padding: 20px;
 `;
-
-// Modern color palette
-const modernColors = {
-  VerySatisfied: '#10B981',  // Emerald
-  Satisfied: '#34D399',      // Light emerald
-  Neutral: '#F59E0B',        // Amber
-  Dissatisfied: '#EF4444'    // Red
-};
 
 // Custom tooltip
 const CustomTooltip = ({ active, payload, label }) => {

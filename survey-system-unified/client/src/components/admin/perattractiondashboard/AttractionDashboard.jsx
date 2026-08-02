@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Skeleton, Fade, Typography } from '@mui/material';
+import { Box, Fade, Typography } from '@mui/material';
 import styled, { keyframes } from 'styled-components';
 import DataDashboard from '../xdatadashboard/DataDashboard';
 import { fetchEntityMetrics } from '../../utils/getSurveyFeedbackApi';
@@ -17,17 +17,6 @@ const fadeIn = keyframes`
     opacity: 1;
     transform: translateY(0);
   }
-`;
-
-const LoadingContainer = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  padding: 40px;
-  min-height: 60vh;
-  justify-content: center;
-  animation: ${fadeIn} 0.6s ease-out;
 `;
 
 const ErrorContainer = styled(Box)`
@@ -52,21 +41,6 @@ const ErrorTitle = styled(Typography)`
 const ErrorMessage = styled(Typography)`
   font-family: ${fontFamily};
   color: #718096;
-  max-width: 400px;
-`;
-
-const LoadingTitle = styled(Typography)`
-  font-family: ${fontFamily};
-  font-weight: 600;
-  color: #4a5568;
-  font-size: 20px;
-  text-align: center;
-`;
-
-const LoadingSubtitle = styled(Typography)`
-  font-family: ${fontFamily};
-  color: #718096;
-  text-align: center;
   max-width: 400px;
 `;
 

@@ -6,18 +6,17 @@ import {
   MenuItem, 
   Select, 
   FormControl,
-  InputLabel,
   Chip,
   Skeleton,
   Fade,
   Paper
 } from '@mui/material';
-import styled, { createGlobalStyle, keyframes } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import OverallMun from './nestedcomponents/OverallMun';
 import OverallBarangay from './nestedcomponents/OverallBarangay';
 import OverallSurveyTopic from './nestedcomponents/OverallSurveyTopic';
 import OverallEstablishment from './nestedcomponents/OverallEstablishment';
-import { fcolor, fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
+import { fontFamily } from '../../../config/fontConfig';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -28,16 +27,6 @@ import {
   Topic as TopicIcon,
   CalendarToday as CalendarIcon
 } from '@mui/icons-material';
-// Global styles to disable scrolling
-const GlobalStyle = createGlobalStyle`
-  body, html {
-    overflow: hidden;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-`;
-
 // Animations
 const fadeIn = keyframes`
   from {
@@ -251,15 +240,25 @@ const LoadingCard = styled(CardContainer)`
   }
 `;
 
-const StatusChip = styled(Chip)`
+/* The MUI `color` prop was being overridden by these rules, so every state
+   rendered identically. Drive the tint from an explicit `tone` prop instead. */
+const STATUS_TONES = {
+  loading: 'rgba(251, 191, 36, 0.35)',
+  success: 'rgba(52, 211, 153, 0.35)',
+  idle: 'rgba(255, 255, 255, 0.2)',
+};
+
+const StatusChip = styled(Chip).withConfig({
+  shouldForwardProp: (prop) => prop !== 'tone',
+})`
   font-family: ${fontFamily};
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.2);
+  background: ${({ tone }) => STATUS_TONES[tone] || STATUS_TONES.idle};
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
+    filter: brightness(1.15);
   }
 `;
 
@@ -270,8 +269,6 @@ const Dashboard = () => {
   const [classificationStatus, setClassificationStatus] = useState('idle');
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    
     // Simulate loading for better UX
     const loadTimer = setTimeout(() => {
       setIsLoading(false);
@@ -324,7 +321,6 @@ const Dashboard = () => {
     classifyResponses();
 
     return () => {
-      document.body.style.overflow = 'auto';
       clearTimeout(loadTimer);
     };
   }, []);
@@ -350,15 +346,6 @@ const Dashboard = () => {
   // Handle quarter change
   const handleQuarterChange = (event) => {
     setQuarter(event.target.value);
-  };
-
-  // Get status color for classification
-  const getStatusColor = () => {
-    switch (classificationStatus) {
-      case 'loading': return 'warning';
-      case 'success': return 'success';
-      default: return 'default';
-    }
   };
 
   const getStatusText = () => {
@@ -399,7 +386,6 @@ const Dashboard = () => {
 
   return (
     <>
-      <GlobalStyle />
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -441,9 +427,9 @@ const Dashboard = () => {
               </Box>
               
               <Box display="flex" alignItems="center" gap={2}>
-                <StatusChip 
+                <StatusChip
                   label={getStatusText()}
-                  color={getStatusColor()}
+                  tone={classificationStatus}
                   size="small"
                 />
                 
@@ -498,7 +484,9 @@ const Dashboard = () => {
                           <Skeleton variant="text" width="40%" height={16} sx={{ mt: 1 }} />
                         </Box>
                       </CardHeader>
-                      <Skeleton variant="rectangular" height="100%" />
+                      {/* height:100% resolves against a flex line, not the card,
+                          so the skeleton collapsed. flexGrow fills the card. */}
+                      <Skeleton variant="rectangular" sx={{ flexGrow: 1, borderRadius: 2 }} />
                     </LoadingCard>
                   ) : (
                     <CardContainer elevation={0}>

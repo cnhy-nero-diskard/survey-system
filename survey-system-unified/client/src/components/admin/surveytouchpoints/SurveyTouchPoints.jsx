@@ -7,18 +7,18 @@ import {
   MenuItem,
   Box,
   Link,
-  CircularProgress,
   Snackbar,
   Button,
   Skeleton,
   Alert,
   IconButton,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
 import styled from 'styled-components';
 import domtoimage from 'dom-to-image';
-import { Refresh, Download, ArrowDropDown, ContentCopy } from '@mui/icons-material';
+import { Download, ArrowDropDown, ContentCopy } from '@mui/icons-material';
 import { Autocomplete } from '@mui/material';
 
 const StyledLink = styled(Link)`
@@ -54,12 +54,15 @@ const LinkContainer = styled(Box)`
   }
 `;
 
+/* 100vw ignores the 300px sidebar, so the page ran off-screen and forced a
+   horizontal scrollbar; a fixed 100vh height clipped the generated QR card. */
 const StyledContainer = styled(Container)`
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  box-sizing: border-box;
 `;
 
 const Title = styled(Typography)`
@@ -94,7 +97,7 @@ const QRCodeContainer = styled(Box)`
   padding: 2rem;
   background-color: rgb(255, 255, 255);
   border-radius: 12px;
-  width: 80vw;
+  width: 100%;
   max-width: 800px;
   box-sizing: border-box;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -120,6 +123,20 @@ const DownloadButton = styled(Button)`
   }
 `;
 
+// `value` must match the key in the touchpointData payload; `label` is what the
+// admin reads. Previously two of these were capitalised and the Autocomplete
+// label interpolated the raw key ("Select muncity").
+const TOUCHPOINT_TYPES = [
+  { value: 'muncity', label: 'Municipality/City' },
+  { value: 'barangay', label: 'Barangay' },
+  { value: 'transportation', label: 'Transportation' },
+  { value: 'attractions', label: 'Attractions' },
+  { value: 'activities', label: 'Activities' },
+  { value: 'establishments', label: 'Establishments' },
+  { value: 'point', label: 'Points' },
+  { value: 'island', label: 'Island' },
+];
+
 const SurveyTouchpoints = () => {
   const [selectedType, setSelectedType] = useState('');
   const [selectedItem, setSelectedItem] = useState('');
@@ -136,6 +153,7 @@ const SurveyTouchpoints = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [toast, setToast] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -163,12 +181,10 @@ const SurveyTouchpoints = () => {
 
   const handleItemChange = (event, value) => {
     const selectedKey = value ? value.short_id : '';
-    const category = selectedType.toLowerCase();
-    const selectedTouchpoint = touchpointData[category].find(
-      (item) => item.short_id === selectedKey
-    );
     setSelectedItem(selectedKey);
-    setQrValue(`${process.env.REACT_APP_SELF_URL}/feedback?idx=${selectedKey}`);
+    // Clearing the Autocomplete must clear the QR too, otherwise a stale code
+    // stays on screen pointing at the previous touchpoint.
+    setQrValue(selectedKey ? `${process.env.REACT_APP_SELF_URL}/feedback?idx=${selectedKey}` : '');
   };
 
   const generateQRCode = (value) => {
@@ -196,10 +212,14 @@ const SurveyTouchpoints = () => {
   const handleCopyLink = (link) => {
     navigator.clipboard.writeText(link)
       .then(() => {
-        alert('Link copied to clipboard!');
+        // A blocking window.alert() for a copy confirmation is jarring and is
+        // the only modal dialog in the admin UI; use the same Snackbar the
+        // rest of the app uses.
+        setToast('Link copied to clipboard');
       })
-      .catch((error) => {
-        console.error('Failed to copy link:', error);
+      .catch((err) => {
+        console.error('Failed to copy link:', err);
+        setError('Could not copy the link to your clipboard.');
       });
   };
 
@@ -207,18 +227,13 @@ const SurveyTouchpoints = () => {
     setError('');
   };
 
-  const handleRetry = () => {
-    setError('');
-    setSelectedType('');
-    setSelectedItem('');
-    setQrValue('');
-  };
-
   const getTouchpointItems = () => {
     if (!selectedType) return [];
-    const category = selectedType.toLowerCase();
-    return touchpointData[category] || [];
+    return touchpointData[selectedType] || [];
   };
+
+  const selectedTypeLabel =
+    TOUCHPOINT_TYPES.find((t) => t.value === selectedType)?.label || 'item';
 
   return (
     <>
@@ -242,19 +257,16 @@ const SurveyTouchpoints = () => {
                 >
                   {`${process.env.REACT_APP_SELF_URL}/survey/`}
                 </StyledLink>
-                <IconButton
-  onClick={() => handleCopyLink(`${process.env.REACT_APP_SELF_URL}/survey/`)}
-  sx={{
-    '&:hover': {
-      backgroundColor: 'transparent', // Remove hover background
-      boxShadow: 'none', // Remove hover shadow
-    },
-    borderRadius: '50%', // Ensure the button is circular
-    padding: '8px', // Adjust padding for better shape
-  }}
->
-  <ContentCopy />
-</IconButton>              </LinkContainer>
+                <Tooltip title="Copy survey link">
+                  <IconButton
+                    aria-label="Copy survey link"
+                    onClick={() => handleCopyLink(`${process.env.REACT_APP_SELF_URL}/survey/`)}
+                    sx={{ ml: 1 }}
+                  >
+                    <ContentCopy fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </LinkContainer>
             </QRCodeContainer>
           </Grid>
         </Grid>
@@ -281,14 +293,9 @@ const SurveyTouchpoints = () => {
                     <MenuItem value="" disabled>
                       Select Type
                     </MenuItem>
-                    <MenuItem value="muncity">Municipality/City</MenuItem>
-                    <MenuItem value="barangay">Barangay</MenuItem>
-                    <MenuItem value="transportation">Transportation</MenuItem>
-                    <MenuItem value="attractions">Attractions</MenuItem>
-                    <MenuItem value="Activities">Activities</MenuItem>
-                    <MenuItem value="Establishments">Establishments</MenuItem>
-                    <MenuItem value="point">Points</MenuItem>
-                    <MenuItem value="island">Island</MenuItem>
+                    {TOUCHPOINT_TYPES.map(({ value, label }) => (
+                      <MenuItem key={value} value={value}>{label}</MenuItem>
+                    ))}
                   </StyledSelect>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -297,13 +304,15 @@ const SurveyTouchpoints = () => {
                   ) : (
                     <Autocomplete
                       options={getTouchpointItems()}
-                      getOptionLabel={(option) => option.name}
+                      getOptionLabel={(option) => option.name || ''}
+                      isOptionEqualToValue={(option, value) => option.short_id === value.short_id}
                       onChange={handleItemChange}
                       disabled={!selectedType}
+                      noOptionsText={`No ${selectedTypeLabel.toLowerCase()} touchpoints found`}
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          label={`Select ${selectedType}`}
+                          label={selectedType ? `Select ${selectedTypeLabel}` : 'Select a type first'}
                           variant="outlined"
                         />
                       )}
@@ -320,19 +329,16 @@ const SurveyTouchpoints = () => {
                     <StyledLink href={qrValue} target="_blank" rel="noopener">
                       {qrValue}
                     </StyledLink>
-                    <IconButton
-  onClick={() => handleCopyLink(qrValue)}
-  sx={{
-    '&:hover': {
-      backgroundColor: 'transparent', // Remove hover background
-      boxShadow: 'none', // Remove hover shadow
-    },
-    borderRadius: '50%', // Ensure the button is circular
-    padding: '8px', // Adjust padding for better shape
-  }}
->
-  <ContentCopy />
-</IconButton>                  </LinkContainer>
+                    <Tooltip title="Copy touchpoint link">
+                      <IconButton
+                        aria-label="Copy touchpoint link"
+                        onClick={() => handleCopyLink(qrValue)}
+                        sx={{ ml: 1 }}
+                      >
+                        <ContentCopy fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </LinkContainer>
                   <DownloadButton
                     onClick={handleDownloadQRCode}
                     startIcon={<Download />}
@@ -344,22 +350,28 @@ const SurveyTouchpoints = () => {
             </QRCodeContainer>
           </Grid>
         </Grid>
-        {/* Error Handling */}
+        {/* Error handling. The Alert here used to be commented out, leaving a
+            Snackbar with no child — so fetch failures surfaced nothing at all. */}
         <Snackbar
           open={!!error}
           autoHideDuration={6000}
           onClose={handleCloseError}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          {/* <Alert
-            severity="error"
-            action={
-              <IconButton size="small" color="inherit" onClick={handleRetry}>
-                <Refresh fontSize="small" />
-              </IconButton>
-            }
-          >
+          <Alert severity="error" onClose={handleCloseError} sx={{ width: '100%' }}>
             {error}
-          </Alert> */}
+          </Alert>
+        </Snackbar>
+
+        <Snackbar
+          open={!!toast}
+          autoHideDuration={3000}
+          onClose={() => setToast('')}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert severity="success" onClose={() => setToast('')} sx={{ width: '100%' }}>
+            {toast}
+          </Alert>
         </Snackbar>
       </StyledContainer>
     </>

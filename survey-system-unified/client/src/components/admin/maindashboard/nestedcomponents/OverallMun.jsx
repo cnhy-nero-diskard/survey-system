@@ -33,8 +33,9 @@ const LoadingContainer = styled(Box)`
   padding: 20px;
 `;
 
-// Custom tooltip component
-const CustomTooltip = ({ active, payload, label }) => {
+// `total` must come from the caller — a Pie tooltip's payload only ever holds
+// the hovered slice, so summing it always produced "100.0%".
+const CustomTooltip = ({ active, payload, total = 0 }) => {
   if (active && payload && payload.length) {
     const data = payload[0];
     return (
@@ -54,9 +55,11 @@ const CustomTooltip = ({ active, payload, label }) => {
         <Typography variant="body2" sx={{ color: '#4a5568' }}>
           Count: {data.value}
         </Typography>
-        <Typography variant="body2" sx={{ color: '#718096' }}>
-          {((data.value / payload.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1)}%
-        </Typography>
+        {total > 0 && (
+          <Typography variant="body2" sx={{ color: '#718096' }}>
+            {((data.value / total) * 100).toFixed(1)}%
+          </Typography>
+        )}
       </Box>
     );
   }
@@ -162,7 +165,6 @@ const OverallMun = ({ year, quarter }) => {
           name: `Positive (${positiveLabel})`, 
           value: parseInt(counts.positive), 
           color: modernColors.positive,
-          gradient: 'url(#positiveGradient)'
         });
       }
       if (counts.neutral !== "0" && neutralLabel) {
@@ -170,7 +172,6 @@ const OverallMun = ({ year, quarter }) => {
           name: `Neutral (${neutralLabel})`, 
           value: parseInt(counts.neutral), 
           color: modernColors.neutral,
-          gradient: 'url(#neutralGradient)'
         });
       }
       if (counts.negative !== "0" && negativeLabel) {
@@ -178,10 +179,8 @@ const OverallMun = ({ year, quarter }) => {
           name: `Negative (${negativeLabel})`, 
           value: parseInt(counts.negative), 
           color: modernColors.negative,
-          gradient: 'url(#negativeGradient)'
         });
       }
-      console.log(`PIE DATA -->${JSON.stringify(data)}`);
 
       setPieData(data);
     };
@@ -205,6 +204,27 @@ const OverallMun = ({ year, quarter }) => {
     );
   }
 
+  const pieTotal = pieData.reduce((sum, item) => sum + item.value, 0);
+
+  if (pieData.length === 0) {
+    return (
+      <MainContent>
+        <Box
+          sx={{
+            height: '100%', minHeight: 200, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', textAlign: 'center', px: 2,
+          }}
+        >
+          {/* Without this, a failed or empty fetch left a blank white card with
+              no explanation. */}
+          <Typography variant="body2" sx={{ fontFamily, color: '#718096' }}>
+            No sentiment data for the selected period.
+          </Typography>
+        </Box>
+      </MainContent>
+    );
+  }
+
   return (
     <MainContent>
       <Fade in={!loading} timeout={600}>
@@ -215,20 +235,6 @@ const OverallMun = ({ year, quarter }) => {
           <StyledChartContainer>
             <ResponsiveContainer width="100%" height={320}>
               <PieChart>
-                <defs>
-                  <linearGradient id="positiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#10B981" />
-                    <stop offset="100%" stopColor="#059669" />
-                  </linearGradient>
-                  <linearGradient id="neutralGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#F59E0B" />
-                    <stop offset="100%" stopColor="#D97706" />
-                  </linearGradient>
-                  <linearGradient id="negativeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#EF4444" />
-                    <stop offset="100%" stopColor="#DC2626" />
-                  </linearGradient>
-                </defs>
                 <Pie
                   data={pieData}
                   dataKey="value"
@@ -254,7 +260,7 @@ const OverallMun = ({ year, quarter }) => {
                     />
                   ))}
                 </Pie>
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip total={pieTotal} />} />
                 <Legend
                   wrapperStyle={{
                     fontSize: '13px',

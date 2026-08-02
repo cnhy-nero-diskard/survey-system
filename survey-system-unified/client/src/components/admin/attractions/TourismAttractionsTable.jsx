@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Snackbar, Fab } from '@mui/material';
-import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import AddAttractionDialog from './AddAttractionDialog';
 import EditAttractionDialog from './EditAttractionDialog';
 import AddIcon from '@mui/icons-material/Add';
 import WarningMessage from '../../partials/WarningMessage';
 // Styled Components
+/* 100vw / min-width:100vw ignored the 300px sidebar, pushing the whole page
+   sideways. The table needs the horizontal scroll, not the page. */
 const GradientContainer = styled(Container)`
   background: linear-gradient(135deg, rgb(57, 93, 146), #c3cfe2);
   padding: 2rem;
-  width: 100vw;
-  border-radius: 15px;
-  min-width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  overflow-x: auto;
+  box-sizing: border-box;
   margin: 0;
 `;
 
 const StyledTableContainer = styled(TableContainer)`
   border-radius: 15px;
-  overflow: hidden;
+  /* overflow:hidden clipped the 15 columns instead of letting them scroll. */
+  overflow-x: auto;
   margin-top: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
-  min-width: 100%;
 `;
 
 const StyledTableHead = styled(TableHead)`
@@ -55,17 +56,13 @@ const DeleteButton = styled(Button)`
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
 `;
 
+/* right: 50vw parked the FAB in the middle of the viewport, on top of the
+   table. Standard bottom-right placement instead, at a normal FAB size. */
 const FloatingButtonContainer = styled.div`
   position: fixed;
-  bottom: 20px;
-  right: 50vw;
+  bottom: 32px;
+  right: 32px;
   z-index: 1000;
-
-  .MuiFab-root {
-    width: 80px;
-    height: 80px;
-    font-size: 2rem;
-  }
 `;
 
 const TourismAttractionsTable = () => {
@@ -186,15 +183,13 @@ const TourismAttractionsTable = () => {
         }
     };
 
-    const fade = useSpring({ from: { opacity: 0 }, opacity: 1 });
-
     return (
         <GradientContainer>
             {isUnauthorized ? (
                 <WarningMessage message="YOU ARE NOT AUTHORIZED TO VIEW THIS PAGE" /> // Render WarningMessage if unauthorized
             ) : (
                 <>
-                    <Typography variant="h3" gutterBottom>
+                    <Typography variant="h4" sx={{ fontSize: 28, fontWeight: 600, color: 'white' }} gutterBottom>
                         Tourism Attractions
                     </Typography>
                     <StyledTableContainer component={Paper}>
@@ -219,6 +214,13 @@ const TourismAttractionsTable = () => {
                                 </TableRow>
                             </StyledTableHead>
                             <TableBody>
+                                {attractions.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={15} align="center" sx={{ py: 4, color: '#718096', fontStyle: 'italic' }}>
+                                            No attractions recorded yet — use the + button to add one.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                                 {attractions.map((attraction) => (
                                     <StyledTableRow key={attraction.id}>
                                         <TableCell style={{ whiteSpace: 'normal' }}>{attraction.ta_name}</TableCell>

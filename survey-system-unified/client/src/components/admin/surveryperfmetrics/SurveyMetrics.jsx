@@ -20,9 +20,7 @@ import {
     Backdrop,
     Chip,
     IconButton,
-    Divider,
-    Container,
-    alpha
+    Skeleton
 } from '@mui/material';
 import {
     PieChart,
@@ -33,17 +31,13 @@ import {
     XAxis,
     YAxis,
     Tooltip,
-    Legend,
     ResponsiveContainer,
-    LineChart,
-    Line,
     Area,
     AreaChart
 } from 'recharts';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CancelIcon from '@mui/icons-material/Cancel';
-import InsertChartIcon from '@mui/icons-material/InsertChart';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import PeopleIcon from '@mui/icons-material/People';
 import PublicIcon from '@mui/icons-material/Public';
@@ -51,9 +45,10 @@ import GroupIcon from '@mui/icons-material/Group';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CloseIcon from '@mui/icons-material/Close';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
-import { sentimentColors } from '../../../config/sentimentConfig';
+import DonutLargeIcon from '@mui/icons-material/DonutLarge';
+import PlaceIcon from '@mui/icons-material/Place';
 import styled, { ThemeProvider as StyledThemeProvider, keyframes } from 'styled-components';
-import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
+import { fontFamily } from '../../../config/fontConfig';
 import * as XLSX from 'xlsx';
 
 // Animations
@@ -118,24 +113,33 @@ const StyledHeaderCard = styled(Card)`
   }
 `;
 
-const StyledMetricCard = styled(Card)`
+/* Only the cards that actually open a modal get the pointer + lift. Four of the
+   nine advertised a click that did nothing. Pass `clickable` alongside onClick. */
+const StyledMetricCard = styled(Card).withConfig({
+  shouldForwardProp: (prop) => !['gradient', 'clickable'].includes(prop),
+})`
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
+  cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
   height: 100%;
   position: relative;
   overflow: hidden;
   animation: ${scaleIn} 0.5s ease-out;
-  
+
   &:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: ${({ clickable }) => (clickable ? 'translateY(-8px) scale(1.02)' : 'translateY(-2px)')};
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   }
-  
+
+  &:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 3px;
+  }
+
   &::before {
     content: '';
     position: absolute;
@@ -252,6 +256,7 @@ const SurveyMetrics = () => {
 
     // State to hold survey metrics fetched from server
     const [surveyMetrics, setSurveyMetrics] = useState(null);
+    const [loadError, setLoadError] = useState(null);
 
     // State control for modals
     const [open, setOpen] = useState(false);
@@ -267,10 +272,11 @@ const SurveyMetrics = () => {
             .get(`${process.env.REACT_APP_API_HOST}/api/admin/getsurveymetrics`, { withCredentials: true })
             .then((response) => {
                 setSurveyMetrics(response.data.data);
-                console.log(`METRICS -- > ${JSON.stringify(response.data.data)}`);
             })
             .catch((error) => {
                 console.error('Error fetching Survey Metrics:', error);
+                // Without this the page sat on "Loading Survey Metrics..." forever.
+                setLoadError(error.response?.data?.message || error.message || 'Request failed');
             });
     }, []);
 
@@ -336,12 +342,58 @@ const SurveyMetrics = () => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
-    // Guard condition if data isn't loaded yet
+    if (loadError) {
+        return (
+            <StyledDashboardContainer>
+                <StyledHeaderCard elevation={0}>
+                    <CardContent>
+                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                            Survey Performance Analytics
+                        </Typography>
+                    </CardContent>
+                </StyledHeaderCard>
+                <Box
+                    sx={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center',
+                        justifyContent: 'center', textAlign: 'center', gap: 1.5, py: 8,
+                    }}
+                >
+                    <AnalyticsIcon sx={{ fontSize: '3rem', color: '#e53e3e' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#e53e3e' }}>
+                        Couldn't load survey metrics
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#718096', maxWidth: 420 }}>
+                        Please refresh the page, or contact support if the problem persists.
+                    </Typography>
+                    <Box sx={{ mt: 1, p: 2, bgcolor: '#fed7d7', borderRadius: 2, maxWidth: 500 }}>
+                        <Typography variant="caption" sx={{ color: '#c53030' }}>
+                            Error details: {loadError}
+                        </Typography>
+                    </Box>
+                </Box>
+            </StyledDashboardContainer>
+        );
+    }
+
+    // Skeleton rather than a bare line of text, so this page loads like the rest
+    // of the admin dashboards do.
     if (!surveyMetrics) {
         return (
-            <Box sx={{ padding: 4 }}>
-                <Typography variant="h6">Loading Survey Metrics...</Typography>
-            </Box>
+            <StyledDashboardContainer>
+                <StyledHeaderCard elevation={0}>
+                    <CardContent>
+                        <Skeleton variant="text" width="40%" height={36} sx={{ bgcolor: 'rgba(255,255,255,0.25)' }} />
+                        <Skeleton variant="text" width="55%" height={22} sx={{ bgcolor: 'rgba(255,255,255,0.15)' }} />
+                    </CardContent>
+                </StyledHeaderCard>
+                <Grid container spacing={2}>
+                    {Array.from({ length: 8 }, (_, i) => (
+                        <Grid item xs={12} sm={6} lg={3} key={i}>
+                            <Skeleton variant="rectangular" height={220} sx={{ borderRadius: '20px' }} />
+                        </Grid>
+                    ))}
+                </Grid>
+            </StyledDashboardContainer>
         );
     }
 
@@ -349,10 +401,6 @@ const SurveyMetrics = () => {
     const completionRateData = [
         { name: 'Completed', value: surveyMetrics.surveyCompletionRate },
         { name: 'Not Completed', value: surveyMetrics.dropOffRate }
-    ];
-
-    const satisfactionData = [
-        { name: 'Satisfaction Score', value: surveyMetrics.surveySatisfactionScore }
     ];
 
     const surveyDistributionData = Object.entries(surveyMetrics.surveyDistribution).map(([key, value]) => ({
@@ -386,9 +434,6 @@ const SurveyMetrics = () => {
         name: capitalizeFirstLetter(key),
         value
     }));
-
-    const colors = [sentimentColors.positive, sentimentColors.negative];
-    const distributionColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1919'];
 
     // Function to export fetched data to Excel
     const exportToExcel = () => {
@@ -462,8 +507,14 @@ const SurveyMetrics = () => {
                     <CardContent>
                         <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
                             <Box flex={1}>
-                                <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-                                    📊 Survey Performance Analytics
+                                {/* Icon + text, matching the header treatment on every other
+                                    admin page (the emoji was the only one of its kind). */}
+                                <Typography
+                                    variant="h5"
+                                    sx={{ fontWeight: 700, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1.5 }}
+                                >
+                                    <AnalyticsIcon sx={{ fontSize: 32 }} />
+                                    Survey Performance Analytics
                                 </Typography>
                                 <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 400, mb: 1 }}>
                                     Real-time insights and comprehensive survey metrics
@@ -505,11 +556,8 @@ const SurveyMetrics = () => {
                                 <Typography variant="body2" sx={{ color: '#6b7280' }}>
                                     out of {surveyMetrics.totalSurveys} total
                                 </Typography>
-                                <Box sx={{ mt: 1.5, p: 1, bgcolor: 'rgba(34, 197, 94, 0.1)', borderRadius: '10px' }}>
-                                    <Typography variant="caption" sx={{ color: theme.palette.success.dark }}>
-                                        Last updated: {getCurrentTime()}
-                                    </Typography>
-                                </Box>
+                                {/* Dropped the per-card "Last updated" box: it printed the render
+                                    time, not the data time, and the header already shows it. */}
                             </CardContent>
                         </StyledMetricCard>
                     </Grid>
@@ -518,6 +566,11 @@ const SurveyMetrics = () => {
                     <Grid item xs={12} sm={6} lg={3}>
                         <StyledMetricCard gradient="linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)">
                             <CardContent>
+                                {/* The two chart cards were the only ones without an icon tile,
+                                    so their titles sat higher than every neighbour in the row. */}
+                                <StyledMetricIcon color="#3b82f6">
+                                    <DonutLargeIcon fontSize="inherit" />
+                                </StyledMetricIcon>
                                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
                                     Completion Rate
                                 </Typography>
@@ -609,10 +662,17 @@ const SurveyMetrics = () => {
                         <StyledMetricCard 
                             gradient="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
                             onClick={handleDistributionOpen}
+                            clickable
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleDistributionOpen(); } }}
                         >
                             <CardContent>
+                                <StyledMetricIcon color="#8b5cf6">
+                                    <PlaceIcon fontSize="inherit" />
+                                </StyledMetricIcon>
                                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#1f2937' }}>
-                                    📍 Survey Distribution
+                                    Survey Distribution
                                 </Typography>
                                 {surveyDistributionData.length > 0 ? (
                                     <Box sx={{ width: '100%', height: 200 }}>
@@ -652,6 +712,10 @@ const SurveyMetrics = () => {
                         <StyledMetricCard
                             gradient="linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)"
                             onClick={handleNationalityOpen}
+                            clickable
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNationalityOpen(); } }}
                         >
                             <CardContent>
                                 <StyledMetricIcon color="#06b6d4">
@@ -688,6 +752,10 @@ const SurveyMetrics = () => {
                         <StyledMetricCard
                             gradient="linear-gradient(135deg, #ec4899 0%, #db2777 100%)"
                             onClick={handleCountryOpen}
+                            clickable
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCountryOpen(); } }}
                         >
                             <CardContent>
                                 <StyledMetricIcon color="#ec4899">
@@ -724,6 +792,10 @@ const SurveyMetrics = () => {
                         <StyledMetricCard
                             gradient="linear-gradient(135deg, #84cc16 0%, #65a30d 100%)"
                             onClick={handleAgeGroupOpen}
+                            clickable
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleAgeGroupOpen(); } }}
                         >
                             <CardContent>
                                 <StyledMetricIcon color="#84cc16">
@@ -760,6 +832,10 @@ const SurveyMetrics = () => {
                         <StyledMetricCard 
                             gradient="linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)"
                             onClick={handleOpen}
+                            clickable
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOpen(); } }}
                         >
                             <CardContent>
                                 <StyledMetricIcon color="#6366f1">
@@ -1021,8 +1097,10 @@ const SurveyMetrics = () => {
                                             Responses by Nationality
                                         </Typography>
                                         <ResponsiveContainer width="100%" height={400}>
-                                            <BarChart data={surveyResponsesByRegionData.slice(0, 10)}>
-                                                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                                            {/* Sorted: a "top 10" chart built from an unsorted slice is
+                                                just the first 10 keys the API returned. */}
+                                            <BarChart data={sortedRegions.slice(0, 10)}>
+                                                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} interval={0} />
                                                 <YAxis />
                                                 <Tooltip 
                                                     contentStyle={{
@@ -1062,7 +1140,10 @@ const SurveyMetrics = () => {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {surveyResponsesByRegionData.map((row, index) => (
+                                                    {/* Ranked list: must iterate the sorted array, or the
+                                                        "1., 2., 3." chips and the highlight are applied to
+                                                        whatever order the API happened to return. */}
+                                                    {sortedRegions.map((row, index) => (
                                                         <TableRow key={row.name}>
                                                             <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
                                                                 <Box display="flex" alignItems="center">
@@ -1121,8 +1202,8 @@ const SurveyMetrics = () => {
                                             Responses by Country of Residence
                                         </Typography>
                                         <ResponsiveContainer width="100%" height={400}>
-                                            <BarChart data={surveyResponsesByCountryData.slice(0, 10)}>
-                                                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                                            <BarChart data={sortedResidence.slice(0, 10)}>
+                                                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} interval={0} />
                                                 <YAxis />
                                                 <Tooltip 
                                                     contentStyle={{
@@ -1162,7 +1243,7 @@ const SurveyMetrics = () => {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {surveyResponsesByCountryData.map((row, index) => (
+                                                    {sortedResidence.map((row, index) => (
                                                         <TableRow key={row.name}>
                                                             <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
                                                                 <Box display="flex" alignItems="center">
@@ -1262,7 +1343,7 @@ const SurveyMetrics = () => {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {surveyResponsesByAgeGroupData.map((row, index) => (
+                                                    {sortedAgeGroup.map((row, index) => (
                                                         <TableRow key={row.name}>
                                                             <TableCell component="th" scope="row" sx={{ fontWeight: 600 }}>
                                                                 <Box display="flex" alignItems="center">

@@ -16,42 +16,49 @@ import {
   Modal,
 } from "@mui/material";
 
-import { Circle } from "@mui/icons-material";
-import { Pie, Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-} from "chart.js";
+import { Circle, VerifiedUserOutlined as UserIcon } from "@mui/icons-material";
+import styled from "styled-components";
 import AdminSessionDashboard from "../adminsessiondashboard/AdminLogins";
+import { fontFamily } from "../../../config/fontConfig";
+import { gradients } from "../shared/designTokens";
 
-// Register Chart.js components
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement
-);
+// Removed the chart.js registration plus the `dummyData` geographic/language
+// datasets: both chart objects were built on every render and never rendered.
 
-const dummyData = {
-  geographicDistribution: {
-    USA: 50,
-    Canada: 30,
-    UK: 20,
-    Germany: 10,
-  },
-  languagePreferences: {
-    English: 70,
-    French: 20,
-    Spanish: 10,
-  },
-};
+const PageShell = styled(Box)`
+  background: ${gradients.page};
+  min-height: 100vh;
+  padding: 32px;
+  font-family: ${fontFamily};
+  box-sizing: border-box;
+`;
+
+const HeaderContainer = styled(Box)`
+  background: ${gradients.brand};
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: white;
+`;
+
+const HeaderTitle = styled(Typography)`
+  font-family: ${fontFamily};
+  font-weight: 600;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const GlassCard = styled(Card)`
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 100%;
+`;
 
 const UsersDashboard = () => {
   const [anonymousUsers, setAnonymousUsers] = useState([]);
@@ -85,64 +92,51 @@ const UsersDashboard = () => {
 
   const activeUsers = anonymousUsers.filter((user) => user.is_active).length;
 
-  const geographicData = {
-    labels: Object.keys(dummyData.geographicDistribution),
-    datasets: [
-      {
-        label: "Users by Country",
-        data: Object.values(dummyData.geographicDistribution),
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
-      },
-    ],
-  };
-
-  const languageData = {
-    labels: Object.keys(dummyData.languagePreferences),
-    datasets: [
-      {
-        label: "Language Preferences",
-        data: Object.values(dummyData.languagePreferences),
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-      },
-    ],
-  };
-
   return (
-    <Box sx={{ flexGrow: 1, padding: 3, height: "100vh", display: "flex", flexDirection: "column" }}>
-      <Typography variant="h4" gutterBottom>
-        Users Dashboard
-      </Typography>
+    <PageShell>
+      <HeaderContainer>
+        <HeaderTitle>
+          <UserIcon sx={{ fontSize: 32 }} />
+          Users Dashboard
+        </HeaderTitle>
+        <Typography variant="subtitle1" sx={{ fontFamily, opacity: 0.9, mt: 0.5 }}>
+          Admin sessions and anonymous survey participants, refreshed every 5 seconds
+        </Typography>
+      </HeaderContainer>
 
       {/* Grid Layout */}
-      <Grid container spacing={3} sx={{ flexGrow: 1 }}>
+      <Grid container spacing={3} alignItems="stretch">
         {/* Active Admins Section */}
         <Grid item xs={12} md={6}>
-          <Card sx={{ height: "100%", width: '100%', display: "flex", flexDirection: "column" }}>
+          <GlassCard elevation={0}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{ fontFamily, fontWeight: 600, color: '#2d3748' }}>
                 Active Admins
               </Typography>
               <AdminSessionDashboard />
             </CardContent>
-          </Card>
+          </GlassCard>
         </Grid>
 
         {/* Active Users Section */}
         <Grid item xs={12} md={6}>
-          <Card sx={{ height: "100%" }}>
+          <GlassCard elevation={0}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Active Users: {activeUsers} users taking surveys
+              <Typography variant="h6" gutterBottom sx={{ fontFamily, fontWeight: 600, color: '#2d3748' }}>
+                Active Users
               </Typography>
-              <Button variant="contained" onClick={() => setOpenModal(true)}>
+              <Typography variant="h3" sx={{ fontFamily, fontWeight: 700, color: '#667eea', my: 1 }}>
+                {activeUsers}
+              </Typography>
+              <Typography variant="body2" sx={{ fontFamily, color: '#718096', mb: 2 }}>
+                currently taking surveys · {anonymousUsers.length} total recorded
+              </Typography>
+              <Button variant="contained" onClick={() => setOpenModal(true)} sx={{ textTransform: 'none' }}>
                 View All Users
               </Button>
             </CardContent>
-          </Card>
+          </GlassCard>
         </Grid>
- 
-  
-
       </Grid>
 
       {/* Modal for All Users */}
@@ -153,12 +147,16 @@ const UsersDashboard = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 800,
+            // A hard 800px overflowed narrower viewports with no way to scroll
+            // horizontally out of it.
+            width: "90%",
+            maxWidth: 800,
             bgcolor: "background.paper",
+            borderRadius: 3,
             boxShadow: 24,
             p: 4,
-            maxHeight: "80vh", // Restrict the height of the modal to 80% of the viewport height
-            overflowY: "auto", // Enable vertical scrolling if content exceeds the height
+            maxHeight: "80vh",
+            overflowY: "auto",
           }}
         >
           <Typography variant="h6" gutterBottom>
@@ -171,7 +169,7 @@ const UsersDashboard = () => {
               overflowY: "auto", // Enable vertical scrolling for the table
             }}
           >
-            <Table>
+            <Table stickyHeader size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>ID</TableCell>
@@ -181,17 +179,26 @@ const UsersDashboard = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
+                {anonymousUsers.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center" sx={{ py: 4, color: '#718096', fontStyle: 'italic' }}>
+                      No anonymous users recorded yet.
+                    </TableCell>
+                  </TableRow>
+                )}
                 {anonymousUsers.map((user) => (
-                  <TableRow key={user.anonymous_user_id}>
+                  <TableRow key={user.anonymous_user_id} hover>
                     <TableCell>{user.anonymous_user_id}</TableCell>
                     <TableCell>{user.nickname}</TableCell>
-                    <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
+                    <TableCell>{user.created_at ? new Date(user.created_at).toLocaleString() : '—'}</TableCell>
                     <TableCell>
-                      {user.is_active ? (
-                        <Circle sx={{ color: "green", fontSize: "small" }} />
-                      ) : (
-                        <Circle sx={{ color: "red", fontSize: "small" }} />
-                      )}
+                      {/* The bare dot conveyed status by colour alone. */}
+                      <Box display="flex" alignItems="center" gap={0.75}>
+                        <Circle sx={{ color: user.is_active ? '#10b981' : '#ef4444', fontSize: 12 }} />
+                        <Typography variant="caption" sx={{ color: '#4a5568' }}>
+                          {user.is_active ? 'Active' : 'Inactive'}
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -200,8 +207,8 @@ const UsersDashboard = () => {
           </TableContainer>
         </Box>
       </Modal>
-    </Box>
+    </PageShell>
   );
 };
 
-export default UsersDashboard;  
+export default UsersDashboard;

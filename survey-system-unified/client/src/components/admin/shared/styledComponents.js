@@ -11,7 +11,7 @@ export const MainContent = styled(Box)`
   font-size: ${fontSize};
   font-weight: ${fontWeight};
   height: 100%;
-  width: 100
+  width: 100%;
   display: flex;
   flex-direction: column;
 `;

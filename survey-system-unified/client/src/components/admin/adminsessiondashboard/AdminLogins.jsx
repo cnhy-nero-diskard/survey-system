@@ -15,14 +15,9 @@ const fadeIn = keyframes`
 // Styled components
 const Container = styled.div`
   padding: 20px;
-  font-family: Arial, sans-serif;
+  /* Arial here was the only non-Poppins surface in the admin area. */
+  font-family: 'Poppins', sans-serif;
   animation: ${fadeIn} 0.5s ease-in;
-`;
-
-const Title = styled.h1`
-  color: #333;
-  text-align: center;
-  margin-bottom: 20px;
 `;
 
 const Table = styled.table`
@@ -32,19 +27,22 @@ const Table = styled.table`
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.18);
   border-radius: 10px;
   overflow: hidden;
+  font-size: 14px;
 `;
 
 const TableHeader = styled.thead`
-  background-color: #007bff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 `;
 
 const TableRow = styled.tr`
+  /* Zebra striping was solid #007bff behind dark body text — effectively
+     unreadable. A faint brand tint keeps the stripe without the contrast hit. */
   &:nth-child(even) {
-    background-color:  #007bff;
+    background-color: rgba(102, 126, 234, 0.06);
   }
   &:hover {
-    background-color:rgba(0, 123, 255, 0.67);
+    background-color: rgba(102, 126, 234, 0.14);
   }
   animation: ${fadeIn} 0.5s ease-in;
 `;
@@ -52,23 +50,37 @@ const TableRow = styled.tr`
 const TableCell = styled.td`
   padding: 12px;
   text-align: left;
-  border: 1px solid #ddd;
+  border-bottom: 1px solid #e2e8f0;
+  color: #2d3748;
 `;
 
 const TableHeaderCell = styled.th`
   padding: 12px;
   text-align: left;
-  border: 1px solid #ddd;
+  font-weight: 600;
+  white-space: nowrap;
+`;
+
+const EmptyRow = styled.td`
+  padding: 24px 12px;
+  text-align: center;
+  color: #718096;
+  font-style: italic;
 `;
 
 const IconWrapper = styled.span`
   margin-right: 8px;
-  color: #007bff;
+  color: #667eea;
+  vertical-align: middle;
 `;
 
-const StatusIndicator = styled(FaCircle)`
-  color: ${props => (props.status === 'Logged In' ? '#4caf50' : '#f44336')};
+const StatusIndicator = styled(FaCircle).withConfig({
+  // Without this, `status` is spread onto the <svg> and React warns.
+  shouldForwardProp: (prop) => prop !== 'loggedIn',
+})`
+  color: ${props => (props.loggedIn ? '#10b981' : '#ef4444')};
   margin-right: 8px;
+  vertical-align: middle;
 `;
 
 const AdminSessionDashboard = () => {
@@ -94,8 +106,8 @@ const AdminSessionDashboard = () => {
                 }
 
                 const data = await response.json();
-                console.log('Session data:', data);
-                setSessionData(data);
+                // Guard: a non-array payload would blow up .map() below.
+                setSessionData(Array.isArray(data) ? data : []);
                 setIsUnauthorized(false); // Reset unauthorized state if request succeeds
             } catch (error) {
                 console.error('Error fetching session data:', error);
@@ -124,15 +136,26 @@ const AdminSessionDashboard = () => {
                         </tr>
                     </TableHeader>
                     <tbody>
-                        {sessionData.map((admin, index) => (
-                            <TableRow key={index}>
-                                <TableCell><IconWrapper><FaUser /></IconWrapper>{admin.username}</TableCell>
-                                <TableCell><IconWrapper><FaSignInAlt /></IconWrapper>{new Date(admin.last_login).toLocaleString()}</TableCell>
-                                <TableCell><IconWrapper><FaSignOutAlt /></IconWrapper>{admin.last_logout ? new Date(admin.last_logout).toLocaleString() : 'N/A'}</TableCell>
-                                <TableCell><IconWrapper><FaClock /></IconWrapper>{admin.session_duration ? `${admin.session_duration} seconds` : 'N/A'}</TableCell>
-                                <TableCell><StatusIndicator status={admin.is_logged_in ? 'Logged In' : 'Logged Out'} />{admin.is_logged_in ? 'Logged In' : 'Logged Out'}</TableCell>
-                            </TableRow>
-                        ))}
+                        {sessionData.length === 0 ? (
+                            <tr>
+                                {/* Previously an empty response rendered a header with nothing
+                                    under it, which reads as a broken table. */}
+                                <EmptyRow colSpan={5}>No admin sessions recorded yet.</EmptyRow>
+                            </tr>
+                        ) : (
+                            sessionData.map((admin, index) => (
+                                <TableRow key={admin.username || index}>
+                                    <TableCell><IconWrapper><FaUser /></IconWrapper>{admin.username}</TableCell>
+                                    <TableCell><IconWrapper><FaSignInAlt /></IconWrapper>{admin.last_login ? new Date(admin.last_login).toLocaleString() : 'N/A'}</TableCell>
+                                    <TableCell><IconWrapper><FaSignOutAlt /></IconWrapper>{admin.last_logout ? new Date(admin.last_logout).toLocaleString() : 'N/A'}</TableCell>
+                                    <TableCell><IconWrapper><FaClock /></IconWrapper>{admin.session_duration ? `${admin.session_duration} seconds` : 'N/A'}</TableCell>
+                                    <TableCell>
+                                        <StatusIndicator loggedIn={!!admin.is_logged_in} />
+                                        {admin.is_logged_in ? 'Logged In' : 'Logged Out'}
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </tbody>
                 </Table>
             )}

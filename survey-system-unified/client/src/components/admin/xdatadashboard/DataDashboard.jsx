@@ -30,7 +30,6 @@ import {
   Chip,
   Select,
   FormControl,
-  InputLabel,
   MenuItem,
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -43,7 +42,6 @@ import {
   PieChart as PieChartIcon,
   Language as LanguageIcon,
   Analytics as AnalyticsIcon,
-  CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
 
 // Modern color palette for charts
@@ -343,10 +341,11 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const CustomPieTooltip = ({ active, payload }) => {
+// `total` must be supplied by the caller: a Pie tooltip's payload only ever
+// contains the hovered slice, so summing it always yields 100%.
+const CustomPieTooltip = ({ active, payload, total = 0 }) => {
   if (active && payload && payload.length) {
     const data = payload[0];
-    const total = payload.reduce((sum, item) => sum + item.value, 0);
     return (
       <Box
         sx={{
@@ -364,9 +363,11 @@ const CustomPieTooltip = ({ active, payload }) => {
         <Typography variant="body2" sx={{ color: '#4a5568' }}>
           Count: {data.value}
         </Typography>
-        <Typography variant="body2" sx={{ color: '#718096' }}>
-          {((data.value / total) * 100).toFixed(1)}%
-        </Typography>
+        {total > 0 && (
+          <Typography variant="body2" sx={{ color: '#718096' }}>
+            {((data.value / total) * 100).toFixed(1)}%
+          </Typography>
+        )}
       </Box>
     );
   }
@@ -462,15 +463,15 @@ const DataDashboard = ({
   }, 0);
 
   useEffect(() => {
-    console.log(`Entities = ${JSON.stringify(entities)}`);
-    
-    // Simulate loading for better UX
+    // Parents build `entities` inline during render, so it is a new array on
+    // every pass — depending on it here restarted the timer (and logged) on
+    // each render. The stagger only needs to run once on mount.
     const loadTimer = setTimeout(() => {
       setIsLoading(false);
     }, 800);
-    
+
     return () => clearTimeout(loadTimer);
-  }, [entities]);
+  }, []);
 
   // Build a single data entry for the stacked bar,
   // where each property is named after an entity's 'name' and stores its % of total
@@ -488,6 +489,15 @@ const DataDashboard = ({
     ),
   ];
 
+  // Changing the year/quarter filter refetches a different set of entities.
+  // Without this the previously-selected key can vanish from `data`, leaving
+  // an empty Autocomplete and every chart reading zero.
+  useEffect(() => {
+    if (!selectedEntity || !data[selectedEntity]) {
+      setSelectedEntity(entityKey);
+    }
+  }, [entityKey, data, selectedEntity]);
+
   // Data for the currently selected entity
   const entityData = data[selectedEntity];
 
@@ -496,6 +506,8 @@ const DataDashboard = ({
     ...item,
     color: MODERN_COLORS.sentiment[item.name] || '#8B5CF6'
   })) || [];
+
+  const sentimentTotal = enhancedSentimentData.reduce((sum, item) => sum + (item.value || 0), 0);
 
   // Handle modal open
   const handleModalOpen = () => {
@@ -764,7 +776,7 @@ const DataDashboard = ({
                           />
                         ))}
                       </Pie>
-                      <Tooltip content={<CustomPieTooltip />} />
+                      <Tooltip content={<CustomPieTooltip total={sentimentTotal} />} />
                       <Legend
                         wrapperStyle={{
                           fontFamily: fontFamily,

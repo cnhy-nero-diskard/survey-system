@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Skeleton, Fade, Typography } from '@mui/material';
+import { Box, Fade, Typography } from '@mui/material';
 import styled, { keyframes } from 'styled-components';
 import DataDashboard from '../xdatadashboard/DataDashboard';
 import { fetchEntityMetrics } from '../../utils/getSurveyFeedbackApi';
 import { fontFamily } from '../../../config/fontConfig';
+import FetchingDataLoader from '../../partials/FetchingDataLoader';
 
 // Enhanced loading and error components
 const fadeIn = keyframes`
@@ -15,17 +16,6 @@ const fadeIn = keyframes`
     opacity: 1;
     transform: translateY(0);
   }
-`;
-
-const LoadingContainer = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  padding: 40px;
-  min-height: 60vh;
-  justify-content: center;
-  animation: ${fadeIn} 0.6s ease-out;
 `;
 
 const ErrorContainer = styled(Box)`
@@ -50,21 +40,6 @@ const ErrorTitle = styled(Typography)`
 const ErrorMessage = styled(Typography)`
   font-family: ${fontFamily};
   color: #718096;
-  max-width: 400px;
-`;
-
-const LoadingTitle = styled(Typography)`
-  font-family: ${fontFamily};
-  font-weight: 600;
-  color: #4a5568;
-  font-size: 20px;
-  text-align: center;
-`;
-
-const LoadingSubtitle = styled(Typography)`
-  font-family: ${fontFamily};
-  color: #718096;
-  text-align: center;
   max-width: 400px;
 `;
 
@@ -174,25 +149,26 @@ const AreaDashboard = () => {
     );
   }
 
+  // Uses the same shared loader as the attraction/establishment dashboards.
+  // These two used to render a bespoke skeleton capped at 600px, so switching
+  // between sibling pages showed two different loading treatments.
   if (isLoading) {
     return (
-      <LoadingContainer>
-        <LoadingTitle>
-          Loading Area Dashboard
-        </LoadingTitle>
-        <LoadingSubtitle>
-          Fetching and processing area survey data including barangays, islands, points of interest, and transportation...
-        </LoadingSubtitle>
-        <Box sx={{ width: '100%', maxWidth: 600 }}>
-          <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 2, mb: 3 }} />
-          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-            <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 2 }} />
-            <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 2 }} />
-            <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 2 }} />
-          </Box>
-          <Skeleton variant="rectangular" width="100%" height={100} sx={{ borderRadius: 2 }} />
-        </Box>
-      </LoadingContainer>
+      <FetchingDataLoader
+        message="Fetching Data"
+        subtitle="Loading area survey data including barangays, islands, points of interest and transportation..."
+        showCircularLoader={true}
+        showSkeleton={true}
+        showDots={true}
+        minHeight="60vh"
+        background="linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)"
+        borderRadius="0px"
+        titleColor="#4a5568"
+        subtitleColor="#718096"
+        loaderColor="#667eea"
+        titleSize="24px"
+        skeletonMaxWidth="800px"
+      />
     );
   }
 
