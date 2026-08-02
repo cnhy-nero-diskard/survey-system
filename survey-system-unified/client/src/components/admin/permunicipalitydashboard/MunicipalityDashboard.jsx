@@ -4,6 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import DataDashboard from '../xdatadashboard/DataDashboard';
 import { fetchEntityMetrics } from '../../utils/getSurveyFeedbackApi';
 import { fontFamily } from '../../../config/fontConfig';
+import { getRatingSentimentData } from '../../../config/sentimentConfig';
 import FetchingDataLoader from '../../partials/FetchingDataLoader';
 
 // Enhanced loading and error components
@@ -100,8 +101,16 @@ const MunicipalityDashboard = () => {
 
   // Function to aggregate data for "PANGLAO"
   const aggregatePanglaoData = (data) => {
+    // DataDashboard forwards this identifier to the topic-sentiment endpoint.
+    // Prefer Panglao's location record for the municipality aggregate and use
+    // the first available ID as a defensive fallback.
+    const municipalityShortId = data.find(
+      (item) => item.entity?.toUpperCase() === 'PANGLAO' && item.short_id
+    )?.short_id || data.find((item) => item.short_id)?.short_id;
+
     const panglaoData = {
       entity: "PANGLAO",
+      short_id: municipalityShortId,
       touchpoint: "muncity",
       total_responses: 0,
       rating: {
@@ -116,13 +125,13 @@ const MunicipalityDashboard = () => {
 
     data.forEach((item) => {
       // Sum total responses
-      panglaoData.total_responses += parseInt(item.total_responses, 10);
+      panglaoData.total_responses += Number(item.total_responses) || 0;
 
       // Sum ratings
-      panglaoData.rating.Dissatisfied += parseInt(item.rating.Dissatisfied, 10);
-      panglaoData.rating.Neutral += parseInt(item.rating.Neutral, 10);
-      panglaoData.rating.Satisfied += parseInt(item.rating.Satisfied, 10);
-      panglaoData.rating.VerySatisfied += parseInt(item.rating.VerySatisfied, 10);
+      panglaoData.rating.Dissatisfied += Number(item.rating?.Dissatisfied ?? item.rating?.['1']) || 0;
+      panglaoData.rating.Neutral += Number(item.rating?.Neutral ?? item.rating?.['2']) || 0;
+      panglaoData.rating.Satisfied += Number(item.rating?.Satisfied ?? item.rating?.['3']) || 0;
+      panglaoData.rating.VerySatisfied += Number(item.rating?.VerySatisfied ?? item.rating?.['4']) || 0;
 
       // Sum language counts
       for (const [lang, count] of Object.entries(item.language || {})) {
@@ -145,12 +154,7 @@ const MunicipalityDashboard = () => {
       acc[key] = {
         name: metric.entity,
         totalResponses: parseInt(metric.total_responses, 10),
-        sentimentData: [
-          { name: 'Dissatisfied', value: parseInt(metric.rating["Dissatisfied"], 10) },
-          { name: 'Neutral', value: parseInt(metric.rating["Neutral"], 10) },
-          { name: 'Satisfied', value: parseInt(metric.rating["Satisfied"], 10) },
-          { name: 'Very Satisfied', value: parseInt(metric.rating["VerySatisfied"], 10) },
-        ],
+        sentimentData: getRatingSentimentData(metric.rating),
         mentionedTerms: Object.entries(metric.mentionedTerms || {}).map(([term, count]) => ({
           term,
           count,
@@ -169,6 +173,7 @@ const MunicipalityDashboard = () => {
     return metrics.map((metric) => ({
       key: metric.entity.toLowerCase().replace(/\s+/g, ''), // Create a unique key for each entity
       name: metric.entity,
+      short_id: metric.short_id,
     }));
   };
 
