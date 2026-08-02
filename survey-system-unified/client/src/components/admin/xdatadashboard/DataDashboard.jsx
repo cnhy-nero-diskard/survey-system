@@ -84,9 +84,9 @@ const shimmer = keyframes`
 
 // Enhanced styled components
 const StyledPaper = styled(Paper)`
-  padding: 24px;
+  padding: 20px;
   width: 100%;
-  max-width: 600px;
+  max-width: none;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -122,15 +122,18 @@ const StyledPaper = styled(Paper)`
 const MainContainer = styled(Box)`
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
-  padding: 32px;
+  padding: 24px;
   animation: ${fadeIn} 0.6s ease-out;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 `;
 
 const HeaderContainer = styled(Box)`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 16px;
   padding: 24px;
-  margin-bottom: 32px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   color: white;
   position: relative;
@@ -250,7 +253,9 @@ const FilterLabel = styled(Typography)`
 
 const StyledGridContainer = styled(Grid)`
   padding: 0;
-  min-height: 100vh;
+  /* The outer page shell owns the viewport height. Giving this wrapping Grid
+     a viewport minimum stretches its flex rows and creates large blank bands
+     between dashboard sections. */
   background-color: transparent;
   font-family: ${fontFamily};
   font-size: ${fontSize};
@@ -276,7 +281,7 @@ const CardIcon = styled(Box)`
 const CardTitle = styled(Typography)`
   font-family: ${fontFamily};
   font-weight: 600;
-  margin-bottom: 16px !important;
+  margin-bottom: 12px !important;
   color: #2d3748;
   font-size: 18px;
 `;
@@ -484,7 +489,10 @@ const DataDashboard = ({
         const percentage = totalResponsesAll > 0
           ? (entityTotal / totalResponsesAll) * 100
           : 0;
-        acc[entity.name] = Math.round(percentage * 100) / 100; // Round to 2 decimal places
+        // Keep the plotted values unrounded so stacked segments always total
+        // exactly 100% for the axis calculation. Values are rounded only when
+        // displayed in the tooltip and table.
+        acc[entity.name] = percentage;
         return acc;
       },
       { name: '' }
@@ -545,7 +553,8 @@ const DataDashboard = ({
   return (
     <MainContainer>
       <Fade in={!isLoading} timeout={600}>
-        <StyledGridContainer container spacing={3}>
+        {/* Explicit section margins keep the dashboard dense across MUI Grid versions. */}
+        <StyledGridContainer container spacing={0}>
           {/* Header Section */}
           <Grid item xs={12}>
             <HeaderContainer>
@@ -619,11 +628,11 @@ const DataDashboard = ({
             </HeaderContainer>
           </Grid>
 
-          {/* Search Dropdown */}
-          <Grid item xs={12}>
+          {/* Entity selector */}
+          <Grid item xs={12} sx={{ mt: 2 }}>
             <Box display="flex" justifyContent="center">
               <StyledAutocomplete
-                sx={{ width: 400 }}
+                sx={{ width: '100%', maxWidth: 560 }}
                 options={entities}
                 getOptionLabel={(option) => option.name}
                 value={entities.find((entity) => entity.key === selectedEntity) || null}
@@ -649,10 +658,9 @@ const DataDashboard = ({
             </Box>
           </Grid>
       
-          {/* Total Responses Card */}
-          <Grid item xs={12}>
-            <Box display="flex" justifyContent="center">
-              <StatsCard elevation={0}>
+          {/* Overview: KPI and distribution share a row on wider screens */}
+          <Grid item xs={12} md={4} sx={{ mt: 2, pr: { md: 1.25 } }}>
+            <StatsCard elevation={0} sx={{ height: '100%', minHeight: 220 }}>
                 <CardIcon>
                   <TrendingUpIcon />
                 </CardIcon>
@@ -665,23 +673,23 @@ const DataDashboard = ({
                 <Typography variant="body2" sx={{ opacity: 0.9, mt: 1 }}>
                   From selected {entityLabel.toLowerCase()}
                 </Typography>
-              </StatsCard>
-            </Box>
+            </StatsCard>
           </Grid>
       
           {/* Responses Proportion Bar */}
-          <Grid item xs={12}>
-            <Box display="flex" justifyContent="center">
-              <StyledPaper
-                elevation={0}
-                onClick={handleModalOpen}
-                sx={{
-                  cursor: 'pointer',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                  }
-                }}
-              >
+          <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1.25 } }}>
+            <StyledPaper
+              elevation={0}
+              onClick={handleModalOpen}
+              sx={{
+                height: '100%',
+                minHeight: 220,
+                cursor: 'pointer',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                }
+              }}
+            >
                 <CardIcon>
                   <BarChartIcon />
                 </CardIcon>
@@ -705,7 +713,8 @@ const DataDashboard = ({
                     <XAxis
                       type="number"
                       domain={[0, 100]}
-                      tickFormatter={(tick) => `${tick}%`}
+                      allowDataOverflow
+                      tickFormatter={(tick) => `${Math.round(tick * 100) / 100}%`}
                       tick={{ fontSize: 12, fontFamily: fontFamily, fill: '#4a5568' }}
                     />
                     <YAxis
@@ -736,23 +745,22 @@ const DataDashboard = ({
                     ))}
                   </BarChart>
                 </ResponsiveContainer>
-              </StyledPaper>
-            </Box>
+            </StyledPaper>
           </Grid>
       
           {/* Charts Row - Horizontal Layout */}
-          <Grid container item xs={12} spacing={3}>
+          <Grid container item xs={12} spacing={2.5} sx={{ mt: 2 }}>
             {/* General Sentiment */}
             <Grid item xs={12} md={4}>
-              <Box display="flex" justifyContent="center" height="100%">
-                <StyledPaper elevation={0} sx={{ height: '100%', minHeight: 400 }}>
+              <Box display="flex" height="100%">
+                <StyledPaper elevation={0} sx={{ height: '100%', minHeight: 360 }}>
                   <CardIcon>
                     <PieChartIcon />
                   </CardIcon>
                   <CardTitle>
                     General Sentiment
                   </CardTitle>
-                  <ResponsiveContainer width="100%" height={280}>
+                  <ResponsiveContainer width="100%" height={245}>
                     <PieChart>
                       <defs>
                         {Object.entries(MODERN_COLORS.sentiment).map(([key, color], index) => (
@@ -799,15 +807,15 @@ const DataDashboard = ({
       
             {/* Sentiment by Topic */}
             <Grid item xs={12} md={4}>
-              <Box display="flex" justifyContent="center" height="100%">
-                <StyledPaper elevation={0} sx={{ height: '100%', minHeight: 400 }}>
+              <Box display="flex" height="100%">
+                <StyledPaper elevation={0} sx={{ height: '100%', minHeight: 360 }}>
                   <CardIcon>
                     <AnalyticsIcon />
                   </CardIcon>
                   <CardTitle>
                     Sentiment by Topic
                   </CardTitle>
-                  <Box width="100%" height={280}>
+                  <Box width="100%" height={245}>
                     <LocSpecificTopic short_id={entities.find((entity) => entity.key === selectedEntity)?.short_id} />
                   </Box>
                 </StyledPaper>
@@ -816,15 +824,15 @@ const DataDashboard = ({
       
             {/* Language Distribution */}
             <Grid item xs={12} md={4}>
-              <Box display="flex" justifyContent="center" height="100%">
-                <StyledPaper elevation={0} sx={{ height: '100%', minHeight: 400 }}>
+              <Box display="flex" height="100%">
+                <StyledPaper elevation={0} sx={{ height: '100%', minHeight: 360 }}>
                   <CardIcon>
                     <LanguageIcon />
                   </CardIcon>
                   <CardTitle>
                     Language Distribution
                   </CardTitle>
-                  <ResponsiveContainer width="100%" height={280}>
+                  <ResponsiveContainer width="100%" height={245}>
                     <BarChart data={entityData?.languageDistribution || []}>
                       <defs>
                         <linearGradient id="languageGrad" x1="0%" y1="0%" x2="0%" y2="100%">
