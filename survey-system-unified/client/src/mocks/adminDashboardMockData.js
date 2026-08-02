@@ -172,6 +172,112 @@ export const surveyMetricsMock = {
   },
 };
 
+// Used by SurveyTally.jsx (GET /api/admin/getAllByTallyPaginated), one entry
+// per survey question. `occurrences` is a map of response_value -> count,
+// matching the shape produced by getAllSurveyTallyPaginated in
+// server/services/analyticsCRUD.js. A couple of entries carry all-zero
+// occurrences so the "Data Coverage" stat isn't a flat 100%.
+export const surveyTallyMock = [
+  {
+    division: 'ACCOMODATIONFORM',
+    question: 'Has user stayed in a commercial accommodation?',
+    surveyquestion_ref: 'tally-acc-001',
+    occurrences: { Yes: 3, No: 1 },
+    totalResponses: 4,
+  },
+  {
+    division: 'ACCOMODATIONFORM',
+    question: 'How would you rate the cleanliness of your accommodation?',
+    surveyquestion_ref: 'tally-acc-002',
+    occurrences: { VerySatisfied: 12, Satisfied: 20, Neutral: 6, Dissatisfied: 2 },
+    totalResponses: 40,
+  },
+  {
+    division: 'TRANSPORTATION',
+    question: 'Did you use public transportation during your stay?',
+    surveyquestion_ref: 'tally-trans-001',
+    occurrences: { Yes: 18, No: 9 },
+    totalResponses: 27,
+  },
+  {
+    division: 'TRANSPORTATION',
+    question: 'How would you rate the availability of transportation options?',
+    surveyquestion_ref: 'tally-trans-002',
+    occurrences: { VerySatisfied: 8, Satisfied: 15, Neutral: 10, Dissatisfied: 4 },
+    totalResponses: 37,
+  },
+  {
+    division: 'ATTRACTIONS',
+    question: 'Which attractions did you visit?',
+    surveyquestion_ref: 'tally-attr-001',
+    occurrences: { ChocolateHills: 22, LobocRiver: 15, PanglaoBeach: 19 },
+    totalResponses: 56,
+  },
+  {
+    division: 'ATTRACTIONS',
+    question: 'How satisfied were you with the tour guides?',
+    surveyquestion_ref: 'tally-attr-002',
+    occurrences: { VerySatisfied: 25, Satisfied: 18, Neutral: 5, Dissatisfied: 1 },
+    totalResponses: 49,
+  },
+  {
+    division: 'ESTABLISHMENTFORM',
+    question: 'Did you dine at any local establishments?',
+    surveyquestion_ref: 'tally-est-001',
+    occurrences: { Yes: 33, No: 7 },
+    totalResponses: 40,
+  },
+  {
+    division: 'ESTABLISHMENTFORM',
+    question: 'How would you rate the value for money?',
+    surveyquestion_ref: 'tally-est-002',
+    occurrences: { VerySatisfied: 10, Satisfied: 14, Neutral: 8, Dissatisfied: 3 },
+    totalResponses: 35,
+  },
+  {
+    division: 'BARANGAYFORM',
+    question: 'How would you rate the cleanliness of the barangay?',
+    surveyquestion_ref: 'tally-bar-001',
+    occurrences: { VerySatisfied: 14, Satisfied: 20, Neutral: 6, Dissatisfied: 2 },
+    totalResponses: 42,
+  },
+  {
+    division: 'BARANGAYFORM',
+    question: 'Did you feel safe during your visit?',
+    surveyquestion_ref: 'tally-bar-002',
+    occurrences: { Yes: 38, No: 4 },
+    totalResponses: 42,
+  },
+  {
+    division: 'GENERALFORM',
+    question: 'What is your primary language?',
+    surveyquestion_ref: 'tally-gen-001',
+    occurrences: { English: 45, Korean: 20, Chinese: 12, Japanese: 8 },
+    totalResponses: 85,
+  },
+  {
+    division: 'GENERALFORM',
+    question: 'How likely are you to recommend Bohol to others?',
+    surveyquestion_ref: 'tally-gen-002',
+    occurrences: { VeryLikely: 50, Likely: 22, Neutral: 8, Unlikely: 2 },
+    totalResponses: 82,
+  },
+  {
+    division: 'FEEDBACKFORM',
+    question: 'Any additional comments on infrastructure?',
+    surveyquestion_ref: 'tally-fb-001',
+    occurrences: {},
+    totalResponses: 0,
+  },
+  {
+    division: 'FEEDBACKFORM',
+    question: 'Would you like to be contacted for a follow-up survey?',
+    surveyquestion_ref: 'tally-fb-002',
+    occurrences: {},
+    totalResponses: 0,
+  },
+];
+
 export const surveyTopicsMock = {
   'Accommodation': { dissatisfied: 4, neutral: 12, satisfied: 48, very_satisfied: 30 },
   'Transportation': { dissatisfied: 8, neutral: 20, satisfied: 35, very_satisfied: 15 },

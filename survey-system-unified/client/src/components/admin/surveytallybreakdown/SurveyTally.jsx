@@ -117,8 +117,16 @@ const StatCard = styled(Card).withConfig({
 })`
   /* The gradient prop already carries a full linear-gradient(...) value —
      don't wrap it in a second one or the declaration is invalid and the card
-     falls back to Paper white, leaving white text on a white card. */
-  background: ${props => props.gradient || 'linear-gradient(135deg, #ffffff, #f8fafc)'};
+     falls back to Paper white, leaving white text on a white card.
+     MUI's own Paper/Card styles set background-color via an emotion class on
+     the same element; that rule can win the cascade depending on style-tag
+     injection order, silently discarding the plain background rule above.
+     Target the MuiPaper-root class directly so this always wins regardless
+     of order. */
+  &.MuiPaper-root {
+    background: ${props => props.gradient || 'linear-gradient(135deg, #ffffff, #f8fafc)'};
+    background-color: transparent;
+  }
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
