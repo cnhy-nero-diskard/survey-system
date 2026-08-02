@@ -487,7 +487,14 @@ const SurveyTally = () => {
       {/* Search and Controls */}
       <Fade in timeout={1000}>
         <SearchContainer elevation={0}>
-          <Box display="flex" gap={2} alignItems="center">
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr) auto',
+              gap: 2,
+              alignItems: 'center'
+            }}
+          >
             <TextField
               fullWidth
               variant="outlined"
@@ -500,7 +507,14 @@ const SurveyTally = () => {
                     <SearchIcon />
                   </InputAdornment>
                 ),
-                sx: { borderRadius: 3 }
+                sx: {
+                  minHeight: 48,
+                  borderRadius: 3,
+                  backgroundColor: '#fff',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(0, 0, 0, 0.23)'
+                  }
+                }
               }}
             />
             <IconButton 
@@ -508,6 +522,9 @@ const SurveyTally = () => {
               disabled={refreshing}
               color="primary" 
               sx={{ 
+                width: 48,
+                height: 48,
+                flexShrink: 0,
                 bgcolor: alpha(theme.palette.primary.main, 0.1),
                 '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) }
               }}
