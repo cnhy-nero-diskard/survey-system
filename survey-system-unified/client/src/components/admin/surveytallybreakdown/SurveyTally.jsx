@@ -26,7 +26,9 @@ import {
   IconButton,
   useTheme,
   alpha,
-  LinearProgress
+  LinearProgress,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -37,7 +39,11 @@ import {
   Assessment as AssessmentIcon,
   TrendingUp as TrendingUpIcon,
   PieChart as PieChartIcon,
-  Category as CategoryIcon
+  Category as CategoryIcon,
+  ViewStream as ViewStreamIcon,
+  ViewModule as ViewModuleIcon,
+  ViewComfy as ViewComfyIcon,
+  Dashboard as DashboardIcon
 } from '@mui/icons-material';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
@@ -168,7 +174,6 @@ const SearchContainer = styled(Paper)`
 `;
 
 const ChartContainer = styled(Card)`
-  margin-bottom: 16px;
   border-radius: ${radius.card};
   overflow: hidden;
   background: ${surface.card};
@@ -178,6 +183,18 @@ const ChartContainer = styled(Card)`
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: ${slideIn} 0.5s ease-out;
   animation-fill-mode: both;
+  /* Equalise card heights within a grid row so a multi-column layout looks
+     tidy. The grid stretches each item; fill that height and let CardContent
+     grow so shorter cards don't collapse. */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  & .MuiCardContent-root {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
 
   &:hover {
     transform: translateY(-2px);
@@ -190,8 +207,10 @@ const LoadingCard = styled(Card)`
   background-size: 400% 100%;
   animation: ${shimmer} 1.2s ease-in-out infinite;
   border-radius: ${radius.card};
-  height: 180px;
-  margin-bottom: 16px;
+  /* Stretch within a grid track (refetch skeletons) but keep a sensible
+     min height when stacked in the first-load skeleton. */
+  height: 100%;
+  min-height: 180px;
 `;
 
 // Accent icon tile for the redesigned overview stat cards.
@@ -282,6 +301,44 @@ const ResultsCount = styled(Typography)`
   font-weight: 500;
 `;
 
+// Layout selector options and the page size each column count fetches. A
+// denser grid fetches more items per page so the screen is actually filled
+// instead of paging after the same 8 items regardless of columns.
+const LAYOUT_COLUMN_OPTIONS = [1, 2, 3, 4];
+const PAGE_SIZE_BY_COLUMNS = { 1: 8, 2: 8, 3: 12, 4: 16 };
+const LAYOUT_STORAGE_KEY = 'surveyTally.layoutColumns';
+
+// Read the persisted column preference. Falls back to 2 columns on any error
+// or invalid value. Called lazily from useState's initializer (not at import).
+const readStoredColumns = () => {
+  try {
+    const raw = window.localStorage.getItem(LAYOUT_STORAGE_KEY);
+    const parsed = raw ? parseInt(raw, 10) : NaN;
+    return LAYOUT_COLUMN_OPTIONS.includes(parsed) ? parsed : 2;
+  } catch {
+    return 2;
+  }
+};
+
+// Grid wrapper for the question cards. `columns` drives how many cards sit
+// side by side so the page width is used instead of one tall column. Falls
+// back to fewer columns on narrow screens so cards never get cramped.
+const QuestionGrid = styled(Box).withConfig({
+  shouldForwardProp: (prop) => prop !== 'columns',
+})`
+  display: grid;
+  gap: 16px;
+  align-items: stretch;
+  grid-template-columns: repeat(${({ columns }) => columns}, minmax(0, 1fr));
+
+  @media (max-width: 1280px) {
+    grid-template-columns: repeat(${({ columns }) => Math.min(columns, 2)}, minmax(0, 1fr));
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
 const SurveyTally = () => {
   const theme = useTheme();
   const [data, setData] = useState([]);
@@ -297,7 +354,12 @@ const SurveyTally = () => {
   // search/pagination fetches, which must not unmount the search field —
   // doing so steals focus mid-typing.
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-  const itemsPerPage = 8;
+  // Layout selector: how many question cards sit side by side. Persisted so
+  // the user's preferred density survives reloads. Defaults to 2 columns.
+  const [layoutColumns, setLayoutColumns] = useState(readStoredColumns);
+  // Page size scales with the column count so a denser layout fills the
+  // screen instead of paging after a fixed number of items.
+  const itemsPerPage = PAGE_SIZE_BY_COLUMNS[layoutColumns] ?? 8;
 
   // Debounce search query to avoid excessive API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -384,6 +446,21 @@ const SurveyTally = () => {
     }));
   }, []);
 
+  // Layout (columns) selector handler. A column change also changes the page
+  // size, so reset to page 1 (the new size may have fewer pages) and clear any
+  // per-card expansion state, since the visible card indices change.
+  const handleLayoutChange = useCallback((_, columns) => {
+    if (!LAYOUT_COLUMN_OPTIONS.includes(columns)) return;
+    setLayoutColumns(columns);
+    setExpandedCards({});
+    setCurrentPage(1);
+    try {
+      window.localStorage.setItem(LAYOUT_STORAGE_KEY, String(columns));
+    } catch {
+      /* ignore quota / privacy-mode errors */
+    }
+  }, []);
+
   /**
    * transformData: Enhanced version with additional metadata
    */
@@ -465,9 +542,11 @@ const SurveyTally = () => {
             </Grid>
           ))}
         </Grid>
-        {[1, 2, 3].map((i) => (
-          <LoadingCard key={i} />
-        ))}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {[1, 2, 3].map((i) => (
+            <LoadingCard key={i} />
+          ))}
+        </Box>
       </Container>
     );
   }
@@ -584,7 +663,7 @@ const SurveyTally = () => {
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1fr) auto',
+              gridTemplateColumns: 'minmax(0, 1fr) auto auto',
               gap: 2,
               alignItems: 'center'
             }}
@@ -618,6 +697,50 @@ const SurveyTally = () => {
                 }
               }}
             />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: text.muted,
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  display: { xs: 'none', sm: 'block' }
+                }}
+              >
+                Layout
+              </Typography>
+              <ToggleButtonGroup
+                exclusive
+                size="small"
+                value={layoutColumns}
+                onChange={handleLayoutChange}
+                disabled={loading}
+                aria-label="Question card layout columns"
+                sx={{
+                  '& .MuiToggleButtonGroup-grouped': {
+                    border: `1px solid ${surface.divider}`,
+                    px: 1,
+                    py: 0.5,
+                    color: text.muted,
+                    '&.Mui-selected': {
+                      color: '#fff',
+                      bgcolor: brand.primary,
+                      borderColor: brand.primary,
+                      '&:hover': { bgcolor: brand.primaryDark }
+                    },
+                    '&:not(:first-of-type)': {
+                      borderLeft: `1px solid ${surface.divider}`
+                    }
+                  }
+                }}
+              >
+                <ToggleButton value={1} aria-label="1 column"><ViewStreamIcon fontSize="small" /></ToggleButton>
+                <ToggleButton value={2} aria-label="2 columns"><ViewModuleIcon fontSize="small" /></ToggleButton>
+                <ToggleButton value={3} aria-label="3 columns"><ViewComfyIcon fontSize="small" /></ToggleButton>
+                <ToggleButton value={4} aria-label="4 columns"><DashboardIcon fontSize="small" /></ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
             <IconButton
               onClick={handleRefresh}
               disabled={refreshing}
@@ -678,10 +801,14 @@ const SurveyTally = () => {
       <Box>
         {loading ? (
           // Refetch (search / page change): swap only the result list so the
-          // header, stats and search field keep their state and focus.
-          <>
-            {[1, 2, 3].map((i) => <LoadingCard key={i} />)}
-          </>
+          // header, stats and search field keep their state and focus. The
+          // skeletons mirror the active column layout so the grid doesn't
+          // collapse to a single column while the next page loads.
+          <QuestionGrid columns={layoutColumns}>
+            {Array.from({ length: Math.max(3, Math.min(itemsPerPage, layoutColumns * 3)) }).map((_, i) => (
+              <LoadingCard key={i} />
+            ))}
+          </QuestionGrid>
         ) : data.length === 0 ? (
           <Fade in timeout={1200}>
             <Alert severity="info" sx={{ borderRadius: 2, mb: 3 }}>
@@ -695,7 +822,8 @@ const SurveyTally = () => {
             </Alert>
           </Fade>
         ) : (
-          data.map((group, index) => {
+          <QuestionGrid columns={layoutColumns}>
+            {data.map((group, index) => {
             const isExpanded = !!expandedCards[index];
             const segments = group.pieData || [];
             const visibleSegments = isExpanded ? segments : segments.slice(0, 3);
@@ -825,7 +953,8 @@ const SurveyTally = () => {
               </ChartContainer>
             </Slide>
             );
-          })
+          })}
+          </QuestionGrid>
         )}
       </Box>
 
