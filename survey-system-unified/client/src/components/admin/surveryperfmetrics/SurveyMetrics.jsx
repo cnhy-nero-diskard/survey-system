@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import axios from 'axios';
 import {
     Box,
@@ -270,8 +270,12 @@ const SurveyMetrics = () => {
     // Route changes in the admin SPA preserve the document scroll position.
     // Always begin this dashboard at its header instead of showing it clipped
     // by the scroll offset of the page the user just left.
-    useEffect(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    useLayoutEffect(() => {
+        // Set both scroll roots because the host shell can make either the
+        // document or body the active scrolling element.
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        window.scrollTo(0, 0);
     }, []);
 
     // Fetch data from server

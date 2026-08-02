@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useLayoutEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -208,8 +208,12 @@ const SurveyTally = () => {
 
   // Route changes in the admin SPA preserve the document scroll position.
   // Reset it on entry so the statistics header is never clipped above the viewport.
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  useLayoutEffect(() => {
+    // Set both scroll roots because the host shell can make either the
+    // document or body the active scrolling element.
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo(0, 0);
   }, []);
 
   const fetchData = useCallback(async (page = 1, search = '') => {

@@ -1,5 +1,10 @@
-/* This style for some reason keeps all survey text at the center of the screen and not on the top */
-body {
+/* Centers the single-question survey screens. Scoped to body.survey-mode
+   (toggled by SurveyRoutesContent) instead of a bare `body` selector — this
+   file is a plain global CSS import, so an unscoped `body` rule here was
+   leaking onto every other route in the app (including the admin dashboard,
+   where it vertically centered the whole page inside 100vh and clipped
+   content taller than the viewport off the top). */
+body.survey-mode {
     margin: 0;
     font-family: 'Roboto', sans-serif;
     color: white;

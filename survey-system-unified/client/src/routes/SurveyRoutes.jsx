@@ -46,6 +46,14 @@ const SurveyRoutesContent = () => {
     const { setFeedback, feedback } = useFeedback();
     const currentStepIndex = useCurrentStepIndex(routes);
 
+    // components/utils/styles.css centers survey screens via body.survey-mode.
+    // Toggle it only while a survey/feedback route is mounted so it doesn't
+    // leak onto other parts of the app (e.g. the admin dashboard).
+    useEffect(() => {
+        document.body.classList.add('survey-mode');
+        return () => document.body.classList.remove('survey-mode');
+    }, []);
+
     useEffect(() => {
         if (location.pathname === "/feedback") {
             const queryParams = new URLSearchParams(location.search);
