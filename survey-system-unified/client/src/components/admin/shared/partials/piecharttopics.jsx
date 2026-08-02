@@ -88,15 +88,22 @@ const LocSpecificTopic = ({ short_id }) => {
     useEffect(() => {
         let cancelled = false;
 
-        const processData = async (counts, positive, neutral, negative) => {
+        const processData = async (counts = {}, positive = [], neutral = [], negative = []) => {
             const fetchCustomLabels = async (texts) => {
                 if (!texts || texts.length === 0) return null;
-                const response = await axios.post(
-                    `${process.env.REACT_APP_API_HOST}/api/analyzetopics`,
-                    { text: texts.join("\n"), tokenLabel: "DEV_free" },
-                    { withCredentials: true }
-                );
-                return response.data[0]?.customLabel || null;
+                try {
+                    const response = await axios.post(
+                        `${process.env.REACT_APP_API_HOST}/api/analyzetopics`,
+                        { text: texts.join("\n"), tokenLabel: "DEV_free" },
+                        { withCredentials: true }
+                    );
+                    return response.data[0]?.customLabel || null;
+                } catch (error) {
+                    // Topic enrichment must not hide the sentiment data when
+                    // the optional AI service is unavailable.
+                    console.warn('Unable to fetch topic label:', error);
+                    return null;
+                }
             };
 
             const [positiveLabel, neutralLabel, negativeLabel] = await Promise.all([
@@ -105,18 +112,21 @@ const LocSpecificTopic = ({ short_id }) => {
                 fetchCustomLabels(negative),
             ]);
 
-            // Colours come from the shared sentiment scale. This chart used to
-            // paint "positive" blue while the pie next to it painted the same
-            // sentiment green.
+            // Colours come from the shared sentiment scale. Topic labels are
+            // optional; valid sentiment counts must always produce slices.
             const data = [];
-            if (counts.positive !== "0" && positiveLabel) {
-                data.push({ name: `Positive (${positiveLabel})`, value: parseInt(counts.positive, 10), color: sentimentPalette.positive });
+            const positiveCount = Number(counts.positive) || 0;
+            const neutralCount = Number(counts.neutral) || 0;
+            const negativeCount = Number(counts.negative) || 0;
+
+            if (positiveCount > 0) {
+                data.push({ name: positiveLabel ? `Positive (${positiveLabel})` : 'Positive', value: positiveCount, color: sentimentPalette.positive });
             }
-            if (counts.neutral !== "0" && neutralLabel) {
-                data.push({ name: `Neutral (${neutralLabel})`, value: parseInt(counts.neutral, 10), color: sentimentPalette.neutral });
+            if (neutralCount > 0) {
+                data.push({ name: neutralLabel ? `Neutral (${neutralLabel})` : 'Neutral', value: neutralCount, color: sentimentPalette.neutral });
             }
-            if (counts.negative !== "0" && negativeLabel) {
-                data.push({ name: `Negative (${negativeLabel})`, value: parseInt(counts.negative, 10), color: sentimentPalette.negative });
+            if (negativeCount > 0) {
+                data.push({ name: negativeLabel ? `Negative (${negativeLabel})` : 'Negative', value: negativeCount, color: sentimentPalette.negative });
             }
 
             if (!cancelled) setPieData(data);

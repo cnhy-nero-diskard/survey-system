@@ -4,6 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import DataDashboard from '../xdatadashboard/DataDashboard';
 import { fetchEntityMetrics } from '../../utils/getSurveyFeedbackApi';
 import { fontFamily } from '../../../config/fontConfig';
+import { getRatingSentimentData } from '../../../config/sentimentConfig';
 import FetchingDataLoader from '../../partials/FetchingDataLoader';
 
 // Enhanced loading and error components
@@ -103,12 +104,7 @@ const AreaDashboard = () => {
       acc[key] = {
         name: metric.entity,
         totalResponses: parseInt(metric.total_responses, 10),
-        sentimentData: [
-          { name: 'Dissatisfied', value: parseInt(metric.rating["Dissatisfied"], 10) },
-          { name: 'Neutral', value: parseInt(metric.rating["Neutral"], 10) },
-          { name: 'Satisfied', value: parseInt(metric.rating["Satisfied"], 10) },
-          { name: 'Very Satisfied', value: parseInt(metric.rating["VerySatisfied"], 10) },
-        ],
+        sentimentData: getRatingSentimentData(metric.rating),
         mentionedTerms: Object.entries(metric.mentionedTerms || {}).map(([term, count]) => ({
           term,
           count,

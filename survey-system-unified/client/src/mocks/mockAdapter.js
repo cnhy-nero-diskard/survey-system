@@ -21,9 +21,6 @@ export function setupMockAdapter() {
 
   const mock = new MockAdapter(axios, { delayResponse: 400, onNoMatch: 'passthrough' });
 
-  // TEMP verification-only stub, not part of the deliverable.
-  mock.onGet(/\/api\/auth\/check/).reply(200, { authenticated: true });
-
   mock.onGet(/\/api\/admin\/automateclassification/).reply(200, automateClassificationMock);
   // getsentimenttable and getsentimenttableforlocation share the same {counts, positive, neutral, negative} shape
   mock.onGet(/\/api\/admin\/getsentimenttable(?!forlocation)/).reply(200, sentimentTableMock);

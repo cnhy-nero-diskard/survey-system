@@ -41,6 +41,7 @@ export const analyzeTopicsMock = [
 export const entityMetricsMock = [
   {
     entity: 'Poblacion',
+    short_id: 'loc-poblacion',
     touchpoint: 'barangay',
     total_responses: '42',
     rating: { Dissatisfied: '2', Neutral: '6', Satisfied: '20', VerySatisfied: '14' },
@@ -49,6 +50,7 @@ export const entityMetricsMock = [
   },
   {
     entity: 'Panglao',
+    short_id: 'loc-panglao',
     touchpoint: 'barangay',
     total_responses: '35',
     rating: { Dissatisfied: '1', Neutral: '5', Satisfied: '18', VerySatisfied: '11' },
@@ -57,6 +59,7 @@ export const entityMetricsMock = [
   },
   {
     entity: 'Dauis',
+    short_id: 'loc-dauis',
     touchpoint: 'barangay',
     total_responses: '29',
     rating: { Dissatisfied: '3', Neutral: '7', Satisfied: '13', VerySatisfied: '6' },
@@ -65,6 +68,7 @@ export const entityMetricsMock = [
   },
   {
     entity: 'Tagbilaran',
+    short_id: 'loc-tagbilaran',
     touchpoint: 'barangay',
     total_responses: '18',
     rating: { Dissatisfied: '0', Neutral: '4', Satisfied: '9', VerySatisfied: '5' },
@@ -73,6 +77,7 @@ export const entityMetricsMock = [
   },
   {
     entity: 'Chocolate Hills',
+    short_id: 'attr-chocolate-hills',
     touchpoint: 'attractions',
     total_responses: '38',
     rating: { Dissatisfied: '1', Neutral: '5', Satisfied: '17', VerySatisfied: '15' },
@@ -81,6 +86,7 @@ export const entityMetricsMock = [
   },
   {
     entity: 'Loboc River',
+    short_id: 'attr-loboc-river',
     touchpoint: 'attractions',
     total_responses: '26',
     rating: { Dissatisfied: '0', Neutral: '4', Satisfied: '13', VerySatisfied: '9' },
@@ -89,6 +95,7 @@ export const entityMetricsMock = [
   },
   {
     entity: 'Malinawon Bohol Inc.',
+    short_id: 'est-malinawon-bohol',
     touchpoint: 'establishments',
     total_responses: '31',
     rating: { Dissatisfied: '1', Neutral: '4', Satisfied: '15', VerySatisfied: '11' },
@@ -97,6 +104,7 @@ export const entityMetricsMock = [
   },
   {
     entity: 'Bohol Beach Club',
+    short_id: 'est-bohol-beach-club',
     touchpoint: 'establishments',
     total_responses: '27',
     rating: { Dissatisfied: '2', Neutral: '5', Satisfied: '12', VerySatisfied: '8' },
@@ -105,6 +113,7 @@ export const entityMetricsMock = [
   },
   {
     entity: 'Loboc River Cruise',
+    short_id: 'est-loboc-river-cruise',
     touchpoint: 'establishments',
     total_responses: '22',
     rating: { Dissatisfied: '0', Neutral: '3', Satisfied: '11', VerySatisfied: '8' },
@@ -113,6 +122,7 @@ export const entityMetricsMock = [
   },
   {
     entity: 'Chocolate Hills Resort',
+    short_id: 'est-chocolate-hills-resort',
     touchpoint: 'establishments',
     total_responses: '19',
     rating: { Dissatisfied: '1', Neutral: '2', Satisfied: '9', VerySatisfied: '7' },

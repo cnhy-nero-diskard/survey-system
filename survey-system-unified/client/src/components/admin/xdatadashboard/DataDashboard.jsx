@@ -36,6 +36,7 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import styled, { keyframes } from 'styled-components';
 import { fontFamily, fontSize, fontWeight } from '../../../config/fontConfig';
+import { toSentimentCount } from '../../../config/sentimentConfig';
 import LocSpecificTopic from '../shared/partials/piecharttopics';
 import {
   TrendingUp as TrendingUpIcon,
@@ -503,10 +504,13 @@ const DataDashboard = ({
   const entityData = data[selectedEntity];
 
   // Prepare sentiment data with modern colors
-  const enhancedSentimentData = entityData?.sentimentData?.map(item => ({
-    ...item,
-    color: MODERN_COLORS.sentiment[item.name] || '#8B5CF6'
-  })) || [];
+  const enhancedSentimentData = entityData?.sentimentData
+    ?.map(item => ({
+      ...item,
+      value: toSentimentCount(item.value),
+      color: MODERN_COLORS.sentiment[item.name] || '#8B5CF6'
+    }))
+    .filter(item => item.value > 0) || [];
 
   const sentimentTotal = enhancedSentimentData.reduce((sum, item) => sum + (item.value || 0), 0);
 

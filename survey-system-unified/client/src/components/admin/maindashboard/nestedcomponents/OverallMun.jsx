@@ -137,22 +137,10 @@ const OverallMun = ({ year, quarter }) => {
       }
     };
 
-    const processData = async (counts, positive, neutral, negative) => {
-      // Fetch custom labels for each sentiment category
-      const fetchCustomLabels = async (texts, sentiment) => {
-        if (texts.length === 0) return null;
-        const response = await axios.post(`${process.env.REACT_APP_API_HOST}/api/analyzetopics`, {
-          text: texts.join("\n"),
-          tokenLabel: "DEV_free"
-        });
-        return response.data[0]?.customLabel || null;
-      };
-
-      const positiveLabel = await fetchCustomLabels(positive, "positive");
-      const neutralLabel = await fetchCustomLabels(neutral, "neutral");
-      const negativeLabel = await fetchCustomLabels(negative, "negative");
-
-      // Prepare pie chart data with updated colors and gradients
+    const processData = (counts = {}) => {
+      // The pie must depend only on the sentiment summary. Topic labels are an
+      // optional enhancement and their API can be unavailable in mock mode;
+      // previously that failure removed every otherwise-valid pie slice.
       const modernColors = {
         positive: '#10B981', // Emerald green
         neutral: '#F59E0B',  // Amber
@@ -160,24 +148,28 @@ const OverallMun = ({ year, quarter }) => {
       };
 
       const data = [];
-      if (counts.positive !== "0" && positiveLabel) {
+      const positiveCount = Number(counts.positive) || 0;
+      const neutralCount = Number(counts.neutral) || 0;
+      const negativeCount = Number(counts.negative) || 0;
+
+      if (positiveCount > 0) {
         data.push({ 
-          name: `Positive (${positiveLabel})`, 
-          value: parseInt(counts.positive), 
+          name: 'Positive',
+          value: positiveCount,
           color: modernColors.positive,
         });
       }
-      if (counts.neutral !== "0" && neutralLabel) {
+      if (neutralCount > 0) {
         data.push({ 
-          name: `Neutral (${neutralLabel})`, 
-          value: parseInt(counts.neutral), 
+          name: 'Neutral',
+          value: neutralCount,
           color: modernColors.neutral,
         });
       }
-      if (counts.negative !== "0" && negativeLabel) {
+      if (negativeCount > 0) {
         data.push({ 
-          name: `Negative (${negativeLabel})`, 
-          value: parseInt(counts.negative), 
+          name: 'Negative',
+          value: negativeCount,
           color: modernColors.negative,
         });
       }
