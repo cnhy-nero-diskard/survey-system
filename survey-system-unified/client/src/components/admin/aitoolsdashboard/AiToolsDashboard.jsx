@@ -13,19 +13,39 @@ import {
   Snackbar,
   Alert,
   TextField,
-  List,
-  ListItem,
-  ListItemText,
   Chip,
+  Tooltip,
+  LinearProgress,
+  Divider,
 } from '@mui/material';
-import { ApiRounded as AiToolsIcon } from '@mui/icons-material';
+import {
+  ApiRounded as AiToolsIcon,
+  VpnKeyRounded as TokenIcon,
+  SearchRounded as ScanIcon,
+  SentimentSatisfiedRounded as SentimentIcon,
+  TopicRounded as TopicIcon,
+  CloudUploadRounded as StoreIcon,
+  CheckCircleRounded as CheckIcon,
+  InfoRounded as InfoIcon,
+  DatasetRounded as DatasetIcon,
+  AutoGraphRounded as AutoGraphIcon,
+  TuneRounded as TuneIcon,
+} from '@mui/icons-material';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import { fontFamily } from '../../../config/fontConfig';
-import { gradients } from '../shared/designTokens';
+import {
+  gradients,
+  brand,
+  text,
+  surface,
+  shadow,
+  radius,
+  sentimentPalette,
+} from '../shared/designTokens';
 
 // ----------------------------------
-// NEW IMPORTS FOR DATE PICKERS
+// DATE PICKERS
 // ----------------------------------
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -33,8 +53,174 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 // ----------------------------------
 
-// This page was the odd one out: a plain white MUI Container while every other
-// admin route renders the gradient page shell with a purple header card.
+// ---- Shared section cards & controls (match the rest of the admin app) ----
+// Glassmorphism + top accent rule + hover lift, mirroring UsersDashboard's
+// GlassCard and Dashboard's CardContainer so this page no longer looks like
+// the odd one out.
+const SectionCard = styled(Paper)`
+  background: ${surface.card} !important;
+  backdrop-filter: blur(10px);
+  border: ${surface.cardBorder};
+  border-radius: ${radius.card} !important;
+  box-shadow: ${shadow.card} !important;
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: ${gradients.brandBar};
+  }
+  &:hover {
+    box-shadow: ${shadow.cardHover} !important;
+    transform: translateY(-2px);
+  }
+`;
+
+const SectionHeader = styled(Box)`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+`;
+
+const IconTile = styled(Box)`
+  width: 44px;
+  height: 44px;
+  border-radius: ${radius.control};
+  background: ${gradients.brand};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+  & svg { font-size: 22px; }
+`;
+
+const SectionTitle = styled(Typography)`
+  font-family: ${fontFamily};
+  font-weight: 600;
+  font-size: 18px;
+  color: ${text.heading};
+  line-height: 1.2;
+`;
+
+const SectionSubtitle = styled(Typography)`
+  font-family: ${fontFamily};
+  font-size: 13px;
+  color: ${text.muted};
+`;
+
+const PrimaryButton = styled(Button)`
+  background: ${gradients.brand} !important;
+  color: #fff !important;
+  text-transform: none !important;
+  font-family: ${fontFamily};
+  font-weight: 500;
+  padding: 8px 20px !important;
+  border-radius: ${radius.control} !important;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35) !important;
+  transition: all 0.25s ease;
+  &:hover {
+    background: ${gradients.brandHover} !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.45) !important;
+  }
+  &.Mui-disabled {
+    background: ${gradients.brand} !important;
+    color: rgba(255, 255, 255, 0.55) !important;
+    box-shadow: none !important;
+  }
+`;
+
+// Workflow stepper that surfaces the Configure -> Scan -> Analyze -> Store flow.
+const StepStrip = styled(Box)`
+  display: flex;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 4px;
+`;
+
+const StepItem = styled(Box)`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const StepBadge = styled(Box)`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ${fontFamily};
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: ${({ $active }) => ($active ? gradients.brand : '#fff')};
+  color: ${({ $active }) => ($active ? '#fff' : text.muted)};
+  border: ${({ $active }) => ($active ? 'none' : `2px solid ${surface.divider}`)};
+  box-shadow: ${({ $active }) => ($active ? '0 4px 12px rgba(102, 126, 234, 0.4)' : '0 1px 3px rgba(0,0,0,0.06)')};
+  & svg { font-size: 18px; }
+`;
+
+const StepConnector = styled(Box)`
+  flex: 1;
+  min-width: 24px;
+  max-width: 60px;
+  height: 2px;
+  background: ${({ $done }) => ($done ? gradients.brandBar : surface.divider)};
+  margin: 0 10px;
+`;
+
+// Stacked proportion bar for the sentiment summary (uses sentimentPalette so it
+// agrees with the rest of the app's idea of what "positive" looks like).
+const SentimentBar = styled(Box)`
+  display: flex;
+  height: 14px;
+  border-radius: ${radius.pill};
+  overflow: hidden;
+  background: ${surface.divider};
+`;
+
+const SentimentResultCard = styled(Paper).withConfig({
+  shouldForwardProp: (prop) => !['$accent'].includes(prop),
+})`
+  border-left: 5px solid ${({ $accent }) => $accent};
+  border-radius: ${radius.control} !important;
+  padding: 14px 16px;
+  background: #fff !important;
+  box-shadow: ${shadow.soft} !important;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  &:hover { box-shadow: ${shadow.card} !important; transform: translateY(-1px); }
+`;
+
+const TopicResultCard = styled(Paper)`
+  border-radius: ${radius.control} !important;
+  padding: 18px 18px 16px;
+  background: #fff !important;
+  box-shadow: ${shadow.soft} !important;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  &:hover { box-shadow: ${shadow.card} !important; transform: translateY(-1px); }
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: ${gradients.brandBar};
+  }
+`;
+
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -53,7 +239,7 @@ const HeaderContainer = styled(Box)`
   background: ${gradients.brand};
   border-radius: 16px;
   padding: 24px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   color: white;
 `;
@@ -392,6 +578,18 @@ const AIToolsDashboard = () => {
     setSnackbarOpen(false);
   };
 
+  const stepsDone = {
+    configured: Boolean(selectedHFToken),
+    scanned: openEndedResponses.length > 0,
+    analyzed: Boolean(sentimentResults) || Boolean(topicModelingResult),
+  };
+  const stepList = [
+    { n: 1, label: 'Configure', done: stepsDone.configured },
+    { n: 2, label: 'Scan Responses', done: stepsDone.scanned },
+    { n: 3, label: 'Analyze', done: stepsDone.analyzed },
+    { n: 4, label: 'Store Results', done: false },
+  ];
+
   return (
     <PageShell>
       <Fade in timeout={600}>
@@ -400,343 +598,301 @@ const AIToolsDashboard = () => {
             <AiToolsIcon sx={{ fontSize: 32 }} />
             AI Tools Dashboard
           </HeaderTitle>
-          <Typography
-            variant="subtitle1"
-            sx={{ fontFamily, opacity: 0.9, fontWeight: 400, mt: 0.5 }}
-          >
+          <Typography variant="subtitle1" sx={{ fontFamily, opacity: 0.9, fontWeight: 400, mt: 0.5 }}>
             Sentiment analysis and topic modelling over open-ended survey responses
           </Typography>
         </HeaderContainer>
       </Fade>
 
-      <Grid container spacing={3}>
-        {/* API Configuration Section */}
-        <Grid item xs={12}>
-          <Slide in direction="up" timeout={1000}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 3,
-                bgcolor: 'background.paper',
-                borderRadius: 2,
-                boxShadow: 1,
-              }}
-            >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{ fontWeight: 'medium', color: 'text.primary' }}
-              >
-                API Configuration
+      {/* Workflow steps */}
+      <StepStrip>
+        {stepList.map((step, i) => (
+          <React.Fragment key={step.n}>
+            <StepItem>
+              <StepBadge $active={step.done}>
+                {step.done ? <CheckIcon /> : step.n}
+              </StepBadge>
+              <Typography sx={{ fontFamily, fontWeight: 500, fontSize: 14, color: step.done ? text.heading : text.muted }}>
+                {step.label}
               </Typography>
-              <Box sx={{ mb: 3 }}>
-                <Typography
-                  variant="subtitle1"
-                  sx={{ color: 'text.secondary', mb: 1 }}
-                >
-                  API Token Manager
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  {/* displayEmpty + a placeholder: both analysis buttons stay
-                      disabled until a token is chosen, so an empty unlabelled
-                      box gave no hint about why nothing worked. */}
-                  <Select
-                    fullWidth
-                    displayEmpty
-                    value={selectedHFToken}
-                    onChange={(e) => setSelectedHFToken(e.target.value)}
-                    sx={{ mb: 2 }}
-                    aria-label="Select API Token"
-                    renderValue={(value) =>
-                      hfTokens.find((t) => t.id === value)?.label || 'Select an API token to enable analysis'
-                    }
-                  >
-                    {hfTokens.length === 0 && (
-                      <MenuItem disabled value="">
-                        No API tokens available
-                      </MenuItem>
-                    )}
-                    {hfTokens.map((token) => (
-                      <MenuItem key={token.id} value={token.id}>
-                        {token.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
+            </StepItem>
+            {i < stepList.length - 1 && <StepConnector $done={step.done} />}
+          </React.Fragment>
+        ))}
+      </StepStrip>
+
+      <Grid container spacing={3}>
+        {/* API Configuration */}
+        <Grid item xs={12} md={6}>
+          <Slide in direction="up" timeout={1000}>
+            <SectionCard elevation={0}>
+              <SectionHeader>
+                <IconTile><TokenIcon /></IconTile>
+                <Box>
+                  <SectionTitle>API Configuration</SectionTitle>
+                  <SectionSubtitle>Select a Hugging Face token to power the models</SectionSubtitle>
                 </Box>
+              </SectionHeader>
+              <Typography sx={{ fontFamily, fontSize: 14, color: text.muted, mb: 1 }}>
+                API Token Manager
+              </Typography>
+              <Select
+                fullWidth
+                displayEmpty
+                value={selectedHFToken}
+                onChange={(e) => setSelectedHFToken(e.target.value)}
+                sx={{ mb: 1 }}
+                aria-label="Select API Token"
+                renderValue={(value) =>
+                  hfTokens.find((t) => t.id === value)?.label || 'Select an API token to enable analysis'
+                }
+              >
+                {hfTokens.length === 0 && (
+                  <MenuItem disabled value="">No API tokens available</MenuItem>
+                )}
+                {hfTokens.map((token) => (
+                  <MenuItem key={token.id} value={token.id}>{token.label}</MenuItem>
+                ))}
+              </Select>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 1 }}>
+                {selectedHFToken ? (
+                  <>
+                    <CheckIcon sx={{ color: sentimentPalette.positive, fontSize: 18 }} />
+                    <Typography variant="body2" sx={{ fontFamily, color: text.body }}>
+                      Token selected — analysis tools are enabled
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <InfoIcon sx={{ color: text.muted, fontSize: 18 }} />
+                    <Typography variant="body2" sx={{ fontFamily, color: text.muted }}>
+                      Choose a token to unlock sentiment and topic analysis
+                    </Typography>
+                  </>
+                )}
               </Box>
-            </Paper>
+            </SectionCard>
           </Slide>
         </Grid>
 
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleScanOpenEndedResponses}
-            sx={{ textTransform: 'none', mt: 2 }}
-          >
-            SCAN FOR OPEN-ENDED RESPONSES
-          </Button>
+        {/* Data Source — scan for open-ended responses */}
+        <Grid item xs={12} md={6}>
+          <Slide in direction="up" timeout={1100}>
+            <SectionCard elevation={0}>
+              <SectionHeader>
+                <IconTile><ScanIcon /></IconTile>
+                <Box>
+                  <SectionTitle>Open-Ended Responses</SectionTitle>
+                  <SectionSubtitle>Scan the database for responses to analyse</SectionSubtitle>
+                </Box>
+              </SectionHeader>
+              <Box sx={{ display: 'flex', gap: 2, mb: 2.5 }}>
+                <Box sx={{ flex: 1, background: surface.divider, borderRadius: radius.control, p: 1.5 }}>
+                  <Typography sx={{ fontFamily, fontWeight: 700, fontSize: 24, color: brand.primary, lineHeight: 1.1 }}>
+                    {openEndedResponses.length}
+                  </Typography>
+                  <Typography sx={{ fontFamily, fontSize: 12, color: text.muted }}>
+                    responses scanned
+                  </Typography>
+                </Box>
+                <Box sx={{ flex: 1, background: surface.divider, borderRadius: radius.control, p: 1.5 }}>
+                  <Typography sx={{ fontFamily, fontWeight: 700, fontSize: 24, color: brand.secondary, lineHeight: 1.1 }}>
+                    {uniqueEntities.length}
+                  </Typography>
+                  <Typography sx={{ fontFamily, fontSize: 12, color: text.muted }}>
+                    entities available
+                  </Typography>
+                </Box>
+              </Box>
+              <PrimaryButton onClick={handleScanOpenEndedResponses} startIcon={<ScanIcon />}>
+                Scan for Open-Ended Responses
+              </PrimaryButton>
+            </SectionCard>
+          </Slide>
         </Grid>
 
         {/* Sentiment Analysis */}
         <Grid item xs={12} md={6}>
           <Slide in direction="up" timeout={1200}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 3,
-                bgcolor: 'background.paper',
-                borderRadius: 2,
-                boxShadow: 2,
-              }}
-            >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{ fontWeight: 'medium', color: 'text.primary' }}
-              >
-                Sentiment Analysis
+            <SectionCard elevation={0}>
+              <SectionHeader>
+                <IconTile><SentimentIcon /></IconTile>
+                <Box>
+                  <SectionTitle>Sentiment Analysis</SectionTitle>
+                  <SectionSubtitle>Gauge the emotional tone of free-text responses</SectionSubtitle>
+                </Box>
+              </SectionHeader>
+              <Typography sx={{ fontFamily, fontSize: 14, color: text.muted, mb: 1.5 }}>
+                Paste or type text to classify as positive, neutral or negative.
               </Typography>
-              <Box>
-                <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
-                  Enter text for sentiment analysis.
-                </Typography>
-                <TextField
-                  value={sentimentText}
-                  onChange={(e) => setSentimentText(e.target.value)}
-                  multiline
-                  rows={4}
-                  fullWidth
-                  variant="outlined"
-                  sx={{ mb: 2 }}
-                />
-                {/* One spinner, inside the button. The previous markup rendered a
-                    spinner in the button *and* a second one beside it. */}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSentimentAnalysis}
-                  disabled={
-                    isSentimentAnalyzing || !sentimentText || !selectedHFToken
-                  }
-                  startIcon={isSentimentAnalyzing ? <CircularProgress size={18} color="inherit" /> : null}
-                  sx={{ textTransform: 'none' }}
-                >
-                  {isSentimentAnalyzing ? 'Analyzing…' : 'Analyze Sentiment'}
-                </Button>
-              </Box>
-              {sentimentResults && (
-                <Box
-                  sx={{
-                    mt: 2,
-                    maxHeight: '400px',
-                    overflowY: 'auto',
-                    pr: 2,
-                  }}
-                >
-                  <Typography
-                    variant="body1"
-                    sx={{ color: 'text.secondary', fontWeight: 'bold', mb: 2 }}
-                  >
-                    Sentiment Analysis Results:
-                  </Typography>
+              <TextField
+                value={sentimentText}
+                onChange={(e) => setSentimentText(e.target.value)}
+                multiline
+                rows={4}
+                fullWidth
+                variant="outlined"
+                placeholder="Enter text for sentiment analysis…"
+                sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: radius.control } }}
+              />
+              <PrimaryButton
+                onClick={handleSentimentAnalysis}
+                disabled={isSentimentAnalyzing || !sentimentText || !selectedHFToken}
+                startIcon={isSentimentAnalyzing ? <CircularProgress size={18} color="inherit" /> : <AutoGraphIcon />}
+              >
+                {isSentimentAnalyzing ? 'Analyzing…' : 'Analyze Sentiment'}
+              </PrimaryButton>
 
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {sentimentResults.map((result, index) => (
-                      <Paper
-                        key={index}
-                        elevation={2}
-                        sx={{
-                          p: 2,
-                          borderRadius: 2,
-                          bgcolor: 'background.paper',
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{ color: 'text.secondary', fontWeight: 'medium' }}
-                          >
-                            {result.text}
-                          </Typography>
-                          <Chip
-                            label={result.sentiment.toUpperCase()}
-                            color={
-                              result.sentiment === 'positive'
-                                ? 'success'
-                                : result.sentiment === 'negative'
-                                  ? 'error'
-                                  : 'warning'
-                            }
-                            size="small"
-                          />
-                        </Box>
-                        <Box sx={{ mt: 1 }}>
-                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Confidence: <strong>{result.confidence.toFixed(2)}%</strong>
-                          </Typography>
-                        </Box>
-                      </Paper>
-                    ))}
+              {sentimentResults && sentimentResults.length > 0 && (
+                <Box sx={{ mt: 3, maxHeight: '420px', overflowY: 'auto', pr: 1 }}>
+                  <Typography sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading, mb: 1.5 }}>
+                    Results
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {sentimentResults.map((result, index) => {
+                      const tone = result.sentiment;
+                      const accent = sentimentPalette[tone] || text.muted;
+                      return (
+                        <SentimentResultCard key={index} $accent={accent} elevation={0}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
+                            <Typography sx={{ fontFamily, color: text.body, fontSize: 14, lineHeight: 1.4 }}>
+                              {result.text}
+                            </Typography>
+                            <Chip
+                              label={tone.toUpperCase()}
+                              size="small"
+                              sx={{
+                                flexShrink: 0,
+                                bgcolor: accent,
+                                color: '#fff',
+                                fontWeight: 600,
+                                fontFamily,
+                                textTransform: 'capitalize',
+                              }}
+                            />
+                          </Box>
+                          <Box sx={{ mt: 1.25 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.25 }}>
+                              <Typography sx={{ fontFamily, fontSize: 12, color: text.muted }}>Confidence</Typography>
+                              <Typography sx={{ fontFamily, fontSize: 12, fontWeight: 600, color: text.body }}>
+                                {result.confidence.toFixed(2)}%
+                              </Typography>
+                            </Box>
+                            <LinearProgress
+                              variant="determinate"
+                              value={Math.min(parseFloat(result.confidence) || 0, 100)}
+                              sx={{
+                                height: 6,
+                                borderRadius: radius.pill,
+                                bgcolor: surface.divider,
+                                '& .MuiLinearProgress-bar': { background: accent, borderRadius: radius.pill },
+                              }}
+                            />
+                          </Box>
+                        </SentimentResultCard>
+                      );
+                    })}
                   </Box>
 
-                  {/* Quick Summary */}
+                  {/* Summary */}
                   <Box sx={{ mt: 3 }}>
-                    <Typography
-                      variant="body1"
-                      sx={{ color: 'text.secondary', fontWeight: 'bold', mb: 1 }}
-                    >
-                      Sentiment Summary:
+                    <Typography sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading, mb: 1.5 }}>
+                      Summary
                     </Typography>
                     {(() => {
-                      // Calculate sentiment counts
                       const sentimentCounts = sentimentResults.reduce(
-                        (acc, res) => {
-                          acc[res.sentiment] = (acc[res.sentiment] || 0) + 1;
-                          return acc;
-                        },
+                        (acc, res) => { acc[res.sentiment] = (acc[res.sentiment] || 0) + 1; return acc; },
                         { positive: 0, neutral: 0, negative: 0 }
                       );
                       const total = sentimentResults.length;
-                      const positiveRatio = sentimentCounts.positive / total;
-                      const negativeRatio = sentimentCounts.negative / total;
-                      const neutralRatio = sentimentCounts.neutral / total;
-
                       let averageSentiment = 'neutral';
-                      if (positiveRatio > negativeRatio && positiveRatio > neutralRatio) {
+                      if (sentimentCounts.positive > sentimentCounts.negative && sentimentCounts.positive > sentimentCounts.neutral) {
                         averageSentiment = 'positive';
-                      } else if (
-                        negativeRatio > positiveRatio &&
-                        negativeRatio > neutralRatio
-                      ) {
+                      } else if (sentimentCounts.negative > sentimentCounts.positive && sentimentCounts.negative > sentimentCounts.neutral) {
                         averageSentiment = 'negative';
                       }
-
-                      // Calculate average confidence
-                      const totalConfidence = sentimentResults.reduce(
-                        (sum, item) => sum + parseFloat(item.confidence),
-                        0
-                      );
+                      const totalConfidence = sentimentResults.reduce((sum, item) => sum + parseFloat(item.confidence), 0);
                       const avgConfidence = totalConfidence / total;
-
+                      const segments = [
+                        { key: 'positive', count: sentimentCounts.positive, color: sentimentPalette.positive },
+                        { key: 'neutral', count: sentimentCounts.neutral, color: sentimentPalette.neutral },
+                        { key: 'negative', count: sentimentCounts.negative, color: sentimentPalette.negative },
+                      ];
                       return (
                         <>
-                          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                            <Chip
-                              label={`POSITIVE (${sentimentCounts.positive})`}
-                              color="success"
-                              variant="outlined"
-                            />
-                            <Chip
-                              label={`NEGATIVE (${sentimentCounts.negative})`}
-                              color="error"
-                              variant="outlined"
-                            />
-                            <Chip
-                              label={`NEUTRAL (${sentimentCounts.neutral})`}
-                              color="warning"
-                              variant="outlined"
-                            />
+                          <SentimentBar>
+                            {segments.map((s) => s.count > 0 && (
+                              <Tooltip key={s.key} title={`${s.key} — ${s.count} (${((s.count / total) * 100).toFixed(1)}%)`} arrow>
+                                <Box sx={{ width: `${(s.count / total) * 100}%`, background: s.color, height: '100%' }} />
+                              </Tooltip>
+                            ))}
+                          </SentimentBar>
+                          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 1.5, mb: 1.5 }}>
+                            {segments.map((s) => (
+                              <Box key={s.key} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                <Box sx={{ width: 12, height: 12, borderRadius: '3px', background: s.color }} />
+                                <Typography sx={{ fontFamily, fontSize: 13, color: text.body, textTransform: 'capitalize' }}>
+                                  {s.key} · {s.count}
+                                </Typography>
+                              </Box>
+                            ))}
                           </Box>
-                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Average Sentiment: <strong>{averageSentiment.toUpperCase()}</strong>
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Average Confidence: <strong>{avgConfidence.toFixed(2)}%</strong>
-                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                            <Typography sx={{ fontFamily, fontSize: 13, color: text.muted }}>
+                              Average sentiment:{' '}
+                              <strong style={{ color: sentimentPalette[averageSentiment], textTransform: 'capitalize' }}>
+                                {averageSentiment}
+                              </strong>
+                            </Typography>
+                            <Typography sx={{ fontFamily, fontSize: 13, color: text.muted }}>
+                              Avg. confidence:{' '}
+                              <strong style={{ color: text.heading }}>{avgConfidence.toFixed(2)}%</strong>
+                            </Typography>
+                          </Box>
                         </>
                       );
                     })()}
                   </Box>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleStoreSentimentResults}
-                    sx={{ mt: 2, textTransform: 'none' }}
-                  >
+                  <Divider sx={{ my: 2 }} />
+                  <PrimaryButton onClick={handleStoreSentimentResults} startIcon={<StoreIcon />}>
                     Store Results to Database
-                  </Button>
+                  </PrimaryButton>
                 </Box>
               )}
               {sentimentError && (
-                <Alert severity="error" sx={{ mt: 2 }}>
+                <Alert severity="error" sx={{ mt: 2, borderRadius: radius.control, fontFamily }}>
                   {sentimentError}
                 </Alert>
               )}
-            </Paper>
+            </SectionCard>
           </Slide>
         </Grid>
 
-        {/* Topic Modeling Section */}
+        {/* Topic Modeling */}
         <Grid item xs={12} md={6}>
           <Slide in direction="up" timeout={1400}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 3,
-                bgcolor: 'background.paper',
-                borderRadius: 2,
-                boxShadow: 2,
-                background:
-                  'linear-gradient(to right, #f0f0f0, #fafafa)',
-              }}
-            >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontWeight: 'medium',
-                  color: 'text.primary',
-                  mb: 2,
-                }}
-              >
-                Topic Modeling
-              </Typography>
+            <SectionCard elevation={0}>
+              <SectionHeader>
+                <IconTile><TopicIcon /></IconTile>
+                <Box>
+                  <SectionTitle>Topic Modeling</SectionTitle>
+                  <SectionSubtitle>Discover recurring themes across responses</SectionSubtitle>
+                </Box>
+              </SectionHeader>
 
-              {/* Filter Section */}
+              {/* Filter panel */}
               <Paper
                 variant="outlined"
-                sx={{
-                  p: 2,
-                  mb: 3,
-                  borderRadius: 2,
-                  backgroundColor: '#fff',
-                }}
+                sx={{ p: 2, mb: 3, borderRadius: radius.control, borderColor: surface.divider, backgroundColor: '#fafbff' }}
               >
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    color: 'text.secondary',
-                    fontWeight: 'bold',
-                    mb: 2,
-                  }}
-                >
-                  Date Range & Entity Filters
-                </Typography>
-
-                {/* 
-                  UPDATED: Using MUI DatePicker to disable invalid dates 
-                  based on openEndedResponses
-                */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <TuneIcon sx={{ color: brand.primary, fontSize: 20 }} />
+                  <Typography sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading }}>
+                    Date Range &amp; Entity Filters
+                  </Typography>
+                </Box>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 2,
-                      mb: 2,
-                    }}
-                  >
-                    {/* `renderInput` was removed in @mui/x-date-pickers v7, so the
-                        fullWidth it carried was silently dropped. slotProps is the
-                        supported replacement. */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                     <DatePicker
                       label="Start Date"
                       value={startDate}
@@ -745,11 +901,9 @@ const AIToolsDashboard = () => {
                       slotProps={{ textField: { fullWidth: true } }}
                       shouldDisableDate={(date) => {
                         const dateString = dayjs(date).format('YYYY-MM-DD');
-                        // Grey out if date is not in uniqueDates set
                         return !uniqueDates.has(dateString);
                       }}
                     />
-
                     <DatePicker
                       label="End Date"
                       value={endDate}
@@ -763,12 +917,8 @@ const AIToolsDashboard = () => {
                     />
                   </Box>
                 </LocalizationProvider>
-
                 <Box sx={{ mb: 2 }}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: 'text.secondary', mb: 1 }}
-                  >
+                  <Typography sx={{ fontFamily, fontSize: 13, color: text.muted, mb: 1 }}>
                     Filter by Entity
                   </Typography>
                   <Select
@@ -782,9 +932,7 @@ const AIToolsDashboard = () => {
                     }
                   >
                     {uniqueEntities.length === 0 && (
-                      <MenuItem disabled value="">
-                        Scan for open-ended responses first
-                      </MenuItem>
+                      <MenuItem disabled value="">Scan for open-ended responses first</MenuItem>
                     )}
                     {uniqueEntities.map((entityObj) => (
                       <MenuItem key={entityObj.entity} value={entityObj.entity}>
@@ -793,24 +941,15 @@ const AIToolsDashboard = () => {
                     ))}
                   </Select>
                 </Box>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleRetrieveOpenEndedResponsesForTopicModeling}
-                  sx={{ textTransform: 'none' }}
-                >
-                  Retrieve & Filter Responses
-                </Button>
+                <PrimaryButton onClick={handleRetrieveOpenEndedResponsesForTopicModeling} startIcon={<DatasetIcon />}>
+                  Retrieve &amp; Filter Responses
+                </PrimaryButton>
               </Paper>
 
-              {/* Topic Modeling Section */}
+              {/* Topic text + analyze */}
               <Box>
-                <Typography
-                  variant="body1"
-                  sx={{ color: 'text.secondary', mb: 2 }}
-                >
-                  Below is the auto-populated text from filtered open-ended
-                  responses. Feel free to edit it before analysis.
+                <Typography sx={{ fontFamily, fontSize: 14, color: text.muted, mb: 1.5 }}>
+                  Below is the auto-populated text from filtered open-ended responses. Feel free to edit it before analysis.
                 </Typography>
                 <TextField
                   value={topicText}
@@ -819,94 +958,104 @@ const AIToolsDashboard = () => {
                   rows={4}
                   fullWidth
                   variant="outlined"
-                  sx={{ mb: 2 }}
+                  placeholder="Filtered open-ended responses will appear here…"
+                  sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: radius.control } }}
                 />
-                <Button
-                  variant="contained"
-                  color="primary"
+                <PrimaryButton
                   onClick={handleTopicModeling}
                   disabled={isTopicModeling || !topicText || !selectedHFToken}
-                  startIcon={isTopicModeling ? <CircularProgress size={18} color="inherit" /> : null}
-                  sx={{ textTransform: 'none' }}
+                  startIcon={isTopicModeling ? <CircularProgress size={18} color="inherit" /> : <TopicIcon />}
                 >
                   {isTopicModeling ? 'Analyzing…' : 'Analyze Topics'}
-                </Button>
+                </PrimaryButton>
               </Box>
 
               {topicModelingResult && (
-                <Box
-                  sx={{ mt: 2, maxHeight: '400px', overflowY: 'auto', pr: 2 }}
-                >
-                  <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                    Topic Modeling Results:
+                <Box sx={{ mt: 3, maxHeight: '420px', overflowY: 'auto', pr: 1 }}>
+                  <Typography sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading, mb: 1.5 }}>
+                    Topic Modeling Results
                   </Typography>
-                  <Box sx={{ mt: 1 }}>
-                    {topicModelingResult.map((topic, index) => (
-                      <Box key={index} sx={{ mb: 3 }}>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: 'text.secondary',
-                            fontWeight: 'bold',
-                            fontSize: '1.2rem',
-                          }}
-                        >
-                          Topic {index + 1}: {topic.customLabel}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                          Probability: {(topic.probability * 100).toFixed(2)}%
-                        </Typography>
-                        <Box sx={{ mt: 1 }}>
-                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Top Words:
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {topicModelingResult.map((topic, index) => {
+                      const prob = topic.probability * 100;
+                      return (
+                        <TopicResultCard key={index} elevation={0}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                            <Typography sx={{ fontFamily, fontWeight: 700, fontSize: 16, color: text.heading }}>
+                              Topic {index + 1}: {topic.customLabel}
+                            </Typography>
+                            <Chip
+                              label={`${prob.toFixed(2)}%`}
+                              size="small"
+                              sx={{ bgcolor: gradients.brand, color: '#fff', fontWeight: 600, fontFamily }}
+                            />
+                          </Box>
+                          <Box sx={{ mb: 1.5 }}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={Math.min(prob, 100)}
+                              sx={{
+                                height: 6,
+                                borderRadius: radius.pill,
+                                bgcolor: surface.divider,
+                                '& .MuiLinearProgress-bar': { background: gradients.brandBar, borderRadius: radius.pill },
+                              }}
+                            />
+                          </Box>
+                          <Typography sx={{ fontFamily, fontSize: 13, color: text.muted, mb: 0.5 }}>
+                            Top words
                           </Typography>
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1.5 }}>
                             {topic.top_words.map((word, wordIndex) => (
-                              <Chip key={wordIndex} label={word} variant="outlined" />
+                              <Chip
+                                key={wordIndex}
+                                label={word}
+                                size="small"
+                                sx={{ fontFamily, bgcolor: 'rgba(102, 126, 234, 0.12)', color: brand.primaryDark, fontWeight: 500 }}
+                              />
                             ))}
                           </Box>
-                        </Box>
-
-                        <Box sx={{ mt: 1 }}>
-                          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Contributions:
-                          </Typography>
-                          <List>
-                            {topic.contribution.map((contrib, contribIndex) => (
-                              <ListItem key={contribIndex}>
-                                <ListItemText
-                                  primary={`${contrib[1]}: ${contrib[2]}`}
-                                  secondary={`Topic ${contrib[0]}`}
-                                />
-                              </ListItem>
-                            ))}
-                          </List>
-                        </Box>
-                      </Box>
-                    ))}
+                          {topic.contribution && topic.contribution.length > 0 && (
+                            <Box>
+                              <Typography sx={{ fontFamily, fontSize: 13, color: text.muted, mb: 0.5 }}>
+                                Contributions
+                              </Typography>
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+                                {topic.contribution.map((contrib, contribIndex) => (
+                                  <Box key={contribIndex} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Chip
+                                      label={`T${contrib[0]}`}
+                                      size="small"
+                                      sx={{ height: 20, fontFamily, fontSize: 11, bgcolor: surface.divider, color: text.muted }}
+                                    />
+                                    <Typography sx={{ fontFamily, fontSize: 13, color: text.body }}>
+                                      {contrib[1]}:{' '}
+                                      <strong style={{ color: text.heading }}>{contrib[2]}</strong>
+                                    </Typography>
+                                  </Box>
+                                ))}
+                              </Box>
+                            </Box>
+                          )}
+                        </TopicResultCard>
+                      );
+                    })}
                   </Box>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleStoreTopicModelingResult}
-                    sx={{ mt: 2, textTransform: 'none' }}
-                  >
+                  <Divider sx={{ my: 2 }} />
+                  <PrimaryButton onClick={handleStoreTopicModelingResult} startIcon={<StoreIcon />}>
                     Store Results to Database
-                  </Button>
+                  </PrimaryButton>
                 </Box>
               )}
               {topicModelingError && (
-                <Alert severity="error" sx={{ mt: 2 }}>
+                <Alert severity="error" sx={{ mt: 2, borderRadius: radius.control, fontFamily }}>
                   {topicModelingError}
                 </Alert>
               )}
-            </Paper>
+            </SectionCard>
           </Slide>
         </Grid>
       </Grid>
-
-      {/* Removed the "API Call Metrics" dialog: nothing ever called its opener,
-          so it was unreachable UI pulling in chart.js for no reason. */}
 
       {/* Snackbar for Messages */}
       <Snackbar
@@ -918,7 +1067,7 @@ const AIToolsDashboard = () => {
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbarSeverity}
-          sx={{ width: '100%', fontSize: '1.1rem' }}
+          sx={{ width: '100%', borderRadius: radius.control, fontFamily }}
         >
           {snackbarMessage}
         </Alert>
