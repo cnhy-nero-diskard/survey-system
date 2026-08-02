@@ -213,7 +213,7 @@ const OverallMun = ({ year, quarter }) => {
             Overall Sentiment Analysis
           </ChartTitle>
           <StyledChartContainer>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={320}>
               <PieChart>
                 <defs>
                   <linearGradient id="positiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
