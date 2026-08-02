@@ -192,40 +192,23 @@ const StyledListItem = styled(ListItem).withConfig({
   }
 `;
 
-const CollapseButton = styled(IconButton).withConfig({
-  shouldForwardProp: (prop) => !['collapsed'].includes(prop),
-})`
-  position: ${({ collapsed }) => collapsed ? 'relative' : 'absolute'};
-  top: ${({ collapsed }) => collapsed ? '0' : '12px'};
-  left: ${({ collapsed }) => collapsed ? 'auto' : 'auto'};
-  right: ${({ collapsed }) => collapsed ? 'auto' : '12px'};
-  transform: none;
-  z-index: 3;
-  background: rgba(255, 255, 255, 0.14);
-  color: white;
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  padding: 6px;
-  transition: all 0.18s ease;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
-  cursor: pointer;
-  margin: ${({ collapsed }) => collapsed ? '0 auto 16px auto' : '0'};
-  display: ${({ collapsed }) => collapsed ? 'block' : 'block'};
+const CollapseFooterButton = styled(Button)`
+  border-radius: 12px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  text-transform: none;
+  color: #64748b;
+  justify-content: flex-start;
+  padding-left: 24px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 
-  /* More subtle, less 'materializing' shadow on hover */
   &:hover {
-    background: rgba(255, 255, 255, 0.22);
-    box-shadow: 0 6px 14px rgba(2,6,23,0.08);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
+    background: rgba(79, 70, 229, 0.08);
+    color: #4f46e5;
   }
 
   &:focus-visible {
-    outline: 2px solid rgba(255,255,255,0.45);
+    outline: 2px solid rgba(79, 70, 229, 0.25);
     outline-offset: 2px;
   }
 `;
@@ -423,39 +406,14 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
           here just pushed the sidebar 64px below the page content. */}
       <SidebarHeader collapsed={collapsed}>
         {collapsed ? (
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            gap: 2
-          }}>
-            <CollapseButton
-              collapsed={collapsed}
-              onClick={handleToggleCollapse}
-              aria-label="Expand sidebar"
-            >
-              <MenuIcon />
-            </CollapseButton>
-
-            <Tooltip title="Panglao Tourism Office" placement="right">
-              <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 32, height: 32 }}>
-                <AdminIcon sx={{ fontSize: 18 }} />
-              </Avatar>
-            </Tooltip>
-          </Box>
+          <Tooltip title="Panglao Tourism Office" placement="right">
+            <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 36, height: 36 }}>
+              <AdminIcon sx={{ fontSize: 20 }} />
+            </Avatar>
+          </Tooltip>
         ) : (
           <>
-            <CollapseButton
-              collapsed={collapsed}
-              onClick={handleToggleCollapse}
-              aria-label="Collapse sidebar"
-            >
-              <MenuOpenIcon />
-            </CollapseButton>
-
-            <CustomTypography variant="h6" align="center" fontWeight="bold" sx={{ fontSize: '14px', mb: 1, mt: 2 }}>
+            <CustomTypography variant="h6" align="center" fontWeight="bold" sx={{ fontSize: '14px', mb: 1 }}>
               MULTILINGUAL SURVEY SYSTEM
             </CustomTypography>
             <CustomTypography variant="subtitle2" align="center" sx={{ fontSize: '12px', opacity: 0.9 }}>
@@ -598,31 +556,62 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
       <Box sx={{ mt: 'auto' }}>
         <Divider sx={{ mx: 2, my: 1 }} />
         {collapsed ? (
-          <Tooltip title="Log Out" placement="right">
-            <IconButton 
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            py: 1,
+            gap: 1,
+          }}>
+            <Tooltip title="Log Out" placement="right">
+              <IconButton
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                sx={{
+                  color: '#ef4444',
+                  '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)' },
+                  '&:disabled': { color: '#94a3b8' },
+                }}
+                aria-label="Log out"
+              >
+                <LogoutIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Expand sidebar" placement="right">
+              <IconButton
+                onClick={handleToggleCollapse}
+                sx={{
+                  color: '#64748b',
+                  '&:hover': { bgcolor: 'rgba(79, 70, 229, 0.1)', color: '#4f46e5' },
+                }}
+                aria-label="Expand sidebar"
+              >
+                <MenuIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ) : (
+          <Box sx={{ px: 2, pt: 1, pb: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <LogoutButton
+              fullWidth
+              variant="contained"
+              startIcon={<LogoutIcon />}
               onClick={handleLogout}
               disabled={isLoggingOut}
-              sx={{ 
-                m: 2, 
-                color: '#ef4444',
-                '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)' },
-                '&:disabled': { color: '#94a3b8' }
-              }}
-              aria-label="Log out"
+              sx={{ margin: 0 }}
             >
-              <LogoutIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <LogoutButton
-            fullWidth
-            variant="contained"
-            startIcon={<LogoutIcon />}
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-          >
-            {isLoggingOut ? 'Logging Out...' : 'Log Out'}
-          </LogoutButton>
+              {isLoggingOut ? 'Logging Out...' : 'Log Out'}
+            </LogoutButton>
+            <CollapseFooterButton
+              fullWidth
+              variant="text"
+              startIcon={<MenuOpenIcon />}
+              onClick={handleToggleCollapse}
+            >
+              Collapse
+            </CollapseFooterButton>
+          </Box>
         )}
       </Box>
     </SidebarDrawer>
