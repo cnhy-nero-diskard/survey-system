@@ -267,6 +267,13 @@ const SurveyMetrics = () => {
     const [openNationalityModal, setOpenNationalityModal] = useState(false);
     const [openCountryModal, setOpenCountryModal] = useState(false);
 
+    // Route changes in the admin SPA preserve the document scroll position.
+    // Always begin this dashboard at its header instead of showing it clipped
+    // by the scroll offset of the page the user just left.
+    useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, []);
+
     // Fetch data from server
     useEffect(() => {
         axios

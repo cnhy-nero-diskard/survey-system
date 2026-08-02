@@ -206,6 +206,12 @@ const SurveyTally = () => {
   // Debounce search query to avoid excessive API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
+  // Route changes in the admin SPA preserve the document scroll position.
+  // Reset it on entry so the statistics header is never clipped above the viewport.
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
   const fetchData = useCallback(async (page = 1, search = '') => {
     try {
       setLoading(true);
