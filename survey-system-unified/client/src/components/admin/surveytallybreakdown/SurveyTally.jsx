@@ -5,8 +5,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
-  CartesianGrid,
   ResponsiveContainer
 } from 'recharts';
 import {
@@ -38,11 +36,22 @@ import {
   ExpandLess as ExpandLessIcon,
   Assessment as AssessmentIcon,
   TrendingUp as TrendingUpIcon,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  Category as CategoryIcon
 } from '@mui/icons-material';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import { useDebounce } from '../../../hooks/usePerformance';
+import { fontFamily } from '../../../config/fontConfig';
+import {
+  brand,
+  gradients,
+  text,
+  surface,
+  shadow,
+  radius,
+  categoricalPalette
+} from '../shared/designTokens';
 
 // Animations
 const fadeIn = keyframes`
@@ -80,17 +89,19 @@ const shimmer = keyframes`
 const Container = styled(Box)`
   padding: 24px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: ${gradients.page};
+  font-family: ${fontFamily};
+  box-sizing: border-box;
   animation: ${fadeIn} 0.6s ease-out;
 `;
 
 const HeaderSection = styled(Paper)`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: ${gradients.brand};
   color: white;
   padding: 32px;
   border-radius: 20px;
   margin-bottom: 24px;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 30px ${brand.primary}4d;
   position: relative;
   overflow: hidden;
 
@@ -111,32 +122,28 @@ const StatsGrid = styled(Grid)`
 `;
 
 const StatCard = styled(Card).withConfig({
-  // Keep the styling-only props off the DOM node (MUI spreads unknown props
-  // onto the root div, which makes React warn about them).
-  shouldForwardProp: (prop) => !['gradient', 'accentColor'].includes(prop),
+  // accentColor is styling-only; keep it off the DOM node (MUI would otherwise
+  // spread it onto the root div and React would warn).
+  shouldForwardProp: (prop) => prop !== 'accentColor',
 })`
-  /* The gradient prop already carries a full linear-gradient(...) value —
-     don't wrap it in a second one or the declaration is invalid and the card
-     falls back to Paper white, leaving white text on a white card.
-     MUI's own Paper/Card styles set background-color via an emotion class on
-     the same element; that rule can win the cascade depending on style-tag
-     injection order, silently discarding the plain background rule above.
-     Target the MuiPaper-root class directly so this always wins regardless
-     of order. */
+  /* MUI's Paper/Card set background-color via an emotion class on the same
+     element; target MuiPaper-root directly so our surface always wins the
+     cascade regardless of style-tag injection order. */
   &.MuiPaper-root {
-    background: ${props => props.gradient || 'linear-gradient(135deg, #ffffff, #f8fafc)'};
-    background-color: transparent;
+    background: ${surface.card};
+    background-color: ${surface.card};
   }
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+  height: 100%;
+  border-radius: ${radius.card};
+  box-shadow: ${shadow.card};
+  border: ${surface.cardBorder};
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: ${shadow.cardHover};
   }
 
   &::before {
@@ -146,53 +153,134 @@ const StatCard = styled(Card).withConfig({
     left: 0;
     right: 0;
     height: 4px;
-    background: ${props => props.accentColor || '#667eea'};
+    background: ${props => props.accentColor || brand.primary};
   }
 `;
 
 const SearchContainer = styled(Paper)`
   padding: 20px;
-  border-radius: 16px;
+  border-radius: ${radius.card};
   margin-bottom: 24px;
-  background: rgba(255, 255, 255, 0.95);
+  background: ${surface.card};
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: ${surface.cardBorder};
+  box-shadow: ${shadow.soft};
 `;
 
 const ChartContainer = styled(Card)`
   margin-bottom: 16px;
-  border-radius: 16px;
+  border-radius: ${radius.card};
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.95);
+  background: ${surface.card};
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  border: ${surface.cardBorder};
+  box-shadow: ${shadow.soft};
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: ${slideIn} 0.5s ease-out;
   animation-fill-mode: both;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: ${shadow.cardHover};
   }
 `;
 
 const LoadingCard = styled(Card)`
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
-  );
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 400% 100%;
   animation: ${shimmer} 1.2s ease-in-out infinite;
-  border-radius: 16px;
-  height: 200px;
+  border-radius: ${radius.card};
+  height: 180px;
   margin-bottom: 16px;
 `;
 
-const COLORS = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'];
+// Accent icon tile for the redesigned overview stat cards.
+const StatIconTile = styled(Box).withConfig({
+  shouldForwardProp: (prop) => prop !== 'accent',
+})`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  color: #ffffff;
+  background: ${props => props.accent || brand.primary};
+  box-shadow: 0 6px 16px ${props => `${props.accent || brand.primary}55`};
+`;
+
+// Accent colours for the four overview cards. Pulled from the shared palettes
+// in designTokens (brand purple + categorical/sentiment tones) so the cards
+// stay consistent with the rest of the admin dashboards.
+const ACCENT = {
+  questions: brand.primary,
+  responses: '#06B6D4',
+  average: '#8B5CF6',
+  coverage: '#10B981',
+};
+
+// Stable per-division accent so each category badge keeps its colour across
+// renders and pages. Derived from the shared categorical palette.
+const divisionColor = (name) =>
+  categoricalPalette[
+    (String(name || '').split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0)) %
+      categoricalPalette.length
+  ];
+
+// Division badge shown on each question card.
+const DivisionBadge = styled(Box).withConfig({
+  shouldForwardProp: (prop) => prop !== 'accent',
+})`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: ${radius.pill};
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: ${props => props.accent || brand.primary};
+  background: ${props => `${props.accent || brand.primary}1a`};
+  border: 1px solid ${props => `${props.accent || brand.primary}33`};
+`;
+
+// One row of the categorized tally breakdown (response option -> count/percent).
+const TallyRow = styled(Box)`
+  display: grid;
+  grid-template-columns: minmax(110px, 190px) 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+`;
+
+const TallyBarTrack = styled(Box)`
+  position: relative;
+  height: 8px;
+  border-radius: ${radius.pill};
+  background: ${surface.divider};
+  overflow: hidden;
+`;
+
+const TallyBarFill = styled(Box).withConfig({
+  shouldForwardProp: (prop) => !['fill', 'barColor'].includes(prop),
+})`
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: ${props => props.fill || '0%'};
+  background: ${props => props.barColor || brand.primary};
+  border-radius: ${radius.pill};
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+`;
+
+const ResultsCount = styled(Typography)`
+  color: ${text.muted};
+  font-size: 0.85rem;
+  font-weight: 500;
+`;
 
 const SurveyTally = () => {
   const theme = useTheme();
@@ -323,7 +411,7 @@ const SurveyTally = () => {
       const pieData = Object.entries(item.occurrences).map(([key, value], idx) => ({
         name: key,
         value: parseInt(value, 10) || 0,
-        color: COLORS[idx % COLORS.length]
+        color: categoricalPalette[idx % categoricalPalette.length]
       })).filter(item => item.value > 0);
 
       return {
@@ -335,20 +423,10 @@ const SurveyTally = () => {
     });
   }, []);
 
-  /**
-   * getUniqueKeys: Enhanced to get all unique response types
-   */
-  const uniqueKeys = useMemo(() => {
-    const keys = new Set();
-    data.forEach((group) => {
-      Object.keys(group).forEach((key) => {
-        if (!['name', 'isEmpty', 'shortName', 'question', 'surveyquestion_ref', 'totalResponses', 'pieData', 'index'].includes(key)) {
-          keys.add(key);
-        }
-      });
-    });
-    return Array.from(keys);
-  }, [data]);
+  // Per-question response options are derived from each group's own `pieData`
+  // (built in transformData), so a global key set is no longer needed. The old
+  // global memo made Yes/No questions render empty VerySatisfied/Satisfied
+  // bars and a cluttered legend that didn't belong to the question.
 
   // Statistics calculations
   const stats = useMemo(() => {
@@ -370,8 +448,8 @@ const SurveyTally = () => {
     return (
       <Container>
         <Box display="flex" alignItems="center" gap={1.5} mb={2} role="status" aria-live="polite">
-          <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} />
-          <Typography sx={{ color: '#4a5568', fontWeight: 500 }}>Loading survey statistics…</Typography>
+          <CircularProgress size={28} thickness={4} sx={{ color: brand.primary }} />
+          <Typography sx={{ color: text.body, fontWeight: 500 }}>Loading survey statistics…</Typography>
         </Box>
         <HeaderSection>
           <Skeleton variant="text" width="60%" height={40} sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
@@ -438,52 +516,60 @@ const SurveyTally = () => {
       <Fade in timeout={800}>
         <StatsGrid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <StatCard gradient="linear-gradient(135deg, #667eea, #764ba2)" accentColor="#667eea">
-              <CardContent sx={{ textAlign: 'center', color: 'white' }}>
-                <BarChartIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="h4" fontWeight="bold">
+            <StatCard accentColor={ACCENT.questions}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <StatIconTile accent={ACCENT.questions}>
+                  <BarChartIcon fontSize="small" />
+                </StatIconTile>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: text.heading, lineHeight: 1.1 }}>
                   {stats.totalQuestions}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                <Typography variant="body2" sx={{ color: text.muted, mt: 0.5 }}>
                   Total Questions
                 </Typography>
               </CardContent>
             </StatCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <StatCard gradient="linear-gradient(135deg, #f093fb, #f5576c)" accentColor="#f093fb">
-              <CardContent sx={{ textAlign: 'center', color: 'white' }}>
-                <TrendingUpIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="h4" fontWeight="bold">
+            <StatCard accentColor={ACCENT.responses}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <StatIconTile accent={ACCENT.responses}>
+                  <TrendingUpIcon fontSize="small" />
+                </StatIconTile>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: text.heading, lineHeight: 1.1 }}>
                   {stats.totalResponses.toLocaleString()}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                <Typography variant="body2" sx={{ color: text.muted, mt: 0.5 }}>
                   Total Responses
                 </Typography>
               </CardContent>
             </StatCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <StatCard gradient="linear-gradient(135deg, #4facfe, #00f2fe)" accentColor="#4facfe">
-              <CardContent sx={{ textAlign: 'center', color: 'white' }}>
-                <PieChartIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="h4" fontWeight="bold">
+            <StatCard accentColor={ACCENT.average}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <StatIconTile accent={ACCENT.average}>
+                  <PieChartIcon fontSize="small" />
+                </StatIconTile>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: text.heading, lineHeight: 1.1 }}>
                   {stats.avgResponsesPerQuestion}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                <Typography variant="body2" sx={{ color: text.muted, mt: 0.5 }}>
                   Avg. per Question
                 </Typography>
               </CardContent>
             </StatCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <StatCard gradient="linear-gradient(135deg, #43e97b, #38f9d7)" accentColor="#43e97b">
-              <CardContent sx={{ textAlign: 'center', color: 'white' }}>
-                <AssessmentIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="h4" fontWeight="bold">
+            <StatCard accentColor={ACCENT.coverage}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <StatIconTile accent={ACCENT.coverage}>
+                  <AssessmentIcon fontSize="small" />
+                </StatIconTile>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: text.heading, lineHeight: 1.1 }}>
                   {stats.completionRate}%
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                <Typography variant="body2" sx={{ color: text.muted, mt: 0.5 }}>
                   Data Coverage
                 </Typography>
               </CardContent>
@@ -512,7 +598,7 @@ const SurveyTally = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon />
+                    <SearchIcon sx={{ color: text.subtle }} />
                   </InputAdornment>
                 ),
                 sx: {
@@ -520,51 +606,68 @@ const SurveyTally = () => {
                   borderRadius: 3,
                   backgroundColor: '#fff',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(0, 0, 0, 0.23)'
+                    borderColor: 'rgba(0, 0, 0, 0.15)'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: brand.primary
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: brand.primary,
+                    borderWidth: 2
                   }
                 }
               }}
             />
-            <IconButton 
-              onClick={handleRefresh} 
+            <IconButton
+              onClick={handleRefresh}
               disabled={refreshing}
-              color="primary" 
-              sx={{ 
+              aria-label="Refresh survey statistics"
+              sx={{
                 width: 48,
                 height: 48,
                 flexShrink: 0,
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) }
+                color: brand.primary,
+                bgcolor: alpha(brand.primary, 0.1),
+                '&:hover': { bgcolor: alpha(brand.primary, 0.2) }
               }}
             >
-              <RefreshIcon sx={{ 
-                animation: refreshing ? 'spin 1s linear infinite' : 'none',
-                '@keyframes spin': {
-                  '0%': { transform: 'rotate(0deg)' },
-                  '100%': { transform: 'rotate(360deg)' }
-                }
-              }} />
+              <RefreshIcon
+                sx={{
+                  animation: refreshing ? 'spin 1s linear infinite' : 'none',
+                  '@keyframes spin': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' }
+                  }
+                }}
+              />
             </IconButton>
           </Box>
-          {searchQuery && (
-            <Box mt={2}>
-              <Chip 
-                label={`Search: "${searchQuery}"`} 
-                onDelete={() => setSearchQuery('')}
-                color="primary"
-                variant="outlined"
-              />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1.5, flexWrap: 'wrap', gap: 1 }}>
+            <Box>
+              {searchQuery && (
+                <Chip
+                  label={`Search: "${searchQuery}"`}
+                  onDelete={() => setSearchQuery('')}
+                  variant="outlined"
+                  sx={{ color: brand.primary, borderColor: alpha(brand.primary, 0.4), fontWeight: 500 }}
+                />
+              )}
             </Box>
-          )}
+            {!loading && data.length > 0 && (
+              <ResultsCount>
+                Showing {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount} questions
+              </ResultsCount>
+            )}
+          </Box>
           {loading && (
             <Box mt={2}>
               <LinearProgress
-                sx={{ 
+                sx={{
                   borderRadius: 1,
                   '& .MuiLinearProgress-bar': {
-                    background: 'linear-gradient(45deg, #667eea, #764ba2)'
+                    background: gradients.brandBar
                   }
-                }} 
+                }}
               />
             </Box>
           )}
@@ -592,26 +695,35 @@ const SurveyTally = () => {
             </Alert>
           </Fade>
         ) : (
-          data.map((group, index) => (
-            <Slide 
-              in 
-              timeout={300 + index * 100} 
-              direction="up" 
+          data.map((group, index) => {
+            const isExpanded = !!expandedCards[index];
+            const segments = group.pieData || [];
+            const visibleSegments = isExpanded ? segments : segments.slice(0, 3);
+            const hiddenCount = segments.length - visibleSegments.length;
+            const divisionAccent = divisionColor(group.shortName);
+            return (
+            <Slide
+              in
+              timeout={300 + index * 100}
+              direction="up"
               key={group.surveyquestion_ref || index}
             >
               <ChartContainer>
-                <CardContent>
-                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                    <Box flex={1}>
-                      <Typography variant="h6" fontWeight="bold" color="primary" gutterBottom>
+                <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <DivisionBadge accent={divisionAccent}>
+                        <CategoryIcon sx={{ fontSize: 14 }} />
                         {group.shortName}
-                      </Typography>
-                      <Typography 
-                        variant="body2" 
-                        color="text.secondary"
-                        sx={{ 
+                      </DivisionBadge>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          mt: 1,
+                          color: text.heading,
+                          fontWeight: 600,
                           display: '-webkit-box',
-                          WebkitLineClamp: expandedCards[index] ? 'none' : 2,
+                          WebkitLineClamp: isExpanded ? 'none' : 2,
                           WebkitBoxOrient: 'vertical',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis'
@@ -620,78 +732,100 @@ const SurveyTally = () => {
                         {group.question}
                       </Typography>
                     </Box>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Chip 
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                      <Chip
                         label={`${group.totalResponses || 0} responses`}
-                        color="primary"
                         size="small"
                         variant="outlined"
+                        sx={{ color: brand.primary, borderColor: alpha(brand.primary, 0.4), fontWeight: 600 }}
                       />
                       <IconButton
                         size="small"
                         onClick={() => toggleCardExpansion(index)}
-                        aria-label={expandedCards[index] ? 'Collapse question details' : 'Expand question details'}
-                        aria-expanded={!!expandedCards[index]}
+                        aria-label={isExpanded ? 'Collapse question details' : 'Expand question details'}
+                        aria-expanded={isExpanded}
+                        sx={{ color: text.muted }}
                       >
-                        {expandedCards[index] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                       </IconButton>
                     </Box>
                   </Box>
 
-                  {/* The chart is always visible; the toggle only controls whether
-                      the (potentially long) question text is clamped to 2 lines.
-                      Previously the chart itself was hidden for any question over
-                      100 characters, which made most cards look empty. */}
-                  <Box>
                     {group.isEmpty ? (
                       <Alert severity="warning" sx={{ borderRadius: 2 }}>
-                        <Typography variant="body2">
-                          No response data available for this question
-                        </Typography>
+                        <Typography variant="body2">No response data available for this question</Typography>
                       </Alert>
                     ) : (
-                      <Box sx={{ width: '100%', height: 200 }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart
-                            data={[group]}
-                            layout="vertical"
-                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
-                            <XAxis type="number" />
-                            <YAxis 
-                              type="category" 
-                              dataKey="shortName" 
-                              width={0}
-                              tick={false}
-                            />
-                            <Tooltip 
-                              contentStyle={{
-                                backgroundColor: theme.palette.background.paper,
-                                border: `1px solid ${theme.palette.divider}`,
-                                borderRadius: theme.shape.borderRadius,
-                                boxShadow: theme.shadows[4]
-                              }}
-                            />
-                            <Legend />
-                            {uniqueKeys.map((key, keyIndex) => (
-                              <Bar
-                                key={key}
-                                dataKey={key}
-                                stackId="responses"
-                                fill={COLORS[keyIndex % COLORS.length]}
-                                radius={[0, 4, 4, 0]}
+                      <>
+                        <Box sx={{ width: '100%', height: 64 }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={[group]}
+                              layout="vertical"
+                              margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                              maxBarSize={32}
+                            >
+                              <XAxis type="number" hide />
+                              <YAxis type="category" dataKey="shortName" hide />
+                              <Tooltip
+                                cursor={{ fill: alpha(theme.palette.text.primary, 0.04) }}
+                                contentStyle={{
+                                  backgroundColor: theme.palette.background.paper,
+                                  border: `1px solid ${theme.palette.divider}`,
+                                  borderRadius: theme.shape.borderRadius,
+                                  boxShadow: theme.shadows[4],
+                                  fontSize: '0.85rem'
+                                }}
+                                formatter={(value, name) => [`${value} responses`, name]}
                               />
-                            ))}
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </Box>
+                              {segments.map((entry) => (
+                                <Bar
+                                  key={entry.name}
+                                  dataKey={entry.name}
+                                  stackId="responses"
+                                  fill={entry.color}
+                                />
+                              ))}
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </Box>
+
+                        <Box sx={{ mt: 1.5 }}>
+                          {visibleSegments.map((entry) => {
+                            const pct = group.totalResponses > 0 ? (entry.value / group.totalResponses) * 100 : 0;
+                            return (
+                              <TallyRow key={entry.name}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                                  <Box sx={{ width: 10, height: 10, borderRadius: '50%', flexShrink: 0, bgcolor: entry.color }} />
+                                  <Typography variant="body2" noWrap sx={{ color: text.body, fontWeight: 500 }}>
+                                    {entry.name}
+                                  </Typography>
+                                </Box>
+                                <TallyBarTrack>
+                                  <TallyBarFill fill={`${pct}%`} barColor={entry.color} />
+                                </TallyBarTrack>
+                                <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, justifyContent: 'flex-end' }}>
+                                  <Typography variant="body2" sx={{ fontWeight: 700, color: text.heading }}>{entry.value}</Typography>
+                                  <Typography variant="caption" sx={{ color: text.muted }}>{pct.toFixed(1)}%</Typography>
+                                </Box>
+                              </TallyRow>
+                            );
+                          })}
+                          {hiddenCount > 0 && (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 0.5 }}>
+                              <Typography variant="caption" sx={{ color: text.muted }}>
+                                +{hiddenCount} more option{hiddenCount > 1 ? 's' : ''} — expand to see all
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      </>
                     )}
-                  </Box>
                 </CardContent>
               </ChartContainer>
             </Slide>
-          ))
+            );
+          })
         )}
       </Box>
 
@@ -709,7 +843,7 @@ const SurveyTally = () => {
               showLastButton
               sx={{
                 '& .MuiPagination-ul': {
-                  bgcolor: 'rgba(255, 255, 255, 0.9)',
+                  bgcolor: surface.card,
                   borderRadius: 3,
                   p: 1,
                   boxShadow: theme.shadows[2]
