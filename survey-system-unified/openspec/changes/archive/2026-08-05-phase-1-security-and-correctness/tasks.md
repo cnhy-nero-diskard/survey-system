@@ -9,7 +9,7 @@
 
 - [x] 2.1 Move `helmet()`, rate limiter, and session/cookie setup before all `app.use('/api/...')` route mounts (`server.js`)
 - [x] 2.2 Move `errorHandler` to the end of the middleware chain, after every route is mounted (`server.js`)
-- [ ] 2.3 Smoke-test client, admin, and auth route groups after reordering to confirm no behavior regressions
+- [x] 2.3 Smoke-test client, admin, and auth route groups after reordering to confirm no behavior regressions
 
 ## 3. Route authorization
 
@@ -21,7 +21,7 @@
 - [x] 4.1 Make cookie `secure` conditional on `NODE_ENV`, set `sameSite` explicitly, and match logout-clear attributes to login-set attributes (`server.js:71`, `controllers/authController.js:34-38,63-67`)
 - [x] 4.2 Fail CORS closed instead of defaulting to `origin: true` when `FRONTEND_URL` is unset (`server.js:49-53`)
 - [x] 4.3 Decide and implement: wire `csurf` into state-changing routes, or remove the unused dependency
-- [ ] 4.4 Verify local dev login flow still works after the `NODE_ENV`-conditional cookie change
+- [x] 4.4 Verify local dev login flow still works after the `NODE_ENV`-conditional cookie change
 
 ## 5. Survey submission correctness
 
@@ -44,7 +44,7 @@
 - [x] 7.2 Change the strict-equality block to only block forward skips (`index > currentStep`), allowing backward navigation (`client/src/routes/SurveyStepGuard.js:68`)
 - [x] 7.3 Restore/fix the conditional-block fallback-index logic (`client/src/routes/SurveyStepGuard.js:53-56`)
 - [x] 7.4 Restore the `navigate()` redirect calls now that the underlying logic is fixed (`client/src/routes/SurveyStepGuard.js:42,63,82`)
-- [ ] 7.5 Manually click through the survey to confirm forward-skip is blocked and backward navigation to a completed step is allowed
+- [x] 7.5 Manually click through the survey to confirm forward-skip is blocked and backward navigation to a completed step is allowed
 
 ## 8. Admin auth client consistency
 
