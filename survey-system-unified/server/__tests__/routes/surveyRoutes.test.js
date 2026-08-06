@@ -2,6 +2,24 @@
 import express from 'express';
 import request from 'supertest';
 import { jest } from '@jest/globals';
+// clientRoutes.js transitively loads config/env.js, whose top-level validation
+// exits the process when secrets are missing/invalid. Provide a valid env
+// (dotenv won't override already-set values) before importing the routes.
+Object.assign(process.env, {
+  PG_HOST: 'localhost',
+  PG_PORT: '5432',
+  PG_DATABASE: 'survey_test',
+  PG_USER: 'survey_user',
+  PORT: '5000',
+  NODE_ENV: 'test',
+  PG_PASSWORD: 'p'.repeat(32),
+  JWT_SECRET: 'j'.repeat(32),
+  SESSION_SECRET: 's'.repeat(32),
+  CRYPTO_SECRET: 'c'.repeat(32),
+  HMAC_SECRET: 'h'.repeat(32),
+});
+
+
 
 jest.unstable_mockModule('../../config/db.js', () => ({
   default: {
