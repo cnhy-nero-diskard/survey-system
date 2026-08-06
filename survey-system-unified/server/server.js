@@ -126,8 +126,12 @@ app.get('*', (req, res) => {
 // every route above it (including auth routes).
 app.use(errorHandler);
 
-const PORT = env.PORT;
-app.listen(PORT, () => {
-    logger.info(`Server is running on port ${PORT}`); // Log the actual port being used
-    logger.info(`Serving static files from: ${clientBuildPath}`);
-});
+export default app;
+
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  const PORT = env.PORT;
+  app.listen(PORT, () => {
+      logger.info(`Server is running on port ${PORT}`); // Log the actual port being used
+      logger.info(`Serving static files from: ${clientBuildPath}`);
+  });
+}
