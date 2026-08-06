@@ -5,11 +5,19 @@ Ensure session cookies are configured correctly per environment, CORS fails clos
 ## Requirements
 
 ### Requirement: Session cookies are environment-appropriate and consistent
-The system SHALL set the `secure` cookie attribute based on the runtime environment (not hardcoded false), set `sameSite` explicitly, and clear cookies on logout with the same attributes used to set them. The system SHALL validate that `SESSION_SECRET` is set at startup before the session middleware is initialized; if it is missing, the server SHALL exit with an error message naming the variable.
+The system SHALL set the `secure` cookie attribute based on the runtime environment (not hardcoded false) on both the express-session cookie (`connect.sid`) and the admin JWT cookie (`token`). The system SHALL set an explicit `sameSite` attribute on both cookies, and the `sameSite` value SHALL be consistent across all session/auth cookies. The system SHALL clear cookies on logout using the same attributes used to set them. The system SHALL validate that `SESSION_SECRET` is set at startup before the session middleware is initialized; if it is missing, the server SHALL exit with an error message naming the variable.
 
 #### Scenario: Login in production
 - **WHEN** a user logs in with `NODE_ENV=production`
-- **THEN** the session cookie is set with `secure: true` and an explicit `sameSite` value
+- **THEN** the admin JWT cookie is set with `secure: true` and an explicit `sameSite` value
+
+#### Scenario: Anonymous session cookie in production
+- **WHEN** the server starts with `NODE_ENV=production` and a client makes a request that creates an anonymous session
+- **THEN** the express-session cookie (`connect.sid`) is set with `secure: true` and an explicit `sameSite` value
+
+#### Scenario: Session cookie sameSite is explicit
+- **WHEN** the express-session middleware is configured
+- **THEN** the `cookie.sameSite` option is set to an explicit value (not omitted), matching the `sameSite` value used on the admin JWT cookie
 
 #### Scenario: Logout
 - **WHEN** a user logs out
