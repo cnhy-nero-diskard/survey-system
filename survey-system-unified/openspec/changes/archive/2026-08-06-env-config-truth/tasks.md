@@ -44,7 +44,7 @@
 
 ## 7. Verify and test
 
-- [ ] 7.1 Start server locally with `.env.development` and verify it starts without errors and connects to the DB
+- [x] 7.1 Start server locally with `.env.development` and verify it starts without errors and connects to the DB
 - [x] 7.2 Start server with a required variable missing (e.g., `JWT_SECRET` unset) and verify the error message lists the missing variable name
 - [x] 7.3 Start server with multiple required variables missing and verify the error message lists all missing variable names in one message
 - [x] 7.4 Verify no `process.env` reads remain in application code (excluding `node_modules`) by searching for `process.env` in `server/` directory
