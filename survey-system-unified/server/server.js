@@ -71,6 +71,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 day
       secure: env.NODE_ENV === 'production', // HTTPS-only in production
+      sameSite: 'lax',
     },
   })
 );
