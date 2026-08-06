@@ -29,7 +29,7 @@ try {
   pool = new pg.Pool(config);
   // Handle connection errors
   pool.on('error', (err, client) => {
-    console.error('Unexpected error on idle client', err);
+    logger.error('Unexpected error on idle client', err);
   });
 
   // Optional: Handle successful connection
@@ -38,7 +38,7 @@ try {
   });
 
 } catch (err) {
-  console.error('Failed to create database pool:', err);
+  logger.error('Failed to create database pool:', err);
   process.exit(1); // Exit with error code
 }
 

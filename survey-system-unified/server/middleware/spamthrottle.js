@@ -45,7 +45,7 @@ export const spamThrottle = async (req, res, next) => {
     // For users with low spam counter, proceed normally
     next();
   } catch (error) {
-    console.error('Error in spamThrottle middleware:', error);
+    logger.error('Error in spamThrottle middleware:', error);
     next(); // On error, proceed without throttling
   }
 };

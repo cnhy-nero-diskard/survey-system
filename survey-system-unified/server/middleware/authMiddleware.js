@@ -55,7 +55,7 @@ export const validateSurveyStep = async (req, res, next) => {
         res.status(404).json({ message: "User progress not found" });
       }
     } catch (err) {
-      console.error(err.message);
+      logger.error(err.message);
       res.status(500).send("Server error");
     }
   };
