@@ -5,9 +5,9 @@ services:
     image: postgres:15-alpine
     container_name: survey-db-prod
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -24,13 +24,15 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      CRYPTO_SECRET: ${CRYPTO_SECRET}
+      HMAC_SECRET: ${HMAC_SECRET}
       SESSION_SECRET: ${SESSION_SECRET}
-      # Add other production environment variables as needed
     ports:
       - "5000:5000"
     depends_on:
