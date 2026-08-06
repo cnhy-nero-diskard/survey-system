@@ -6,10 +6,9 @@ import pool from '../config/db.js';
 import { addHFToken, getHFTokenByLabel, getHFTokens } from '../services/hfTokenService.js';
 import { queryHuggingFace } from '../services/huggingFaceService.js';
 import { logEmitter } from '../middleware/logger.js';
-import dotenv from 'dotenv';
+import { env } from '../config/env.js';
 import { createEstablishmentService, createLocalizationService, createSentimentAnalysisService, createSurveyFeedbackService, createSurveyResponseService, createTourismAttractionService, deleteEstablishmentService, deleteLocalizationService, deleteSentimentAnalysisService, deleteSurveyFeedbackService, deleteSurveyResponseService, deleteTourismAttractionService, fetchAllTouchpointsService, fetchEstablishmentsService, fetchEstTypes, fetchLocalizationsService, fetchLocationsWithFilterService, fetchSentimentAnalysisService, fetchSurveyFeedbackService, fetchSurveyResponsesService, fetchTourismAttractionsService, fetchTranslatedTouchpointService, insertTopicDataService, updateEstablishmentService, updateLocalizationService, updateSentimentAnalysisService, updateSurveyFeedbackService, updateSurveyResponseService, updateTourismAttractionService } from '../services/adminCRUD.js';
 import { calculateAverageCompletionTimeService, fetchAllFinishedRows, fetchAndGroupFinishedSurveyResponsesByMonthService, fetchByAgeGroup, fetchByCountryResidence, fetchByGender, fetchByNationality, fetchByTimeOfDay, fetchEntityinSurveyFeedbackService, fetchTouchpointsService, fetchUnfinishedSurveys, getAllSurveyTally, getAllSurveyTallyPaginated, getSentimentAnalysis, getSentimentLocation, getSurveyResponseByTopic, groupByLikertRatingService } from '../services/analyticsCRUD.js';
-dotenv.config();
 
 export const getAdminData = async (req, res, next) => {
   logger.info("GET /api/admin/data");
@@ -125,7 +124,7 @@ export const analyzeSentiment = async (req, res) => {
     }
 
     // Call the Hugging Face API
-    const analysisResult = await queryHuggingFace(text, apiToken, process.env.BERTSENT_ENDPOINT);
+    const analysisResult = await queryHuggingFace(text, apiToken, env.BERTSENT_ENDPOINT);
 
     // Return the analysis result to the frontend
     res.json(analysisResult);
@@ -141,7 +140,7 @@ export const analyzeTopics = async (req, res) => {
   const tokenLabel = req.body.tokenLabel;
   logger.info(`Analyzing topics: ${text}`);
   logger.info(`Using API token label: ${tokenLabel}`);
-  logger.info(`Using endpoint: ${process.env.BERTOPIC_ENDPOINT}`)
+  logger.info(`Using endpoint: ${env.BERTOPIC_ENDPOINT}`)
   try {
     // Fetch the decrypted API token from the database using the label
     const apiToken = await getHFTokenByLabel(tokenLabel); // Ensure this function is implemented in hfTokenService.js
@@ -150,7 +149,7 @@ export const analyzeTopics = async (req, res) => {
       return res.status(400).json({ error: 'Invalid API token label' });
     }
 
-    const analysisResult = await queryHuggingFace(text, apiToken, process.env.BERTOPIC_ENDPOINT);
+    const analysisResult = await queryHuggingFace(text, apiToken, env.BERTOPIC_ENDPOINT);
 
     // Return the analysis result to the frontend
     res.json(analysisResult);
@@ -187,11 +186,11 @@ export const autoAnalyzeSentimentController = async (req, res) => {
     const combinedText = relevantFeedback.rows.map(row => row.response_value).join('\n');
     logger.info(`Analyzing sentiment for ${relevantFeedback.rows.length} responses`);
 
-    if (!process.env.BERTSENT_ENDPOINT) {
+    if (!env.BERTSENT_ENDPOINT) {
       throw new Error('BERT sentiment analysis endpoint not configured');
     }
 
-    const analysisResults = await queryHuggingFace(combinedText, apiToken, process.env.BERTSENT_ENDPOINT);
+    const analysisResults = await queryHuggingFace(combinedText, apiToken, env.BERTSENT_ENDPOINT);
 
     if (!Array.isArray(analysisResults)) {
       throw new Error(`Unexpected API response format: ${JSON.stringify(analysisResults)}`);
@@ -251,7 +250,7 @@ export const autoAnalyzeSentimentController = async (req, res) => {
     res.status(500).json({ 
       error: 'Failed to analyze sentiment', 
       details: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      stack: env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
 };
@@ -283,7 +282,7 @@ export const autoClassifyRelevanceController = async (req, res) => {
     logger.info(`Classifying relevance for ${unknownFeedback.rows.length} responses`);
 
     // Send to Hugging Face
-    const analysisResults = await queryHuggingFace(combinedText, apiToken, process.env.BERTRCLS_ENDPOINT);
+    const analysisResults = await queryHuggingFace(combinedText, apiToken, env.BERTRCLS_ENDPOINT);
 
     // Verify we got the same number of results back
     if (analysisResults.length !== unknownFeedback.rows.length) {
@@ -325,7 +324,7 @@ export const logstream = async (req, res, next) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL); // Explicitly allow your React app's origin
+  res.setHeader('Access-Control-Allow-Origin', env.FRONTEND_URL); // Explicitly allow your React app's origin
   res.setHeader('Access-Control-Allow-Credentials', 'true'); // Allow credentials (if needed)
 
   const sendLog = (log) => {

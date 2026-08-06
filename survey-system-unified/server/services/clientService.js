@@ -1,8 +1,9 @@
 // services/clientService.js
 import pool from '../config/db.js';
+import { env } from '../config/env.js';
 
 export const getMunicipalitiesFromDB = async () => {
-  const tablemunquery = `SELECT * FROM ${process.env.PG_MUNICIPALITIES}`;
+  const tablemunquery = `SELECT * FROM ${env.PG_MUNICIPALITIES}`;
   const result = await pool.query(tablemunquery);
   return result.rows;
 };
@@ -13,7 +14,7 @@ export const getLanguagesFromDB = async () => {
 };
 
 export const getTextsFromDB = async (language, component) => {
-  const query = `SELECT key, textcontent FROM ${process.env.PG_LOCALIZATION} WHERE language_code = $1 AND component = $2`;
+  const query = `SELECT key, textcontent FROM ${env.PG_LOCALIZATION} WHERE language_code = $1 AND component = $2`;
   const result = await pool.query(query, [language, component]);
   return result.rows;
 };

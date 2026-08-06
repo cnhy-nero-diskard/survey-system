@@ -2,7 +2,6 @@
 // server.js
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import clientRoutes from './routes/clientRoutes.js';
@@ -21,6 +20,7 @@ import pgSession from 'connect-pg-simple';
 import { logstream } from './controllers/adminController.js';
 import { spamThrottle } from './middleware/spamthrottle.js';
 import { authenticate, authorizeAdmin } from './middleware/authMiddleware.js';
+import { env } from './config/env.js';
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -28,17 +28,6 @@ const __dirname = path.dirname(__filename);
 
 // Define client build path for static file serving
 const clientBuildPath = path.join(__dirname, '../client/build');
-
-// Load environment variables first
-dotenv.config();
-
-// Check for required environment variables but make FRONTEND_URL optional for unified deployment
-const requiredEnvVars = ['PORT'];
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    throw new Error(`Environment variable ${envVar} is not set`);
-  }
-}
 
 const PgSession = pgSession(session);
 const app = express();
@@ -54,7 +43,7 @@ app.use(helmet());
 // cross-origin allowance is needed; defaulting to `true` would reflect any
 // origin while credentials are enabled, defeating same-origin protection.
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || false,
+  origin: env.FRONTEND_URL || false,
   credentials: true, // Allow cookies to be sent
 };
 app.use(cors(corsOptions));
@@ -76,12 +65,12 @@ app.use(
       pool: pool, // Provide the pool object from the database connection
       tableName: 'anonymous_session', // Name of the table to store sessions (default is "session")
     }),
-    secret: process.env.SESSION_SECRET, // Replace with a secure secret
+    secret: env.SESSION_SECRET, // Replace with a secure secret
     resave: false,
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 day
-      secure: process.env.NODE_ENV === 'production', // HTTPS-only in production
+      secure: env.NODE_ENV === 'production', // HTTPS-only in production
     },
   })
 );
@@ -93,7 +82,7 @@ app.use(spamThrottle);
 app.use('/api/log-stream', authenticate, authorizeAdmin, logstream);
 
 // Serve static files from React build (in production)
-if (process.env.NODE_ENV === 'production') {
+if (env.NODE_ENV === 'production') {
   app.use(express.static(clientBuildPath));
   logger.info(`Serving static files from: ${clientBuildPath}`);
 }
@@ -136,7 +125,7 @@ app.get('*', (req, res) => {
 // every route above it (including auth routes).
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000; // Use environment variable PORT or default to 5000
+const PORT = env.PORT;
 app.listen(PORT, () => {
     logger.info(`Server is running on port ${PORT}`); // Log the actual port being used
     logger.info(`Serving static files from: ${clientBuildPath}`);
