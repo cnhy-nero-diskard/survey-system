@@ -3,8 +3,27 @@ import rateLimit from 'express-rate-limit';
 import pool from '../config/db.js';
 import logger from './logger.js';
 
+const highTierLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  keyGenerator: (req) => req.session.anonymousUserId,
+  message: 'You are being rate limited due to excessive activity',
+  handler: (req, res) => {
+    res.status(429).json({
+      error: 'Too many requests - your account has been temporarily throttled due to excessive activity'
+    });
+  }
+});
+
+const moderateTierLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 15,
+  keyGenerator: (req) => req.session.anonymousUserId,
+  message: 'You are approaching rate limits due to high activity'
+});
+
 export const spamThrottle = async (req, res, next) => {
-    logger.info('SPAM MIDDLEWARE');
+  logger.info('SPAM MIDDLEWARE');
   try {
     // Get the anonymous user ID from session
     const anonymousUserId = req.session.anonymousUserId;
@@ -24,23 +43,10 @@ export const spamThrottle = async (req, res, next) => {
     // Apply different rate limits based on spam counter
     if (spamCounter >= 40) {
       logger.warn(`SPAM User ${anonymousUserId} is being rate limited due to high spam counter: ${spamCounter}`);
-      return rateLimit({
-        windowMs: 60 * 1000, // 1 minute
-        max: 5, // allow 5 requests per minute
-        message: 'You are being rate limited due to excessive activity',
-        handler: (req, res) => {
-          res.status(429).json({
-            error: 'Too many requests - your account has been temporarily throttled due to excessive activity'
-          });
-        }
-      })(req, res, next);
+      return highTierLimiter(req, res, next);
     } else if (spamCounter >= 20) {
-       logger.warn(`SPAM User ${anonymousUserId} will be rate limited due to high spam counter: ${spamCounter}`);
-      return rateLimit({
-        windowMs: 60 * 1000, // 1 minute
-        max: 15, // allow 15 requests per minute
-        message: 'You are approaching rate limits due to high activity'
-      })(req, res, next);
+      logger.warn(`SPAM User ${anonymousUserId} will be rate limited due to high spam counter: ${spamCounter}`);
+      return moderateTierLimiter(req, res, next);
     }
     // For users with low spam counter, proceed normally
     next();
