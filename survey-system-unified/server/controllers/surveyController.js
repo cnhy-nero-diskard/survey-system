@@ -53,7 +53,7 @@ export const fetchSurveyResponsesController = async (req, res, next) => {
         // Scope strictly to the caller's own server-side session identity. The
         // `:user_id` URL param is untrusted and intentionally ignored — trusting
         // it previously allowed any client to read another user's responses (IDOR).
-        const anonymousUserId = req.session?.anonymousUserId || req.cookies?.anonymousUserId;
+        const anonymousUserId = req.session?.anonymousUserId;
         if (!anonymousUserId) {
             return res.status(401).json({ error: 'No session identity' });
         }
