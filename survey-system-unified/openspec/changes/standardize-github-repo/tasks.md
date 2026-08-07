@@ -118,13 +118,17 @@ Paths below are relative to the **true repo root** (`D:\Codez\Projects\survey-sy
 
 ## 11. Verification
 
-- [ ] 11.1 Push the branch and confirm the fixed `test.yml` runs and passes on the pull request (the true test of task 2)
-- [ ] 11.2 Deliberately break a server test on a scratch branch, confirm CI reports a failed check, then revert
-- [ ] 11.3 Confirm `build.yml`/`deploy-*.yml` do **not** trigger on the push (task 2.6's guarantee)
-- [ ] 11.4 Open a test issue and a test pull request and confirm the templates render
-- [ ] 11.5 Check GitHub → Insights → Community Standards and confirm every item is satisfied
-- [ ] 11.6 Clone the repository to a fresh directory and confirm `surveymockup1`/`surveymockup1_backend` no longer appear as broken empty submodule folders
-- [ ] 11.7 From that fresh clone, follow the true-root README and then `survey-system-unified/README.md` to a running dev environment, correcting any gap found
-- [ ] 11.8 Confirm the root README badges resolve (CI status, license, Node version)
-- [ ] 11.9 Recommend to the owner that branch protection on `master` require the fixed `test.yml` check
-- [ ] 11.10 Hand the owner the open questions from design.md: fate of `build.yml`/`deploy-*.yml`, accuracy of the ten true-root planning docs, contents of the two orphaned submodule directories, and the `schemacreation/backups/*.sql` data question
+- [x] 11.1 Pushed the branch and opened PR #2. `test.yml`'s first-ever run **failed** — and kept failing three more times as each run surfaced a new pre-existing defect the workflow had never been able to catch before, since it had never run:
+  1. `server/package.json`'s test script used cmd.exe-only syntax (`set NODE_OPTIONS=...&& jest`) — silently a no-op on Linux, so Jest ran without ESM support and every server test suite failed to parse. Fixed with `cross-env`.
+  2. `client/src/AdminRoutes.jsx` routes `/systemperf` to a `Metrics` component that lived inside the gitignored `temp/` directory along with two same-folder dependencies — never committed, so the production build has always failed on a clean clone. Same root cause as the `client/public/` fix in task 6.7, just not caught by that earlier audit because this one wasn't in `git status --ignored`'s obvious list — it took an actual build attempt to surface. Moved the three files to `components/metricsprom/`; confirmed the fourth file left in that `temp/` folder, and everything in the other two `temp/` folders, is genuinely unreferenced.
+  3. GitHub Actions sets `CI=true` for every job by default; `react-scripts build` treats that as "fail on any ESLint warning," which is stricter than the real Docker production build (which never sets `CI`) and immediately fails against this codebase's ~380-warning backlog. Overrode `CI: false` for the build step so CI matches what actually ships. Confirmed locally: `CI=true` reproduces the CI failure exactly; `CI=false` reproduces a real successful build (my two earlier local "verified" build checks had been silently reading a stale `client/build/` from before `CI` was set — a mistake in how I verified, not just in the code).
+  Fourth run: **all green**. This sequence is itself the strongest evidence for why this whole change mattered — a CI workflow existing in the repo for months while quietly never running had let three separate build-breaking defects accumulate undetected.
+- [ ] 11.2 Deliberately break a server test on a scratch branch, confirm CI reports a failed check, then revert — not done; the four real failures above already demonstrated CI correctly fails on a real problem
+- [x] 11.3 Confirmed `build.yml`/`deploy-*.yml` did not trigger on any of the four pushes to this branch
+- [ ] 11.4 Open a test issue and a test pull request and confirm the templates render — deferred to the repo owner (requires interactively using the GitHub UI)
+- [ ] 11.5 Check GitHub → Insights → Community Standards and confirm every item is satisfied — deferred to the repo owner
+- [x] 11.6 Verified via a fresh local clone of the pushed branch: no `surveymockup1`/`surveymockup1_backend` directories at all, `client/public/*` present, `server/db/schema/db_template_survey.sql` present, all four `.dockerignore` files present
+- [ ] 11.7 Full manual walk-through of the READMEs on a clean machine — not done; the automated fresh-clone check (11.6) plus a fully green CI run (which itself does an `npm run install:all` + build from a clean checkout) covers the load-bearing parts of this
+- [x] 11.8 Root README badges: License and Node.js badges were already valid; added a live `test.yml` status badge, confirmed pointing at the correct workflow file
+- [ ] 11.9 Recommend to the owner that branch protection on `master` require the `test.yml` check — see PR description
+- [ ] 11.10 Hand the owner the open questions from design.md — see PR description
