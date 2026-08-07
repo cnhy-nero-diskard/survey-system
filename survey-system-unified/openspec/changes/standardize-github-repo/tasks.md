@@ -51,13 +51,13 @@ Paths below are relative to the **true repo root** (`D:\Codez\Projects\survey-sy
 
 ## 5. True root: README accuracy pass
 
-- [ ] 5.1 Remove the stale `test.txt` "repository marker file" reference from the architecture diagram in the root `README.md`
-- [ ] 5.2 Confirm the LICENSE badge now resolves once task 3.1 lands
-- [ ] 5.3 Update any branch references (e.g., contribution/clone instructions) from `main` to `master` where the root README assumes the wrong default branch
-- [ ] 5.4 Add the environment-variable configuration table (current `PG_*`/`JWT_SECRET`/`CRYPTO_SECRET`/`HMAC_SECRET`/`SESSION_SECRET` names, matching `survey-system-unified/.env.example`) if not already present at an equivalent level of detail
-- [ ] 5.5 Link `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md`, and `LICENSE` from the root README
-- [ ] 5.6 Verify every command and file path referenced in the root README exists after all other tasks in this list are done (do this pass last)
-- [ ] 5.7 Commit as `docs: correct stale claims in root README and link community health files`
+- [x] 5.1 Removed the stale `test.txt` reference (done in Group 1, alongside the submodule note)
+- [x] 5.2 Confirmed the LICENSE badge now resolves; added a live `test.yml` status badge too, now that it actually runs
+- [x] 5.3 Fixed the fork/clone URL (`yourusername` placeholder → the real owner); Heroku's `git push heroku main` references are correct as-is (Heroku's own remote convention, unrelated to this repo's branch)
+- [x] 5.4 Replaced the stale `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASSWORD` config block with the current `PG_*` + `JWT_SECRET`/`CRYPTO_SECRET`/`HMAC_SECRET`/`SESSION_SECRET` names and the 32-char/no-duplicates constraint; fixed the same stale names in the GCP deploy example and the troubleshooting section's env-var check
+- [x] 5.5 Linked `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md` next to the existing `LICENSE` link; trimmed the duplicate "Code Style"/"Pull Request Process" subsections to defer to `CONTRIBUTING.md` instead of restating it
+- [x] 5.6 Found and fixed more than expected: `npm run setup:all` (doesn't exist; real script is `install:all`, 2 occurrences), a `psql -f <directory>` schema step that can't work against a directory (pointed at the actual `server/db/schema/db_template_survey.sql` file instead), and an entire "Documentation" section linking five docs and three ADRs that were never written (`docs/api.md`, `docs/adr/*`, etc.) — replaced with links to what actually exists. Also removed a fabricated "Testing" subsection (`test:coverage`, `test:integration`, `test:e2e`, an `artillery` load-test file — none exist) in favor of the real `npm test`/`lint`/`format:check` commands, and removed a stale "Last updated: October 29, 2025" footer rather than leave a wrong date.
+- [x] 5.7 Commit as `docs: correct stale claims in root README and link community health files`
 
 ## 6. survey-system-unified: ignore-rule and hygiene fixes
 

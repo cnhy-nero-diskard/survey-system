@@ -2,6 +2,7 @@
 
 please note: repo is in active WIP
 
+[![Tests](https://github.com/cnhy-nero-diskard/survey-system/actions/workflows/test.yml/badge.svg)](https://github.com/cnhy-nero-diskard/survey-system/actions/workflows/test.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18+-blue.svg)](https://reactjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-blue.svg)](https://postgresql.org/)
@@ -64,7 +65,7 @@ cp .env.example .env
 # Edit .env with your database credentials
 
 # Install dependencies and start
-npm run setup:all
+npm run install:all
 npm run dev          # Development mode
 # or
 npm run build        # Production build
@@ -186,29 +187,34 @@ Authentication:
    ```
 
 2. **Environment Variables**
+
+   For `survey-system-unified` (see `survey-system-unified/.env.example` for the
+   authoritative list):
    ```bash
-   # Required for all deployments
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_NAME=survey_db
-   DB_USER=survey_user
-   DB_PASSWORD=your_password
-   SESSION_SECRET=your_secure_session_key
+   # Required
+   PG_HOST=localhost
+   PG_PORT=5432
+   PG_DATABASE=survey_db
+   PG_USER=survey_user
+   PG_PASSWORD=your_password
+   JWT_SECRET=<openssl rand -base64 32>
+   CRYPTO_SECRET=<openssl rand -base64 32>
+   HMAC_SECRET=<openssl rand -base64 32>
+   SESSION_SECRET=<openssl rand -base64 32>
    PORT=5000
-   
-   # Optional: External API integrations
+
+   # Optional: external integrations
    SENDGRID_API_KEY=your_sendgrid_key
    HF_TOKEN_1=hugging_face_token_1
    HF_TOKEN_2=hugging_face_token_2
    ```
+   `JWT_SECRET`, `CRYPTO_SECRET`, `HMAC_SECRET`, and `SESSION_SECRET` must each
+   be at least 32 characters and must all be distinct — server startup
+   validation rejects short or duplicated values.
 
 3. **Database Schema**
    ```bash
-   # Navigate to backend directory
-   cd surveymockup1_backend
-   
-   # Run schema creation scripts
-   psql -U survey_user -d survey_db -f localization_queries/schemacreation/
+   psql -U survey_user -d survey_db -f survey-system-unified/server/db/schema/db_template_survey.sql
    ```
 
 ### Development Workflow
@@ -263,7 +269,7 @@ gcloud run deploy survey-system \
   --image gcr.io/YOUR_PROJECT/survey-system \
   --platform managed \
   --port 5000 \
-  --set-env-vars NODE_ENV=production,DB_HOST=your_db_host
+  --set-env-vars NODE_ENV=production,PG_HOST=your_db_host
 ```
 </details>
 
@@ -359,46 +365,15 @@ The system supports comprehensive localization:
 
 ## 🧪 Testing
 
-### Test Coverage
-
-**Frontend Tests:**
-```bash
-cd surveymockup1 # or survey-system-unified/client
-npm test                      # Jest + React Testing Library
-npm run test:coverage         # Coverage reports
-```
-
-**Backend Tests:**
-```bash
-cd surveymockup1_backend # or survey-system-unified/server  
-npm test                      # Jest + Supertest
-npm run test:integration      # Integration tests
-```
-
-**End-to-End Tests:**
 ```bash
 cd survey-system-unified
-npm run test:e2e             # Full user journey tests
+npm test              # runs both the server (Jest) and client suites
+npm run lint          # ESLint across client/src and server
+npm run format:check  # Prettier check
 ```
 
-### Performance Testing
-
-**Load Testing:**
-```bash
-# Install artillery
-npm install -g artillery
-
-# Run load tests
-artillery run tests/load-test.yml
-```
-
-**Database Performance:**
-```sql
--- Monitor slow queries
-SELECT query, calls, total_time, mean_time 
-FROM pg_stat_statements 
-ORDER BY total_time DESC;
-```
+There is currently no end-to-end, integration, or load-testing setup — if you
+add one, update this section and `CONTRIBUTING.md` to match.
 
 ## 📝 API Documentation
 
@@ -453,7 +428,7 @@ GET /api/admin/fetch
 
 1. **Fork and Clone**
    ```bash
-   git clone https://github.com/yourusername/survey-system.git
+   git clone https://github.com/cnhy-nero-diskard/survey-system.git
    cd survey-system
    ```
 
@@ -461,7 +436,7 @@ GET /api/admin/fetch
    ```bash
    # Unified development (recommended)
    cd survey-system-unified
-   npm run setup:all
+   npm run install:all
    
    # Separate development
    # Set up both surveymockup1 and surveymockup1_backend
@@ -472,36 +447,17 @@ GET /api/admin/fetch
    git checkout -b feature/your-feature-name
    ```
 
-### Code Style
-
-- **Frontend**: ESLint + Prettier configuration
-- **Backend**: StandardJS or ESLint
-- **Database**: SQL formatting standards
-- **Commits**: Conventional commit messages
-
-### Pull Request Process
-
-1. Update documentation for any new features
-2. Add tests for new functionality
-3. Ensure all tests pass
-4. Update version numbers if needed
-5. Create detailed PR description
+See [CONTRIBUTING.md](CONTRIBUTING.md) for code style, commit conventions,
+and the full pull request process.
 
 ## 📚 Documentation
 
-### Additional Resources
+- **[survey-system-unified/docs/](survey-system-unified/docs/)** — AI-agent operating guidelines, admin provisioning, and audit reports for the active codebase
+- **[scripts/README.md](scripts/README.md)** — database setup script reference
+- **[.github/workflows/README.md](.github/workflows/README.md)** — CI/CD workflow reference
 
-- **[API Reference](docs/api.md)** - Complete API documentation
-- **[Database Schema](docs/database.md)** - Table structures and relationships
-- **[Deployment Guide](docs/deployment.md)** - Platform-specific deployment instructions
-- **[Localization Guide](docs/localization.md)** - Adding new languages and content
-- **[Analytics Guide](docs/analytics.md)** - Using the reporting features
-
-### Architecture Decisions
-
-- **[ADR-001](docs/adr/001-unified-deployment.md)** - Unified vs Separate Deployment
-- **[ADR-002](docs/adr/002-database-design.md)** - Database Schema Design
-- **[ADR-003](docs/adr/003-authentication.md)** - Authentication Strategy
+A dedicated API reference, database schema doc, and architecture decision
+records don't exist yet. If you write one, link it here.
 
 ## 🐛 Troubleshooting
 
@@ -518,7 +474,7 @@ systemctl status postgresql
 psql -U survey_user -d survey_db -c "SELECT NOW();"
 
 # Check environment variables
-echo $DB_HOST $DB_USER $DB_NAME
+echo $PG_HOST $PG_USER $PG_DATABASE
 ```
 </details>
 
@@ -575,6 +531,8 @@ curl http://localhost:5000/api/health
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+See also: [CONTRIBUTING.md](CONTRIBUTING.md) · [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · [SECURITY.md](SECURITY.md) · [CHANGELOG.md](CHANGELOG.md)
+
 ## 🙏 Acknowledgments
 
 - **Tourism Research Team** - Original requirements and testing
@@ -588,7 +546,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Issues**: [GitHub Issues](https://github.com/cnhy-nero-diskard/survey-system/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/cnhy-nero-diskard/survey-system/discussions)
-- **Documentation**: Check the `/docs` directory for detailed guides
+- **Documentation**: see the [Documentation](#-documentation) section above
 
 ### Reporting Bugs
 
@@ -610,5 +568,3 @@ Feature requests are welcome! Please:
 ---
 
 **Built with ❤️ for the tourism industry**
-
-*Last updated: October 29, 2025*
