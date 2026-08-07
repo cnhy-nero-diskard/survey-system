@@ -32,11 +32,15 @@ This repository contains three different deployment approaches:
 ### Current Repository Structure
 ```
 survey-system/
-├── surveymockup1/              # Original React Frontend
-├── surveymockup1_backend/      # Original Node.js Backend  
-├── survey-system-unified/      # NEW: Unified Deployment (Recommended)
-└── test.txt                   # Repository marker file
+├── surveymockup1/              # Original React Frontend (legacy, superseded)
+├── surveymockup1_backend/      # Original Node.js Backend (legacy, superseded)
+└── survey-system-unified/      # NEW: Unified Deployment (Recommended)
 ```
+
+`surveymockup1/` and `surveymockup1_backend/` are kept on disk for reference only.
+They are no longer tracked in git (they were broken submodule references with no
+`.gitmodules` file, so a fresh clone never actually populated them) — use
+`survey-system-unified/` for all current work.
 
 ### Deployment Options
 
