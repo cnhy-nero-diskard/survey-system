@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ master ]
 
 jobs:
   test:
@@ -30,14 +30,20 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
+        node-version-file: survey-system-unified/.nvmrc
         cache: npm
         cache-dependency-path: survey-system-unified/package-lock.json
-    
+
     - name: Install dependencies
       working-directory: survey-system-unified
-      run: npm run install:all
-    
+      run: |
+        npm install
+        npm run install:all
+
+    - name: Lint
+      working-directory: survey-system-unified
+      run: npm run lint -- --max-warnings 387
+
     - name: Initialize test database
       env:
         PGHOST: localhost
@@ -46,21 +52,28 @@ jobs:
         PGDATABASE: survey_system_test
         PGPORT: 5432
       run: |
-        psql < survey-system-unified/context/db_template_survey.sql
-    
+        psql < survey-system-unified/server/db/schema/db_template_survey.sql
+
     - name: Run server tests
-      working-directory: survey-system-unified
+      working-directory: survey-system-unified/server
       env:
         NODE_ENV: test
-        DB_HOST: localhost
-        DB_USER: postgres
-        DB_PASSWORD: test_password
-        DB_NAME: survey_system_test
-        DB_PORT: 5432
-        SESSION_SECRET: test_secret_key_for_ci_testing_only
+        PG_HOST: localhost
+        PG_USER: postgres
+        PG_PASSWORD: test_password
+        PG_DATABASE: survey_system_test
+        PG_PORT: 5432
+        SESSION_SECRET: test_secret_key_for_ci_testing_only_0001
+        JWT_SECRET: test_secret_key_for_ci_testing_only_0002
+        CRYPTO_SECRET: test_secret_key_for_ci_testing_only_0003
+        HMAC_SECRET: test_secret_key_for_ci_testing_only_0004
       run: npm test -- --passWithNoTests --bail
       timeout-minutes: 10
-    
+
+    - name: Run client tests
+      working-directory: survey-system-unified/client
+      run: npm test -- --watchAll=false --passWithNoTests
+
     - name: Build frontend
       working-directory: survey-system-unified
       run: npm run client:build
