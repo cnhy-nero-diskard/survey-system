@@ -1,5 +1,7 @@
 ## Context
 
+**Scope correction, discovered mid-implementation:** `survey-system-unified/` is not the git repository root. The real root is `D:\Codez\Projects\survey-system\`, one level up, and it already contains a `.github/` directory (five workflows targeting a `main` branch that doesn't exist — this repo has only `master`), an extensive root `README.md`, ten other planning/handoff documents, and two orphaned submodule gitlinks (`surveymockup1/`, `surveymockup1_backend/`) with no `.gitmodules`. Everything below that was written against the original (incomplete) picture still applies to the `survey-system-unified/` subtree; it has been supplemented, not replaced, with decisions 11–13 covering the true root.
+
 `survey-system-unified` is a three-manifest npm project — root orchestrator, `client` (Create React App 5, React 18), `server` (Express 4, ESM, PostgreSQL) — merged from two previously separate deployments to cut hosting cost. It runs in production against real survey data, which is why `AI_AGENT_README.md` exists and warns against schema and API-contract changes.
 
 Current state relevant to this change:
@@ -121,6 +123,24 @@ Use `git mv` for all moves so history follows the files.
 
 **Rationale:** Revocation requires authenticated access to the owner's GitHub account. It must be done by a person. Rewriting the remote before revoking would create a false sense of safety — the token string has already been exposed in local config and shell history, so rotation is the actual fix and the URL change is only cleanup. Ordering matters: revoke first, then re-point the remote.
 
+### 11. Fix `test.yml` in place; leave the four deploy/build workflows alone
+
+**Decision:** Edit `.github/workflows/test.yml` at the true root: change the branch trigger from `[main, develop]` to `[master]`, replace `DB_HOST`/`DB_USER`/`DB_NAME`/`DB_PASSWORD`/`DB_PORT` with `PG_HOST`/`PG_USER`/`PG_DATABASE`/`PG_PASSWORD`/`PG_PORT`, add `JWT_SECRET`/`CRYPTO_SECRET`/`HMAC_SECRET` (CI-only throwaway values — this workflow already sets a throwaway `SESSION_SECRET`), update the schema-template path to `survey-system-unified/server/db/schema/db_template_survey.sql`, and add a lint step. Do not touch `build.yml`, `deploy-gcp.yml`, `deploy-do.yml`, `manual-deploy-gcp.yml`.
+
+**Rationale:** `test.yml` only runs tests and uploads coverage — flipping its dead `main` trigger to `master` has no side effect beyond "CI now runs." The other four workflows push Docker images and deploy to GCP/DigitalOcean; flipping their trigger to `master` would make every push attempt a real external action the moment matching secrets exist in the repo (some may already be configured — this change does not audit GitHub's secret store). That is an infrastructure/ops decision — which cloud target is actually current, whether Docker Hub publishing is wanted on every push — that belongs to the repository owner, not to a repo-hygiene pass. Reactivating a deploy pipeline as a side effect of "standardize the repo" would violate the instruction to match the scope of changes to what was asked.
+
+**Alternative considered:** Delete the four dormant workflows outright. Rejected — deleting represents a bigger decision (abandoning GCP/DO as deploy targets) than this change has the authority or context to make; `.github/workflows/README.md` documents them as intentional, if unconfigured, options.
+
+### 12. De-register the orphaned submodules, don't delete their working directories
+
+**Decision:** Run `git rm --cached surveymockup1 surveymockup1_backend` at the true root to remove the gitlink entries from the index. Leave the actual directories on disk untouched (they become untracked, ordinary directories).
+
+**Rationale:** `git ls-files -s` shows both as mode `160000` gitlinks with no `.gitmodules` — so `git submodule update --init` has never worked and a fresh clone gets two empty folders. The root README already frames `survey-system-unified/` as their replacement ("NEW: Unified Deployment (Recommended)"), confirmed by the user. De-registering fixes the clone-time defect immediately. Deleting the working directories outright goes further than "fix the git metadata" and risks destroying whatever is actually inside them (each has its own `.git`, meaning they carry their own history) without the owner having looked — that decision is left to a follow-up task, not automated here.
+
+### 13. Update the true-root README in place; keep `survey-system-unified/README.md` as a package-level pointer
+
+**Decision:** The true-root `README.md` already has badges, a feature list, and an architecture explanation of the three deployment approaches — decision 9's plan to "write the root README from scratch" applies to the wrong file. Instead: fix its stale claims (a `test.txt` "repository marker file" that no longer exists, the LICENSE badge that will now resolve once `LICENSE` is added, and branch references), and add the configuration-variable table and schema/certs setup detail originally planned for `survey-system-unified/README.md`. `survey-system-unified/README.md`, `server/README.md`, and `client/README.md` become shorter package-level READMEs that link back to the true root for anything already covered there — consistent with the `project-documentation` spec's existing requirement that package READMEs defer to the root.
+
 ## Risks / Trade-offs
 
 - **CI turns red immediately on existing lint violations, and the repository looks broken from day one** → The warn-ratchet in decision 3 sets `--max-warnings` to the measured current count, so the first CI run is green by construction. Record the count in `CONTRIBUTING.md` so the intent to drive it down is visible.
@@ -163,3 +183,8 @@ Out of band, by the repository owner, before or alongside step 1: revoke the exp
 - **Contact address for `SECURITY.md` and `CODE_OF_CONDUCT.md`** — needs a real, monitored address.
 - **Is the repository intended to become public?** If yes, `AI_AGENT_README.md`'s description of production data handling and the `certs/` arrangement should be reviewed before the visibility flip. If it stays private, the community-health files are still worth having but the urgency of the secret-scanning work is lower.
 - **Should branch protection require the new CI checks on `master`?** Recommended once CI is confirmed green, but it is a repository setting, not a file, and so cannot be delivered by this change.
+- **Are `build.yml`, `deploy-gcp.yml`, `deploy-do.yml`, `manual-deploy-gcp.yml` still wanted?** They are stale (dead `main` trigger, likely-unconfigured secrets) but not obviously abandoned. Owner should decide: fix them the same way `test.yml` was fixed, or delete them, or leave dormant.
+- **Are the ten true-root planning docs (`ARCHITECTURE.md`, `HANDOFF.md`, `TEAM_HANDOFF.md`, etc.) still accurate, or superseded by `survey-system-unified/docs/`?** Several predate the recent security hardening and env-var rename; out of scope for this change but worth a dedicated audit.
+- **What is actually inside `surveymockup1/` and `surveymockup1_backend/`?** Each carries its own `.git` history. Confirm nothing there is needed before deleting the working directories from disk (this change only removes the broken gitlink, not the directories).
+- **Should `client/src copy/` be deleted?** Discovered while wiring up ESLint (task 8.6): a git-tracked, 8-file duplicate of parts of `client/src` with a literal space in its directory name, not referenced by any import. Almost certainly an accidental OS-level copy-paste that got committed. Excluded from lint/format rather than deleted, since deleting tracked files is a bigger call than "add lint config." Recommend the owner confirm and delete it.
+- **Two ESLint findings in `client/src` warrant a human look, not a mechanical fix**: `GradientBackground.jsx` has `{true && (...)}` (`no-constant-binary-expression`) — looks like a debug override that was never reverted; `AttractionsFeedback.jsx` and `PackageTourFeedback.jsx` destructure `({ })` from their props (`no-empty-pattern`) — possibly a forgotten prop. Left as warnings rather than guessed-at fixes, since either could reflect intentional behavior this change has no way to verify.

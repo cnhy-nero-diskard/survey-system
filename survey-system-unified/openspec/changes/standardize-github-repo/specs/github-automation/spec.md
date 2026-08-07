@@ -1,31 +1,50 @@
 ## ADDED Requirements
 
-### Requirement: Continuous integration workflow
-The repository SHALL contain a GitHub Actions workflow at `.github/workflows/ci.yml` that runs on pushes to the default branch and on every pull request, and that installs dependencies, lints, tests, and builds both the `client` and `server` packages.
+### Requirement: Continuous integration workflow actually triggers and passes
+The repository already contains a GitHub Actions test workflow at `.github/workflows/test.yml` (true repo root). It SHALL trigger on the repository's actual default branch and on every pull request, and SHALL install dependencies, lint, test, and build against the codebase's current configuration rather than a stale one.
 
 #### Scenario: CI runs on pull requests
-- **WHEN** a pull request is opened against the default branch
-- **THEN** the CI workflow is triggered and reports a status check on the pull request
+- **WHEN** a pull request is opened against `master`
+- **THEN** the CI workflow is triggered and reports a status check on the pull request, where previously it targeted a nonexistent `main`/`develop` branch and never ran
 
 #### Scenario: CI covers both packages
 - **WHEN** the CI workflow runs
-- **THEN** it installs dependencies for the root, `client`, and `server` packages, runs lint, runs the `server` Jest suite, runs the `client` test suite in non-watch mode, and runs the production `client` build
+- **THEN** it installs dependencies for `survey-system-unified`, `client`, and `server`, runs lint, runs the `server` Jest suite, runs the `client` test suite in non-watch mode, and runs the production `client` build
 
 #### Scenario: CI fails on a failing test
 - **WHEN** a commit breaks `server/__tests__/services/surveyService.test.js`
 - **THEN** the CI workflow exits non-zero and the pull request check is marked failed
 
+#### Scenario: CI uses current environment variable names
+- **WHEN** the workflow's test-database step runs
+- **THEN** it sets `PG_HOST`, `PG_PORT`, `PG_DATABASE`, `PG_USER`, `PG_PASSWORD`, and CI-only throwaway `SESSION_SECRET`, `JWT_SECRET`, `CRYPTO_SECRET`, and `HMAC_SECRET` values, matching what `server/config` actually reads — not the retired `DB_HOST`/`DB_USER`/`DB_NAME`/`DB_PASSWORD` names
+
+#### Scenario: CI references the current schema template path
+- **WHEN** the workflow initializes the test database
+- **THEN** it loads the schema from `survey-system-unified/server/db/schema/db_template_survey.sql`, its post-move location
+
 #### Scenario: CI pins the Node version
 - **WHEN** the workflow sets up Node
-- **THEN** it uses the version recorded in `.nvmrc`, which satisfies the `engines.node` constraint in the root `package.json`
+- **THEN** it uses the version recorded in `survey-system-unified/.nvmrc`, which satisfies the `engines.node` constraint in `survey-system-unified/package.json`
 
 #### Scenario: CI caches npm downloads
 - **WHEN** the workflow installs dependencies
 - **THEN** it uses `actions/setup-node` npm caching keyed on the committed lockfiles so repeat runs do not re-download the full dependency tree
 
-#### Scenario: CI does not require production secrets
+#### Scenario: CI does not require production or deployment secrets
 - **WHEN** the workflow runs on a fork's pull request
-- **THEN** every step completes without needing a database connection, `SENDGRID_API_KEY`, or any other repository secret
+- **THEN** every step completes using only CI-local throwaway values, needing no Docker Hub, GCP, DigitalOcean, `SENDGRID_API_KEY`, or other repository secret
+
+### Requirement: Dormant deployment workflows are flagged, not silently reactivated
+The repository's existing `build.yml`, `deploy-gcp.yml`, `deploy-do.yml`, and `manual-deploy-gcp.yml` workflows SHALL NOT have their trigger branches changed as a side effect of repository-hygiene work, since doing so could cause a real Docker Hub push or cloud deployment to fire on the next push.
+
+#### Scenario: Deploy workflows remain dormant after this change
+- **WHEN** this change is complete and a commit is pushed to `master`
+- **THEN** `build.yml`, `deploy-gcp.yml`, `deploy-do.yml`, and `manual-deploy-gcp.yml` do not trigger, because their branch filters still reference `main`
+
+#### Scenario: The decision is recorded as an open question
+- **WHEN** a maintainer reads this change's design document
+- **THEN** it explicitly asks the repository owner whether these four workflows should be fixed the same way, deleted, or left dormant
 
 ### Requirement: Dependency update automation
 The repository SHALL contain `.github/dependabot.yml` configuring automated dependency update pull requests.

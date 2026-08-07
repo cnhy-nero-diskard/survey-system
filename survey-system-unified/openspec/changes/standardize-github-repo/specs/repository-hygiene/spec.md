@@ -47,6 +47,17 @@ Committed environment files SHALL contain only placeholder values, and the repos
 - **WHEN** a developer creates `.env` from the example
 - **THEN** `.gitignore` keeps it untracked
 
+### Requirement: No orphaned submodule gitlinks
+The repository SHALL NOT track a submodule gitlink entry unless a corresponding `.gitmodules` entry defines where it comes from.
+
+#### Scenario: Fresh clone has no broken submodule directories
+- **WHEN** the repository is cloned fresh
+- **THEN** `surveymockup1` and `surveymockup1_backend` are no longer tracked as gitlinks, so the clone does not produce two empty, unpopulated directories at those paths
+
+#### Scenario: Superseding relationship is documented
+- **WHEN** a reader reaches the root README's architecture section
+- **THEN** it states that `survey-system-unified/` supersedes `surveymockup1/` and `surveymockup1_backend/` as the maintained deployment
+
 ### Requirement: No credentials in the git remote
 The repository's push and fetch remotes SHALL authenticate through a credential helper, SSH, or a token supplied at runtime — never through a token embedded in the remote URL.
 
