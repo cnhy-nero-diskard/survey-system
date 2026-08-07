@@ -10,7 +10,6 @@ export default [
       '**/node_modules/**',
       'client/build/**',
       'client/src/**/.trash/**',
-      'client/src copy/**',
       'server/localization_queries/**',
       'server/db/schema/**',
       'coverage/**',

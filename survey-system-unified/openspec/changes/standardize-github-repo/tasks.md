@@ -2,9 +2,9 @@ Paths below are relative to the **true repo root** (`D:\Codez\Projects\survey-sy
 
 ## 0. Owner prerequisites (out of band, blocking)
 
-- [ ] 0.1 Revoke the GitHub personal access token currently embedded in the `origin` remote URL (`https://ghp_…@github.com/cnhy-nero-diskard/survey-system.git`) in GitHub → Settings → Developer settings → Personal access tokens
-- [ ] 0.2 Reset the remote to a token-free URL: `git remote set-url origin https://github.com/cnhy-nero-diskard/survey-system.git` (or the SSH form), and configure Git Credential Manager or an SSH key for authentication
-- [ ] 0.3 Verify `git remote -v` shows no credential and that `git fetch origin` still succeeds
+- [x] 0.1 Revoked by the owner
+- [x] 0.2 Remote already reset to a token-free URL (confirmed via `git remote -v`); authentication working via an existing credential helper
+- [x] 0.3 Verified: `git remote -v` shows no credential; `git ls-remote origin`/`git push` both succeed
 - [x] 0.4 Decisions recorded: copyright holder = `cnhy-nero-diskard`; contact email = the git-configured `cnhynaqer.greekprogrammraccurn@gmail.com`; repo assumed to be going public; `server/localization_queries/schemacreation/backups/*.sql` left untouched (not deleted, may hold data — owner to review separately); scope = true repo root (confirmed by user); orphaned submodules = remove the gitlinks (confirmed by user)
 
 ## 1. True root: orphaned submodules and remote hygiene
@@ -131,4 +131,4 @@ Paths below are relative to the **true repo root** (`D:\Codez\Projects\survey-sy
 - [ ] 11.7 Full manual walk-through of the READMEs on a clean machine — not done; the automated fresh-clone check (11.6) plus a fully green CI run (which itself does an `npm run install:all` + build from a clean checkout) covers the load-bearing parts of this
 - [x] 11.8 Root README badges: License and Node.js badges were already valid; added a live `test.yml` status badge, confirmed pointing at the correct workflow file
 - [ ] 11.9 Recommend to the owner that branch protection on `master` require the `test.yml` check — see PR description
-- [ ] 11.10 Hand the owner the open questions from design.md — see PR description
+- [x] 11.10 Hand the owner the open questions from design.md — owner resolved three on the spot: PAT already revoked and remote already reset (0.1–0.3), SQL backups confirmed dummy data (deleted), `client/src copy/` and the orphaned `surveymockup1*` directories approved for deletion (deleted). Remaining, still open: fate of `build.yml`/`deploy-*.yml`, accuracy of the ten true-root planning docs, the two `no-constant-binary-expression`/`no-empty-pattern` ESLint findings worth a human look, copyright holder / contact address confirmation, and whether the repo goes public.

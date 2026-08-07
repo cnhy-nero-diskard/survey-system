@@ -18,9 +18,16 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - The database schema template moved from an ignored `context/` directory to `survey-system-unified/server/db/schema/`.
 - Two orphaned git submodule references (`surveymockup1/`, `surveymockup1_backend/`) with no `.gitmodules` file — removed; `survey-system-unified/` supersedes both.
 - Several `catch` blocks in `server/services/analyticsCRUD.js` referenced an out-of-scope variable, throwing a `ReferenceError` and swallowing the real error on every failure.
+- `server/package.json`'s test script used cmd.exe-only syntax, silently running Jest without ESM support on Linux — every server test suite failed to parse in CI.
+- `client/src/AdminRoutes.jsx` routed `/systemperf` to a component that lived inside a gitignored `temp/` directory — never committed, so a fresh clone's frontend build has always failed. Moved to `client/src/components/metricsprom/`.
+- CI's frontend build step failed on this codebase's pre-existing ESLint warning backlog because GitHub Actions sets `CI=true` by default, which `react-scripts` treats as "warnings are errors" — stricter than the real Docker production build. Explicitly set `CI: false` for that step to match.
 
 ### Removed
 - `client/src/App.test.js`, an unmodified Create React App boilerplate test that had never passed against this application (missing dependency, and it asserted text the real app doesn't render).
+- The exposed GitHub personal access token that had been embedded in the `origin` remote URL — revoked by the repository owner.
+- `client/src copy/`, an untracked-until-now duplicate of part of `client/src` with a literal space in the directory name, unreferenced by any import.
+- Five dummy/template SQL files under `server/localization_queries/schemacreation/backups/` — confirmed by the repository owner to contain no real data.
+- The `surveymockup1/` and `surveymockup1_backend/` working directories, kept on disk temporarily after their broken submodule gitlinks were removed — deleted once confirmed unneeded.
 
 ## [1.0.0] - 2025-10-29
 
