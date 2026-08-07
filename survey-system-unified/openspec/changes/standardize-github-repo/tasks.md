@@ -86,7 +86,7 @@ Paths below are relative to the **true repo root** (`D:\Codez\Projects\survey-sy
 - [x] 8.1 Add `survey-system-unified/.nvmrc` pinning `22` (satisfies `engines.node >= 18.0.0`; matches the verified working dev/CI environment)
 - [x] 8.2 Add `survey-system-unified/.editorconfig`: charset, indentation, final newline, trailing-whitespace behavior
 - [x] 8.3 Add `survey-system-unified/.gitattributes`: `* text=auto eol=lf`, `*.sh text eol=lf`, `*.bat text eol=crlf`, binary markers for images, `*.pem`, `*.crt`
-- [ ] 8.4 Run `git add --renormalize survey-system-unified` and commit the line-ending normalization together with `.gitattributes` — **deferred to Group 10's check-in**, bundled with the Prettier formatting pass since both are large-diff, low-semantic-risk operations worth confirming together
+- [x] 8.4 Ran `git add --renormalize .` (Group 10) — only 4 files changed, all OpenSpec planning docs edited earlier this session; the rest of the tree was already LF (git's `core.autocrlf` had evidently been normalizing on commit already). Committed as its own `chore: renormalize line endings per .gitattributes` commit.
 - [x] 8.5 Add `survey-system-unified` root devDependencies: `eslint@9`, `@eslint/js`, `globals`, `prettier`, `eslint-config-prettier`, `eslint-plugin-react`, `eslint-plugin-react-hooks`
 - [x] 8.6 Add `survey-system-unified/eslint.config.js` (flat config): a `server/**` + misc-scripts block (ESM `sourceType`, Node globals), a `client/src/**` block (browser globals + `process` since CRA injects it at build time, JSX, React + React Hooks), a `**/*.test.js`/`**/__tests__/**` block (Jest globals), `eslint-config-prettier` last. Ignoring `node_modules`, `client/build`, `server/localization_queries`, `server/db/schema`, and two newly-discovered stray paths: `client/src/**/.trash/**` and `client/src copy/**` (see finding below)
 - [x] 8.7 Confirmed the root config does not contradict `client/package.json`'s existing `eslintConfig: { extends: ["react-app"] }` — `npm run client:build` passes cleanly with both installed side by side (separate `node_modules`, so CRA resolves its own ESLint 8 independently of the root ESLint 9)
@@ -96,25 +96,25 @@ Paths below are relative to the **true repo root** (`D:\Codez\Projects\survey-sy
 - [x] 8.11 Fixed all remaining real ESLint errors: 11 `no-undef` in `server/services/analyticsCRUD.js` were catch-block variable-name typos (`catch (error) { ...err.message...; throw err }` — `err` was never in scope, so these catches threw `ReferenceError` and swallowed the real error every time they ran; corrected to reference `error`) and 1 `no-useless-catch` in `server/services/clientService.js` (a catch block that only rethrows, removed). Both are behavior-preserving-or-better: the analyticsCRUD fix makes existing error logging work as originally intended instead of masking failures with a ReferenceError; the useless-catch removal changes nothing about what propagates. **Also found and flagged, not touched**: a stray, git-tracked, unreferenced duplicate directory `client/src copy/` (8 files, literal space in the name, not imported anywhere) — excluded from lint/format rather than deleted, since removing tracked files is a bigger call than this task list's scope; recommend the owner delete it. Final: **0 errors, 387 warnings**.
 - [x] 8.12 Downgraded to `warn` for this baseline (ambiguous or purely stylistic, not safe to auto-fix without deeper business-logic context): `no-unused-vars`, `react-hooks/exhaustive-deps` (as planned), plus `react/no-unescaped-entities`, `react/display-name`, `no-prototype-builtins`, `no-constant-binary-expression` (one real-looking dead-conditional `{true && (...)}` in `GradientBackground.jsx`, worth a human look), `no-empty-pattern` (two components destructuring `{}` from unused props, possibly a forgotten prop). CI ratchet value: **`--max-warnings 387`**.
 - [x] 8.13 Verified `npm run client:build` succeeds (confirmed 8.7)
-- [ ] 8.14 Commit as `chore: add shared lint, format, and editor configuration`
+- [x] 8.14 Committed as `chore: add shared lint, format, and editor configuration`
 
 ## 9. survey-system-unified: test wiring
 
-- [ ] 9.1 Run `cd survey-system-unified/server && npm test` locally with PostgreSQL stopped and record the result
-- [ ] 9.2 If `server/__tests__/routes/surveyRoutes.test.js` requires a live database, mock the `pg` pool so it runs without one
-- [ ] 9.3 Run `cd survey-system-unified/client && npm test -- --watchAll=false` and record the result
-- [ ] 9.4 If `client/src/App.test.js` is unmodified CRA boilerplate that fails against the real app, fix or delete it
-- [ ] 9.5 Replace `survey-system-unified/package.json`'s `test` script so it runs both `server` and `client` suites non-interactively and exits non-zero if either fails
-- [ ] 9.6 Verify `npm test` from `survey-system-unified/` passes end to end
-- [ ] 9.7 Commit as `test: wire server and client suites into a root test script`
+- [x] 9.1 `cd server && npm test` with no database running: 4 suites, 17 tests, all passed
+- [x] 9.2 Not needed — the existing suites don't require a live database
+- [x] 9.3 `cd client && npm test -- --watchAll=false`: failed outright (missing `@testing-library/jest-dom` dependency)
+- [x] 9.4 `client/src/App.test.js` was unmodified CRA boilerplate asserting "learn react" text against an `App` that's a real routing/auth shell (and triggers a live API call on mount) — deleted rather than patched; emptied the dead import out of `setupTests.js` too
+- [x] 9.5 Root `test` script now runs `test:server` then `test:client` (the latter with `--watchAll=false --passWithNoTests` so an empty suite doesn't fail CI)
+- [x] 9.6 Verified `npm test` passes end to end
+- [x] 9.7 Committed as `test: wire server and client suites into a root test script`
 
 ## 10. survey-system-unified: formatting pass (isolated commit)
 
-- [ ] 10.1 Confirm no other in-flight branch is mid-edit inside `survey-system-unified/` (the `phase-1-security-and-correctness` work is already archived, so this is now just a courtesy check)
-- [ ] 10.2 Run `npm run format` from `survey-system-unified/`
-- [ ] 10.3 Verify `npm run lint`, `npm test`, and `npm run client:build` all still pass after reformatting
-- [ ] 10.4 Commit the formatting pass alone as `style: apply prettier formatting across survey-system-unified` — no other change in this commit
-- [ ] 10.5 Add `survey-system-unified/.git-blame-ignore-revs` containing that commit's SHA; reference it in `CONTRIBUTING.md`
+- [x] 10.1 Confirmed — `phase-1-security-and-correctness` is archived, no conflict
+- [x] 10.2 Ran `npm run format` from `survey-system-unified/`: 237 files changed
+- [x] 10.3 Verified `npm run lint` (0 errors, 387 warnings, unchanged), `npm test` (still passing), and `npm run client:build` (still succeeds) all pass after reformatting
+- [x] 10.4 Committed the formatting pass alone as `style: apply prettier formatting across the repository` — no other change in that commit
+- [x] 10.5 Added `survey-system-unified/.git-blame-ignore-revs` with that commit's SHA (`bc897a5`); referenced it in `CONTRIBUTING.md`
 
 ## 11. Verification
 

@@ -72,6 +72,10 @@ git reset --hard
 
 to re-normalize line endings in your working tree afterward.
 
+The repository was reformatted with Prettier in one large, isolated commit.
+Run `git config blame.ignoreRevsFile survey-system-unified/.git-blame-ignore-revs`
+once (or add it to your global config) so `git blame` skips over it.
+
 ## Credentials
 
 **Never** embed credentials in a git remote URL, and never commit a real
