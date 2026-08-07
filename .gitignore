@@ -15,6 +15,7 @@ private-key.gpg
 # Database backups and migrations
 *.sql
 !survey-system-unified/server/localization_queries/schemacreation/anonymousUsers_activity.sql
+!survey-system-unified/server/db/schema/db_template_survey.sql
 *.sql.gz
 *.sql.gpg
 
