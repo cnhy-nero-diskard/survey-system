@@ -69,7 +69,9 @@ const Option = styled(motion.div)`
   border-radius: 10px;
   cursor: pointer;
   background-color: #007bff;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-size: 1.5rem;
   color: #fff;
@@ -105,7 +107,6 @@ const Transportation1 = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);
 
-
   useEffect(() => {
     setLanguage(localStorage.getItem('selectedLanguage') || 'en');
   }, []);
@@ -139,8 +140,7 @@ const Transportation1 = () => {
           right: 0,
           bottom: 0,
           zIndex: -1,
-          objectFit: 'cover'
-
+          objectFit: 'cover',
         }}
         buttonAppear={false}
       >

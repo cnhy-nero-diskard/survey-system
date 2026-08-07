@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { Box, Typography, Skeleton, CircularProgress, Fade } from '@mui/material';
 import styled from 'styled-components';
 import { MainContent, ChartContainer } from '../../shared/styledComponents';
@@ -44,21 +53,27 @@ const CustomTooltip = ({ active, payload, label }) => {
           padding: '12px',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
           fontFamily: fontFamily,
-          minWidth: '200px'
+          minWidth: '200px',
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 600, marginBottom: 1, color: '#2d3748' }}>
           {label}
         </Typography>
         {payload.map((item, index) => (
-          <Box key={index} display="flex" justifyContent="space-between" alignItems="center" mb={0.5}>
+          <Box
+            key={index}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={0.5}
+          >
             <Box display="flex" alignItems="center" gap={1}>
               <Box
                 sx={{
                   width: 12,
                   height: 12,
                   backgroundColor: item.color,
-                  borderRadius: '2px'
+                  borderRadius: '2px',
                 }}
               />
               <Typography variant="caption" sx={{ color: '#4a5568' }}>
@@ -93,7 +108,7 @@ const OverallSurveyTopic = ({ year, quarter }) => {
         const params = new URLSearchParams();
         if (year) params.append('year', year);
         if (quarter) params.append('quarter', quarter);
-        
+
         const response = await axios.get(
           `${process.env.REACT_APP_API_HOST}/api/admin/surveytopics?${params.toString()}`
         );
@@ -131,7 +146,12 @@ const OverallSurveyTopic = ({ year, quarter }) => {
       <MainContent>
         <LoadingContainer>
           <Skeleton variant="text" width="60%" height={32} />
-          <CircularProgress size={28} thickness={4} sx={{ color: '#667eea', alignSelf: 'center' }} aria-label="Loading topic analytics" />
+          <CircularProgress
+            size={28}
+            thickness={4}
+            sx={{ color: '#667eea', alignSelf: 'center' }}
+            aria-label="Loading topic analytics"
+          />
           <Skeleton variant="rectangular" width="100%" height={280} />
           <Box display="flex" gap={2} mt={2}>
             <Skeleton variant="rectangular" width={100} height={20} />
@@ -147,9 +167,7 @@ const OverallSurveyTopic = ({ year, quarter }) => {
     <MainContent>
       <Fade in={!loading} timeout={600}>
         <Box>
-          <ChartTitle>
-            Survey Topics Distribution
-          </ChartTitle>
+          <ChartTitle>Survey Topics Distribution</ChartTitle>
           <StyledChartContainer>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart
@@ -183,10 +201,10 @@ const OverallSurveyTopic = ({ year, quarter }) => {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f4f8" strokeWidth={1} />
                 <XAxis
                   dataKey="name"
-                  tick={{ 
-                    fontSize: 11, 
+                  tick={{
+                    fontSize: 11,
                     fontFamily: fontFamily,
-                    fill: '#4a5568'
+                    fill: '#4a5568',
                   }}
                   tickFormatter={(value) => truncateLabel(value, 8)}
                   interval={0}
@@ -195,12 +213,12 @@ const OverallSurveyTopic = ({ year, quarter }) => {
                   height={70}
                   stroke="#cbd5e0"
                 />
-                <YAxis 
+                <YAxis
                   domain={[0, 'dataMax']}
-                  tick={{ 
-                    fontSize: 12, 
+                  tick={{
+                    fontSize: 12,
                     fontFamily: fontFamily,
-                    fill: '#4a5568'
+                    fill: '#4a5568',
                   }}
                   stroke="#cbd5e0"
                 />
@@ -209,30 +227,30 @@ const OverallSurveyTopic = ({ year, quarter }) => {
                   wrapperStyle={{
                     fontFamily: fontFamily,
                     fontSize: '12px',
-                    paddingTop: '10px'
+                    paddingTop: '10px',
                   }}
                 />
-                <Bar 
-                  dataKey="VerySatisfied" 
-                  stackId="a" 
+                <Bar
+                  dataKey="VerySatisfied"
+                  stackId="a"
                   fill="url(#verySatisfiedTopicGrad)"
                   radius={[0, 0, 0, 0]}
                 />
-                <Bar 
-                  dataKey="Satisfied" 
-                  stackId="a" 
+                <Bar
+                  dataKey="Satisfied"
+                  stackId="a"
                   fill="url(#satisfiedTopicGrad)"
                   radius={[0, 0, 0, 0]}
                 />
-                <Bar 
-                  dataKey="Neutral" 
-                  stackId="a" 
+                <Bar
+                  dataKey="Neutral"
+                  stackId="a"
                   fill="url(#neutralTopicGrad)"
                   radius={[0, 0, 0, 0]}
                 />
-                <Bar 
-                  dataKey="Dissatisfied" 
-                  stackId="a" 
+                <Bar
+                  dataKey="Dissatisfied"
+                  stackId="a"
                   fill="url(#dissatisfiedTopicGrad)"
                   radius={[2, 2, 0, 0]}
                 />

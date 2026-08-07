@@ -102,15 +102,25 @@ const HeatmapChart = () => {
   // Labels for X and Y axes
   const xLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
   const yLabels = [
-    'January', 'February', 'March', 'April', 'May', 'June', 
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   return (
     <Container>
       <ContentWrapper>
         <Title>Yearly Heatmap Example</Title>
-        
+
         {/* Year Selector */}
         <SelectorWrapper>
           <label>

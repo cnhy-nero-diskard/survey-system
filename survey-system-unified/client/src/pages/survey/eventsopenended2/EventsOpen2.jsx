@@ -3,9 +3,8 @@ import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import BodyPartial from '../../components/partials/BodyPartial';
 import GradientBackground from '../../components/partials/GradientBackground';
-import imgOverlay from "../../components/img/ball.png";
+import imgOverlay from '../../components/img/ball.png';
 import { useNavigate } from 'react-router-dom';
-
 
 const FeedbackFormContainer = styled(animated.div)`
   max-width: 600px;
@@ -76,16 +75,19 @@ const NextButton = styled.button`
 const EventsOpen2 = () => {
   const [feedback, setFeedback] = useState('');
   const [selectedOption, setSelectedOption] = useState(null);
-  const [placeholderText, setPlaceholderText] = useState('Feel free to share any specific feedback');
+  const [placeholderText, setPlaceholderText] = useState(
+    'Feel free to share any specific feedback'
+  );
 
   const [packageFeedback, setPackageFeedback] = useState('');
   const [selectedPackageOption, setSelectedPackageOption] = useState(null);
-  const [packagePlaceholderText, setPackagePlaceholderText] = useState('If you booked a package tour, share your thoughts here.');
+  const [packagePlaceholderText, setPackagePlaceholderText] = useState(
+    'If you booked a package tour, share your thoughts here.'
+  );
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
 
-    
     switch (option) {
       case 'Dissatisfied':
         setPlaceholderText('What went wrong? How can we improve?');
@@ -107,7 +109,6 @@ const EventsOpen2 = () => {
   const handlePackageOptionClick = (option) => {
     setSelectedPackageOption(option);
 
-    
     switch (option) {
       case 'Dissatisfied':
         setPackagePlaceholderText('What went wrong with the package tour? How can we improve?');
@@ -116,10 +117,14 @@ const EventsOpen2 = () => {
         setPackagePlaceholderText('What could have been better with the package tour?');
         break;
       case 'Satisfied':
-        setPackagePlaceholderText('What did you like about the package tour? Any suggestions for improvement?');
+        setPackagePlaceholderText(
+          'What did you like about the package tour? Any suggestions for improvement?'
+        );
         break;
       case 'Very satisfied':
-        setPackagePlaceholderText('What did you love about the package tour? Any suggestions for improvement?');
+        setPackagePlaceholderText(
+          'What did you love about the package tour? Any suggestions for improvement?'
+        );
         break;
       default:
         setPackagePlaceholderText('If you booked a package tour, share your thoughts here.');
@@ -131,16 +136,15 @@ const EventsOpen2 = () => {
     from: { opacity: 0 },
     config: { duration: 1000 },
   });
-  const navigate = useNavigate(); 
-const handleNextClick = () => {
-  navigate('/'); 
-};
-
+  const navigate = useNavigate();
+  const handleNextClick = () => {
+    navigate('/');
+  };
 
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.015} blendMode='multiply'>
+      <GradientBackground overlayImage={imgOverlay} opacity={0.015} blendMode="multiply">
         <FeedbackFormContainer style={animation}>
           <Title>Did the attractions meet your expectations?</Title>
           <OptionsContainer>

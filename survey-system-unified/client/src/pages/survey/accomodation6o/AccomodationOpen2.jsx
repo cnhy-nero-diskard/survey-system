@@ -19,7 +19,7 @@ const AccomodationOpen2 = () => {
   // State to hold user input
   const [formData, setFormData] = useState({
     selectedOptionValue: '',
-    feedback: ''
+    feedback: '',
   });
 
   // Load any existing data from localStorage on component mount

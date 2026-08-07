@@ -63,6 +63,14 @@ export const satisfactionPalette = {
 
 // Categorical series colours (charts with an arbitrary number of series).
 export const categoricalPalette = [
-  '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#F97316',
-  '#06B6D4', '#EC4899', '#84CC16', '#6366F1', '#F43F5E',
+  '#10B981',
+  '#F59E0B',
+  '#EF4444',
+  '#8B5CF6',
+  '#F97316',
+  '#06B6D4',
+  '#EC4899',
+  '#84CC16',
+  '#6366F1',
+  '#F43F5E',
 ];

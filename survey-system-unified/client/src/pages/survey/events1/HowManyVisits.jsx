@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgOverlay from "../../../components/img/gift.png";
+import imgOverlay from '../../../components/img/gift.png';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -25,7 +25,7 @@ const Container = styled.div`
 const Title = styled.h2`
   font-size: 1.5rem;
   margin-bottom: 20px;
-  color:rgb(2, 67, 136);
+  color: rgb(2, 67, 136);
 `;
 
 const OptionContainer = styled.div`
@@ -108,7 +108,7 @@ const VisitCounter = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode='screen'>
+      <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode="screen">
         <Container>
           <Title>{translations.visitCounterTitle}</Title>
           <OptionContainer>
@@ -123,7 +123,9 @@ const VisitCounter = () => {
               </Option>
             ))}
           </OptionContainer>
-          <NextButton style={springProps} onClick={handleNextClick}>{translations.visitCounterNextButton}</NextButton>
+          <NextButton style={springProps} onClick={handleNextClick}>
+            {translations.visitCounterNextButton}
+          </NextButton>
         </Container>
       </GradientBackground>
     </>

@@ -8,7 +8,6 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const Services1 = () => {
-
   const { routes } = useContext(UnifiedContext);
   const [setCurrentStep] = useState();
   const currentStepIndex = useCurrentStepIndex(routes);
@@ -38,9 +37,9 @@ const Services1 = () => {
   ];
 
   const handleRatingChange = (category, rating) => {
-    setRatings(prevRatings => ({
+    setRatings((prevRatings) => ({
       ...prevRatings,
-      [category]: rating
+      [category]: rating,
     }));
   };
   // Load data from localStorage when the component mounts
@@ -62,7 +61,6 @@ const Services1 = () => {
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
-
   return (
     <RatingSlider
       title={translations.services1PricingTitle}
@@ -71,7 +69,6 @@ const Services1 = () => {
       surveyquestion_refs={'SVC1'}
       entranslations={encategories}
       onRatingComplete={handleRatingComplete}
-
     />
   );
 };

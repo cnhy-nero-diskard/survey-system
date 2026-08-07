@@ -1,4 +1,3 @@
-
 // config/db.js
 import pg from 'pg';
 import logger from '../middleware/logger.js';
@@ -17,7 +16,7 @@ try {
     max: 10,
     connectionTimeoutMillis: 5000,
   };
-  
+
   // Add SSL configuration only in production mode
   if (env.NODE_ENV === 'production') {
     config.ssl = {
@@ -25,7 +24,7 @@ try {
       ca: fs.readFileSync('./certs/server-ca.pem').toString(),
     };
   }
-  
+
   pool = new pg.Pool(config);
   // Handle connection errors
   pool.on('error', (err, client) => {
@@ -36,7 +35,6 @@ try {
   pool.on('connect', () => {
     logger.database('Successfully connected to PostgreSQL database');
   });
-
 } catch (err) {
   logger.error('Failed to create database pool:', err);
   process.exit(1); // Exit with error code

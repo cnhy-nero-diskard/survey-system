@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import BodyPartial from '../../../components/partials/BodyPartial';
-import imgoverlay from "../../components/img/beach.png";
+import imgoverlay from '../../components/img/beach.png';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/shared/useTranslations';
 
@@ -44,58 +44,56 @@ const Option = styled(motion.div)`
 `;
 
 const PrimaryAtt = () => {
-    const [selected, setSelected] = useState(null);
-    const [showNextPage, setShowNextPage] = useState(false);
-    const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const [selected, setSelected] = useState(null);
+  const [showNextPage, setShowNextPage] = useState(false);
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
 
-    const translations = useTranslations('PrimaryAtt', language);
+  const translations = useTranslations('PrimaryAtt', language);
 
-    const handleOptionClick = (option) => {
-        setSelected(option);
-        setShowNextPage(true);
-    };
+  const handleOptionClick = (option) => {
+    setSelected(option);
+    setShowNextPage(true);
+  };
 
-    const navigate = useNavigate();
-    const handleNextClick = () => {
-        navigate('/');
-    };
+  const navigate = useNavigate();
+  const handleNextClick = () => {
+    navigate('/');
+  };
 
-    const NextPage = () => (
-        handleNextClick()
-    );
+  const NextPage = () => handleNextClick();
 
-    return (
-        <>
-            <BodyPartial />
-            <GradientBackground overlayImage={imgoverlay} opacity={0.15} blendMode='screen'>
-                {showNextPage ? (
-                    <NextPage />
-                ) : (
-                    <Container
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <Title>{translations.primaryAttQuestion}</Title>
-                        <Option
-                            onClick={() => handleOptionClick('1x')}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            {translations.primaryAttYesOption}
-                        </Option>
-                        <Option
-                            onClick={() => handleOptionClick('2x')}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            {translations.primaryAttNoOption}
-                        </Option>
-                    </Container>
-                )}
-            </GradientBackground>
-        </>
-    );
+  return (
+    <>
+      <BodyPartial />
+      <GradientBackground overlayImage={imgoverlay} opacity={0.15} blendMode="screen">
+        {showNextPage ? (
+          <NextPage />
+        ) : (
+          <Container
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Title>{translations.primaryAttQuestion}</Title>
+            <Option
+              onClick={() => handleOptionClick('1x')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {translations.primaryAttYesOption}
+            </Option>
+            <Option
+              onClick={() => handleOptionClick('2x')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {translations.primaryAttNoOption}
+            </Option>
+          </Container>
+        )}
+      </GradientBackground>
+    </>
+  );
 };
 
 export default PrimaryAtt;

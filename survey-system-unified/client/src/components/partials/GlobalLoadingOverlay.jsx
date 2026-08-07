@@ -85,7 +85,7 @@ const CircularLoaderContainer = styled(Box)`
 const StyledCircularProgress = styled(CircularProgress)`
   color: #667eea;
   animation: ${pulse} 2s ease-in-out infinite;
-  
+
   & .MuiCircularProgress-circle {
     stroke-linecap: round;
   }
@@ -103,16 +103,12 @@ const Dot = styled.div`
   border-radius: 50%;
   background-color: rgba(102, 126, 234, 0.65);
   animation: ${pulse} 1.5s ease-in-out infinite;
-  animation-delay: ${props => props.delay}s;
+  animation-delay: ${(props) => props.delay}s;
 `;
 
 const GlobalLoadingOverlay = () => {
-  const { 
-    isGlobalLoading, 
-    loadingMessage, 
-    loadingSubtitle, 
-    showCircularLoader 
-  } = useGlobalLoadingStore();
+  const { isGlobalLoading, loadingMessage, loadingSubtitle, showCircularLoader } =
+    useGlobalLoadingStore();
 
   if (!isGlobalLoading) return null;
 
@@ -125,19 +121,15 @@ const GlobalLoadingOverlay = () => {
               <StyledCircularProgress size={60} thickness={3} />
             </CircularLoaderContainer>
           )}
-          
+
           <Box>
-            <LoadingTitle variant="h4">
-              {loadingMessage}
-            </LoadingTitle>
-            
+            <LoadingTitle variant="h4">{loadingMessage}</LoadingTitle>
+
             {loadingSubtitle && (
-              <LoadingSubtitle variant="body1">
-                {loadingSubtitle}
-              </LoadingSubtitle>
+              <LoadingSubtitle variant="body1">{loadingSubtitle}</LoadingSubtitle>
             )}
           </Box>
-          
+
           <DotsContainer>
             <Dot delay={0} />
             <Dot delay={0.2} />

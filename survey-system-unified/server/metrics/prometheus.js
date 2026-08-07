@@ -30,9 +30,4 @@ register.registerMetric(cpuUsageGauge);
 register.registerMetric(memoryUsageGauge);
 
 // Export the metrics and register
-export {
-  register,
-  httpRequestDurationMicroseconds,
-  cpuUsageGauge,
-  memoryUsageGauge,
-};
+export { register, httpRequestDurationMicroseconds, cpuUsageGauge, memoryUsageGauge };

@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { FaCheckCircle } from 'react-icons/fa'; // Importing a checkmark icon
 import GradientBackground from '../../../components/partials/GradientBackground';
 import BodyPartial from '../../../components/partials/BodyPartial';
-import imgoverlay from "../../../components/img/thank.png";
+import imgoverlay from '../../../components/img/thank.png';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +43,7 @@ const Header = styled.h1`
 
 const Paragraph = styled.p`
   font-size: 1.2rem;
-  color:rgb(247, 246, 246);
+  color: rgb(247, 246, 246);
   margin-bottom: 1rem;
   line-height: 1.6;
 `;
@@ -59,7 +59,9 @@ const FinishButton = styled.button`
   font-size: 1rem;
   border-radius: 25px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
   margin-top: 2rem;
 
   &:hover {
@@ -81,15 +83,13 @@ const ThankYouMessageF = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
-  
   const navigate = useNavigate();
   const language = localStorage.getItem('selectedLanguage');
   const translations = useTranslations('ThankYouMessage', language);
   const [surveyResponses, setSurveyResponses] = useState([]);
 
   useEffect(() => {
-    const responses = [
-    ];
+    const responses = [];
     setSurveyResponses(responses);
   }, []);
 
@@ -97,10 +97,10 @@ const ThankYouMessageF = () => {
     try {
       await submitSurveyResponses(surveyResponses);
       console.log('Survey responses submitted successfully');
-      
+
       const finishResponse = { surveyquestion_ref: 'FINISHF', response_value: 'Survey Completed' };
       await submitSurveyResponses([finishResponse]);
-      
+
       console.log('Survey completion indicated');
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {

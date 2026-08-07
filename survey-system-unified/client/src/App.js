@@ -1,8 +1,7 @@
-
 /**
  * Initializes the anonymous user by making an API call to the backend.
  * Logs the success or failure of the initialization process.
- * 
+ *
  * @async
  * @function initializeAnonymousUser
  * @returns {Promise<void>}
@@ -11,7 +10,7 @@
 /**
  * The main App component that sets up the routing for the application.
  * It initializes the anonymous user on mount and provides the AuthProvider context.
- * 
+ *
  * @component
  * @returns {JSX.Element} The rendered component.
  */
@@ -30,9 +29,12 @@ const App = () => {
   const initializeAnonymousUser = async () => {
     console.log('Initializing anonymous user...');
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/init-anonymous-user`, {
-        withCredentials: true, 
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_HOST}/api/init-anonymous-user`,
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200) {
         console.log('Anonymous user initialized successfully');

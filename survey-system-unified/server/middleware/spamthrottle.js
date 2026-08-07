@@ -10,16 +10,17 @@ const highTierLimiter = rateLimit({
   message: 'You are being rate limited due to excessive activity',
   handler: (req, res) => {
     res.status(429).json({
-      error: 'Too many requests - your account has been temporarily throttled due to excessive activity'
+      error:
+        'Too many requests - your account has been temporarily throttled due to excessive activity',
     });
-  }
+  },
 });
 
 const moderateTierLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 15,
   keyGenerator: (req) => req.session.anonymousUserId,
-  message: 'You are approaching rate limits due to high activity'
+  message: 'You are approaching rate limits due to high activity',
 });
 
 export const spamThrottle = async (req, res, next) => {
@@ -27,7 +28,7 @@ export const spamThrottle = async (req, res, next) => {
   try {
     // Get the anonymous user ID from session
     const anonymousUserId = req.session.anonymousUserId;
-    
+
     if (!anonymousUserId) {
       return next(); // No user ID, proceed with normal rate limiting
     }
@@ -42,10 +43,14 @@ export const spamThrottle = async (req, res, next) => {
     const spamCounter = result.rows[0].spamcounter;
     // Apply different rate limits based on spam counter
     if (spamCounter >= 40) {
-      logger.warn(`SPAM User ${anonymousUserId} is being rate limited due to high spam counter: ${spamCounter}`);
+      logger.warn(
+        `SPAM User ${anonymousUserId} is being rate limited due to high spam counter: ${spamCounter}`
+      );
       return highTierLimiter(req, res, next);
     } else if (spamCounter >= 20) {
-      logger.warn(`SPAM User ${anonymousUserId} will be rate limited due to high spam counter: ${spamCounter}`);
+      logger.warn(
+        `SPAM User ${anonymousUserId} will be rate limited due to high spam counter: ${spamCounter}`
+      );
       return moderateTierLimiter(req, res, next);
     }
     // For users with low spam counter, proceed normally

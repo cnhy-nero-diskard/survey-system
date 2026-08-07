@@ -23,14 +23,14 @@ const RateAttraction = () => {
     translations.rateAttractionCleanliness,
     translations.rateAttractionActivities,
     translations.rateAttractionClientService,
-    translations.rateAttractionValueForMoney
+    translations.rateAttractionValueForMoney,
   ];
   const encategories = [
     entranslations.rateAttractionSecurity,
     entranslations.rateAttractionCleanliness,
     entranslations.rateAttractionActivities,
     entranslations.rateAttractionClientService,
-    entranslations.rateAttractionValueForMoney
+    entranslations.rateAttractionValueForMoney,
   ];
 
   // Load data from localStorage when the component mounts
@@ -55,7 +55,7 @@ const RateAttraction = () => {
       onRatingComplete={handleRatingComplete}
       surveyquestion_refs={'RATT'}
       entranslations={encategories}
-      
+
       initialSliderValues={initialSliderValues}
     />
   );

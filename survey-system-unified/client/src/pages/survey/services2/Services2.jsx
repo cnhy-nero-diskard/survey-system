@@ -12,7 +12,6 @@ const Services2 = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
-
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('Services2', language);
   const entranslations = useTranslations('Services2', 'en');
@@ -32,7 +31,7 @@ const Services2 = () => {
     translations.services2ShopsMalls,
     translations.services2PanglaoInternationalAirport,
     translations.services2Seaport,
-    translations.services2MobileSignalWifi
+    translations.services2MobileSignalWifi,
   ];
   const encategories = [
     entranslations.services2AccomodationPersonnel,
@@ -49,12 +48,12 @@ const Services2 = () => {
     entranslations.services2ShopsMalls,
     entranslations.services2PanglaoInternationalAirport,
     entranslations.services2Seaport,
-    entranslations.services2MobileSignalWifi
+    entranslations.services2MobileSignalWifi,
   ];
   const navigate = useNavigate();
   const handleRatingComplete = (sliderValues) => {
-        saveToLocalStorage('Services2', sliderValues);
-    
+    saveToLocalStorage('Services2', sliderValues);
+
     console.log(translations.services2AllRatingsCompleted);
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
@@ -75,7 +74,6 @@ const Services2 = () => {
       surveyquestion_refs={'SVC2'}
       entranslations={encategories}
       initialSliderValues={initialSliderValues}
-
     />
   );
 };

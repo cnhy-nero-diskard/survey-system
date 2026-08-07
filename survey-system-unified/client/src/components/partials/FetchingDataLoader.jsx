@@ -46,26 +46,26 @@ const LoadingContainer = styled(Box)`
   align-items: center;
   gap: 24px;
   padding: 40px;
-  min-height: ${props => props.minHeight || '60vh'};
+  min-height: ${(props) => props.minHeight || '60vh'};
   justify-content: center;
   text-align: center;
   animation: ${fadeIn} 0.6s ease-out;
-  background: ${props => props.background || 'transparent'};
-  border-radius: ${props => props.borderRadius || '0px'};
+  background: ${(props) => props.background || 'transparent'};
+  border-radius: ${(props) => props.borderRadius || '0px'};
 `;
 
 const LoadingTitle = styled(Typography)`
   font-family: ${fontFamily};
   font-weight: 600;
-  color: ${props => props.titleColor || '#4a5568'};
-  font-size: ${props => props.titleSize || '20px'};
+  color: ${(props) => props.titleColor || '#4a5568'};
+  font-size: ${(props) => props.titleSize || '20px'};
   text-align: center;
   animation: ${pulse} 2s ease-in-out infinite;
 `;
 
 const LoadingSubtitle = styled(Typography)`
   font-family: ${fontFamily};
-  color: ${props => props.subtitleColor || '#718096'};
+  color: ${(props) => props.subtitleColor || '#718096'};
   text-align: center;
   max-width: 400px;
   line-height: 1.5;
@@ -80,9 +80,9 @@ const CircularLoaderContainer = styled(Box)`
 `;
 
 const StyledCircularProgress = styled(CircularProgress)`
-  color: ${props => props.color || '#667eea'};
+  color: ${(props) => props.color || '#667eea'};
   animation: ${rotate} 1s linear infinite;
-  
+
   & .MuiCircularProgress-circle {
     stroke-linecap: round;
   }
@@ -90,7 +90,7 @@ const StyledCircularProgress = styled(CircularProgress)`
 
 const SkeletonContainer = styled(Box)`
   width: 100%;
-  max-width: ${props => props.maxWidth || '600px'};
+  max-width: ${(props) => props.maxWidth || '600px'};
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -106,64 +106,54 @@ const Dot = styled.div`
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: ${props => props.color || '#667eea'};
+  background-color: ${(props) => props.color || '#667eea'};
   animation: ${pulse} 1.5s ease-in-out infinite;
-  animation-delay: ${props => props.delay}s;
+  animation-delay: ${(props) => props.delay}s;
 `;
 
-const FetchingDataLoader = ({ 
-  message = "Fetching Data",
-  subtitle = "Please wait while we retrieve the latest information",
+const FetchingDataLoader = ({
+  message = 'Fetching Data',
+  subtitle = 'Please wait while we retrieve the latest information',
   showCircularLoader = true,
   showSkeleton = false,
   showDots = true,
-  minHeight = "60vh",
-  background = "transparent",
-  borderRadius = "0px",
-  titleColor = "#4a5568",
-  subtitleColor = "#718096",
-  loaderColor = "#667eea",
-  titleSize = "20px",
-  skeletonMaxWidth = "600px"
+  minHeight = '60vh',
+  background = 'transparent',
+  borderRadius = '0px',
+  titleColor = '#4a5568',
+  subtitleColor = '#718096',
+  loaderColor = '#667eea',
+  titleSize = '20px',
+  skeletonMaxWidth = '600px',
 }) => {
   return (
-    <LoadingContainer 
-      minHeight={minHeight}
-      background={background}
-      borderRadius={borderRadius}
-    >
+    <LoadingContainer minHeight={minHeight} background={background} borderRadius={borderRadius}>
       {showCircularLoader && (
         <CircularLoaderContainer>
-          <StyledCircularProgress 
-            size={50} 
-            thickness={3.5} 
-            color={loaderColor}
-          />
+          <StyledCircularProgress size={50} thickness={3.5} color={loaderColor} />
         </CircularLoaderContainer>
       )}
-      
+
       <Box>
-        <LoadingTitle 
-          variant="h5"
-          titleColor={titleColor}
-          titleSize={titleSize}
-        >
+        <LoadingTitle variant="h5" titleColor={titleColor} titleSize={titleSize}>
           {message}
         </LoadingTitle>
-        
+
         {subtitle && (
-          <LoadingSubtitle 
-            variant="body1"
-            subtitleColor={subtitleColor}
-          >
+          <LoadingSubtitle variant="body1" subtitleColor={subtitleColor}>
             {subtitle}
           </LoadingSubtitle>
         )}
       </Box>
-      
+
       {showSkeleton && (
         <SkeletonContainer maxWidth={skeletonMaxWidth}>
-          <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 2, mb: 3 }} />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={200}
+            sx={{ borderRadius: 2, mb: 3 }}
+          />
           <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
             <Skeleton variant="rectangular" width="100%" height={150} sx={{ borderRadius: 2 }} />
             <Skeleton variant="rectangular" width="100%" height={150} sx={{ borderRadius: 2 }} />
@@ -172,7 +162,7 @@ const FetchingDataLoader = ({
           <Skeleton variant="rectangular" width="100%" height={80} sx={{ borderRadius: 2 }} />
         </SkeletonContainer>
       )}
-      
+
       {showDots && (
         <DotsContainer>
           <Dot delay={0} color={loaderColor} />

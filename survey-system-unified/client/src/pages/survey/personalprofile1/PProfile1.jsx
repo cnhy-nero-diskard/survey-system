@@ -17,10 +17,7 @@ import {
   fetchConversionRates,
   convertIncomeToPHP,
 } from '../../../components/utils/currencyUtils';
-import {
-  saveToLocalStorage,
-  loadFromLocalStorage,
-} from '../../../components/utils/storageUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 /** --- Styled Components --- **/
 const Container = styled(motion.div)`
@@ -203,7 +200,7 @@ const PProfile1 = () => {
               const alreadySet = (savedData || []).find(
                 (inp) => inp.id === 'nationality' && inp.value
               );
-              if (alreadySet) return prevInputs; 
+              if (alreadySet) return prevInputs;
               return prevInputs.map((inp) => {
                 if (inp.id === 'nationality') {
                   return { ...inp, value: englishDemonym };
@@ -233,9 +230,7 @@ const PProfile1 = () => {
             // Fallback if country unknown
             setNativeNationalityLabel(countryName);
             setInputs((prev) =>
-              prev.map((inp) =>
-                inp.id === 'nationality' ? { ...inp, value: countryName } : inp
-              )
+              prev.map((inp) => (inp.id === 'nationality' ? { ...inp, value: countryName } : inp))
             );
           }
         })
@@ -243,9 +238,7 @@ const PProfile1 = () => {
           console.error('Error fetching restcountries data:', error);
           setNativeNationalityLabel(countryName);
           setInputs((prev) =>
-            prev.map((inp) =>
-              inp.id === 'nationality' ? { ...inp, value: countryName } : inp
-            )
+            prev.map((inp) => (inp.id === 'nationality' ? { ...inp, value: countryName } : inp))
           );
         });
     }
@@ -401,8 +394,7 @@ const PProfile1 = () => {
             <Select
               options={nationalities}
               value={nationalities.find(
-                (option) =>
-                  option.value === inputs.find((inp) => inp.id === 'nationality')?.value
+                (option) => option.value === inputs.find((inp) => inp.id === 'nationality')?.value
               )}
               onChange={(option) => handleInputChange('nationality', option.value)}
               placeholder="........."
@@ -471,8 +463,7 @@ const PProfile1 = () => {
             <Select
               options={currencies}
               value={currencies.find(
-                (option) =>
-                  option.value === inputs.find((input) => input.id === 'currency').value
+                (option) => option.value === inputs.find((input) => input.id === 'currency').value
               )}
               onChange={(option) => handleInputChange('currency', option.value)}
               styles={{
@@ -493,9 +484,7 @@ const PProfile1 = () => {
                 option: (provided, state) => ({
                   ...provided,
                   fontSize: 16,
-                  backgroundColor: state.isSelected
-                    ? 'rgb(0, 50, 100)'
-                    : 'rgb(0, 100, 182)',
+                  backgroundColor: state.isSelected ? 'rgb(0, 50, 100)' : 'rgb(0, 100, 182)',
                   color: 'white',
                   '&:hover': {
                     backgroundColor: 'rgb(0, 150, 255)',

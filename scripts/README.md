@@ -92,7 +92,7 @@ Helper scripts for database management, migrations, and development tasks.
 - Tests database connection
 - Optionally drops existing database
 - Creates new database
-- Initializes schema from `context/db_template_survey.sql`
+- Initializes schema from `server/db/schema/db_template_survey.sql`
 - Lists created tables
 
 ---
@@ -138,7 +138,7 @@ For now, Windows users can:
 
 ## Database Template
 
-**Location:** `survey-system-unified/context/db_template_survey.sql`
+**Location:** `survey-system-unified/server/db/schema/db_template_survey.sql`
 
 This file contains the complete PostgreSQL schema for the survey system:
 - Tables (surveys, responses, users, localization, etc.)

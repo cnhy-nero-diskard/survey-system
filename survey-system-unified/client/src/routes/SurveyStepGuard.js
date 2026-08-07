@@ -1,44 +1,50 @@
-import { useEffect, useContext, useState, useRef } from "react";
-import { useNavigate, useLocation, Router } from "react-router-dom";
-import axios from "axios";
-import { sroutes as surveyRoutes } from "./surveyRoutesConfig";
-import { UnifiedContext } from "./UnifiedContext";
+import { useEffect, useContext, useState, useRef } from 'react';
+import { useNavigate, useLocation, Router } from 'react-router-dom';
+import axios from 'axios';
+import { sroutes as surveyRoutes } from './surveyRoutesConfig';
+import { UnifiedContext } from './UnifiedContext';
 
 const SurveyStepGuard = ({ route, index, totalSteps }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { activeBlocks, routes, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
+  const { activeBlocks, routes, appendActiveBlocks, removeActiveBlocks } =
+    useContext(UnifiedContext);
   const [redirectCount, setRedirectCount] = useState(0);
   const isMounted = useRef(true);
 
   const getParentPath = (path) => {
-    const segments = path.split("/");
-    return segments.slice(0, -1).join("/");
+    const segments = path.split('/');
+    return segments.slice(0, -1).join('/');
   };
   useEffect(() => {
-    console.log(`SURVEY STEP GUARD - TRYING TO RENDER COMPONENT - route ${route.path} index ${index}`);
+    console.log(
+      `SURVEY STEP GUARD - TRYING TO RENDER COMPONENT - route ${route.path} index ${index}`
+    );
 
     const validateStepAccess = async () => {
       try {
-
-
         console.log(`SSGUARD VERIFYING with active blocks ${JSON.stringify(activeBlocks)}`);
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
+          withCredentials: true,
+        });
         let currentStep = response.data.currentStep;
-        let parentPath = getParentPath(location.pathname)
+        let parentPath = getParentPath(location.pathname);
         console.log(`PARENT PATH of ${location.pathname} --> ${parentPath}`);
-        if (parentPath ===""){
-          parentPath = location.pathname
+        if (parentPath === '') {
+          parentPath = location.pathname;
         }
-        if (location.pathname === "/survey" || getParentPath(location.pathname) == "/survey" && !activeBlocks.includes("surveytpms")) {
-          removeActiveBlocks("feedback");
-        } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
-          removeActiveBlocks("surveytpms");
+        if (
+          location.pathname === '/survey' ||
+          (getParentPath(location.pathname) == '/survey' && !activeBlocks.includes('surveytpms'))
+        ) {
+          removeActiveBlocks('feedback');
+        } else if (location.pathname === '/feedback' && !activeBlocks.includes('feedback')) {
+          removeActiveBlocks('surveytpms');
         }
         // Redirect to the first step if currentStep is 0 and the user is trying
         // to skip ahead of it.
         if (currentStep === 0 && index !== 0) {
-          console.log("SSGUARD detected zero currentStep")
+          console.log('SSGUARD detected zero currentStep');
           navigate(parentPath);
           return;
         }
@@ -55,9 +61,13 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
             newindex--;
           }
 
-          await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
-            currentStep: newindex,
-          }, { withCredentials: true });
+          await axios.post(
+            `${process.env.REACT_APP_API_HOST}/api/survey/progress`,
+            {
+              currentStep: newindex,
+            },
+            { withCredentials: true }
+          );
 
           navigate(`${parentPath}/${routes[newindex].path}`);
           return;
@@ -66,14 +76,16 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
         // Block forward-skipping only. Revisiting a completed step
         // (index <= currentStep) is allowed without redirect.
         if (index > currentStep) {
-          console.log(`SSGUARD forward-skip blocked: index ${index} is ahead of currentStep ${currentStep}`);
+          console.log(
+            `SSGUARD forward-skip blocked: index ${index} is ahead of currentStep ${currentStep}`
+          );
 
-          setRedirectCount(prevCount => prevCount + 1);
+          setRedirectCount((prevCount) => prevCount + 1);
 
           // Prevent infinite loops by redirecting to 404 after 3 invalid attempts
           if (redirectCount >= 3) {
-            console.error("Runaway render detected. Redirecting to 404.");
-            navigate("/404");
+            console.error('Runaway render detected. Redirecting to 404.');
+            navigate('/404');
             return;
           }
 
@@ -85,7 +97,7 @@ const SurveyStepGuard = ({ route, index, totalSteps }) => {
         // Reset redirect count if the user is on the correct step
         setRedirectCount(0);
       } catch (err) {
-        console.error("Error validating step access:", err);
+        console.error('Error validating step access:', err);
       }
     };
 

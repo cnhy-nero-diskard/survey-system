@@ -33,11 +33,11 @@ export const VARIABLE_DESCRIPTORS = Object.freeze([
 ]);
 
 export const REQUIRED_VARS = Object.freeze(
-  VARIABLE_DESCRIPTORS.filter(({ required }) => required).map(({ name }) => name),
+  VARIABLE_DESCRIPTORS.filter(({ required }) => required).map(({ name }) => name)
 );
 
 export const OPTIONAL_VARS = Object.freeze(
-  VARIABLE_DESCRIPTORS.filter(({ required }) => !required).map(({ name }) => name),
+  VARIABLE_DESCRIPTORS.filter(({ required }) => !required).map(({ name }) => name)
 );
 
 // These values were committed in docker-compose.yml, .env.development,
@@ -51,13 +51,15 @@ export const CRYPTO_SECRETS = Object.freeze([
 
 // These values were committed in docker-compose.yml, .env.development,
 // .env.example, or related repository configuration/history.
-export const KNOWN_PUBLIC_SECRETS = Object.freeze(new Set([
-  'docker_dev_secret_change_in_production',
-  'dev_session_secret_key',
-  'your_super_secret_session_key_change_this_in_production',
-  'dev_password',
-  'survey_password',
-]));
+export const KNOWN_PUBLIC_SECRETS = Object.freeze(
+  new Set([
+    'docker_dev_secret_change_in_production',
+    'dev_session_secret_key',
+    'your_super_secret_session_key_change_this_in_production',
+    'dev_password',
+    'survey_password',
+  ])
+);
 
 const secretDescriptors = VARIABLE_DESCRIPTORS.filter(({ secret }) => secret);
 
@@ -126,12 +128,12 @@ export const buildConfig = (source = process.env) => {
   }
   const duplicateGroups = [...groupedSecrets.values()].filter((names) => names.length > 1);
   if (duplicateGroups.length > 0) {
-    errors.push(`Cryptographic secrets must be distinct: ${duplicateGroups.map((names) => names.join(', ')).join('; ')}`);
+    errors.push(
+      `Cryptographic secrets must be distinct: ${duplicateGroups.map((names) => names.join(', ')).join('; ')}`
+    );
   }
 
-  const config = Object.fromEntries(
-    VARIABLE_DESCRIPTORS.map(({ name }) => [name, values[name]]),
-  );
+  const config = Object.fromEntries(VARIABLE_DESCRIPTORS.map(({ name }) => [name, values[name]]));
 
   return {
     config: Object.freeze(config),
@@ -150,11 +152,9 @@ if (validation.errors.length > 0) {
 
 export const env = validation.config;
 
-export const redactedConfig = () => Object.freeze(
-  Object.fromEntries(
-    VARIABLE_DESCRIPTORS.map(({ name, secret }) => [
-      name,
-      secret ? '[REDACTED]' : env[name],
-    ]),
-  ),
-);
+export const redactedConfig = () =>
+  Object.freeze(
+    Object.fromEntries(
+      VARIABLE_DESCRIPTORS.map(({ name, secret }) => [name, secret ? '[REDACTED]' : env[name]])
+    )
+  );

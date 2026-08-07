@@ -5,24 +5,34 @@ This directory contains CI/CD pipeline configurations for automated testing, bui
 ## Available Workflows
 
 ### 1. `test.yml` - Automated Testing
-**Triggers:** Push to `main`/`develop`, Pull requests
+**Triggers:** Push to `master`, Pull requests against `master`
+
+(Previously targeted `main`/`develop`, which this repository never had, so this
+workflow had never actually run. Fixed 2026-08-07.)
 
 **What it does:**
 - Sets up PostgreSQL test database
-- Installs dependencies for client and server
-- Initializes database schema from template
-- Runs Jest test suite for backend
-- Builds React frontend
+- Installs root, client, and server dependencies
+- Lints (`npm run lint`, warnings capped at the current baseline)
+- Initializes database schema from `server/db/schema/db_template_survey.sql`
+- Runs the Jest suite for the backend (`PG_*` env vars plus throwaway
+  `JWT_SECRET`/`CRYPTO_SECRET`/`HMAC_SECRET`/`SESSION_SECRET` values —
+  `server/config/env.js` requires all four, each distinct and ≥32 characters)
+- Runs the client test suite (currently `--passWithNoTests`; there are no
+  client tests yet — see the root `CONTRIBUTING.md`)
+- Builds the React frontend
 - Uploads coverage reports to Codecov
 
 **Requirements:**
-- Working test suite (`npm test` succeeds locally)
+- Working test suite (`npm test` succeeds locally from `survey-system-unified/`)
 - Database schema properly defined
 
 **Fix if failing:**
 - Ensure all tests pass locally first
 - Check database initialization is working
 - Verify environment variables for tests are set
+- If lint fails on warning count, either fix warnings or raise `--max-warnings`
+  deliberately (don't raise it just to silence CI — see `CONTRIBUTING.md`)
 
 ---
 

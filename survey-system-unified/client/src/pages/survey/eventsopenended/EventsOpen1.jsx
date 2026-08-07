@@ -13,7 +13,6 @@ const EventsOpen1 = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
-  
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('EventsOpen1', language);
 
@@ -26,7 +25,7 @@ const EventsOpen1 = () => {
   // State to hold user input
   const [formData, setFormData] = useState({
     selectedOptionValue: '',
-    feedback: ''
+    feedback: '',
   });
   // Load any existing data from localStorage on component mount
   useEffect(() => {
@@ -52,9 +51,8 @@ const EventsOpen1 = () => {
     <OpenFormat1
       title={translations.eventsOpen1AttractionsExpectations}
       onNext={handleNext}
-      squestion_identifier='EV'
+      squestion_identifier="EV"
       initialValue={formData}
-
     />
   );
 };

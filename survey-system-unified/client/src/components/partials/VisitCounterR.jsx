@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import BodyPartial from '../../components/partials/BodyPartial';
 import GradientBackground from '../../components/partials/GradientBackground';
 import { Container, Option } from '../utils/styles1';
-import imgOverlay from "../../components/img/city.png";
+import imgOverlay from '../../components/img/city.png';
 import useTranslations from '../utils/useTranslations';
 import { VISITFREQUENCYFORM } from '../utils/componentConstants';
 import { submitSurveyResponses } from '../utils/sendInputUtils';
@@ -125,40 +125,40 @@ const VisitCounterR = ({ title, surveyquestion_ref, handNext, visitCount, handle
   return (
     <>
       <BodyPartial />
-      <GradientBackground imgOverlay={imgOverlay} handleNextClick={handleNextClick} buttonAppear={visitCount !== null}>
-          <AnimatedContainer style={containerAnimation}>
-            <Title>{title}</Title>
-            <ButtonGroup>
-              <Option
-                selected={visitCount === 0}
-                onClick={() => handleChoice("0")}
-                aria-label="Zero"
-              >
-                {"0"}
-              </Option>
-              <Option
-                selected={visitCount === 1}
-                onClick={() => handleChoice("1x")}
-                aria-label="Once"
-              >
-                {translations.VisitFrequencyForm_Option1x || "1x"}
-              </Option>
-              <Option
-                selected={visitCount === 2}
-                onClick={() => handleChoice("2x")}
-                aria-label="Twice"
-              >
-                {translations.VisitFrequencyForm_Option2x || "2x"}
-              </Option>
-              <Option
-                selected={visitCount === 3}
-                onClick={() => handleChoice("3x or more")}
-                aria-label="Three times or more"
-              >
-                {translations.VisitFrequencyForm_Option3xOrMore || "3x or more"}
-              </Option>
-            </ButtonGroup>
-          </AnimatedContainer>
+      <GradientBackground
+        imgOverlay={imgOverlay}
+        handleNextClick={handleNextClick}
+        buttonAppear={visitCount !== null}
+      >
+        <AnimatedContainer style={containerAnimation}>
+          <Title>{title}</Title>
+          <ButtonGroup>
+            <Option selected={visitCount === 0} onClick={() => handleChoice('0')} aria-label="Zero">
+              {'0'}
+            </Option>
+            <Option
+              selected={visitCount === 1}
+              onClick={() => handleChoice('1x')}
+              aria-label="Once"
+            >
+              {translations.VisitFrequencyForm_Option1x || '1x'}
+            </Option>
+            <Option
+              selected={visitCount === 2}
+              onClick={() => handleChoice('2x')}
+              aria-label="Twice"
+            >
+              {translations.VisitFrequencyForm_Option2x || '2x'}
+            </Option>
+            <Option
+              selected={visitCount === 3}
+              onClick={() => handleChoice('3x or more')}
+              aria-label="Three times or more"
+            >
+              {translations.VisitFrequencyForm_Option3xOrMore || '3x or more'}
+            </Option>
+          </ButtonGroup>
+        </AnimatedContainer>
       </GradientBackground>
     </>
   );

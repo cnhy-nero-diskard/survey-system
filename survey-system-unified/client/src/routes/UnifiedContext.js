@@ -6,7 +6,9 @@ export const UnifiedProvider = ({ children, routes }) => {
   // Initialize activeBlocks from sessionStorage or use default value
   const [activeBlocks, setActiveBlocks] = useState(() => {
     const storedActiveBlocks = sessionStorage.getItem('activeBlocks');
-    return storedActiveBlocks ? JSON.parse(storedActiveBlocks) : ['universal', 'surveytpms', 'feedback', 'isalone'];
+    return storedActiveBlocks
+      ? JSON.parse(storedActiveBlocks)
+      : ['universal', 'surveytpms', 'feedback', 'isalone'];
   });
 
   const [headerText, setHeaderText] = useState('');

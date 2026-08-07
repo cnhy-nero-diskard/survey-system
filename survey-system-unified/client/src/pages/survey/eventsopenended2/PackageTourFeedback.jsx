@@ -7,13 +7,13 @@ import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
-const PackageTourFeedback = ({  }) => {
+const PackageTourFeedback = ({}) => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
   const [formData, setFormData] = useState({
     selectedOptionValue: '',
-    feedback: ''
+    feedback: '',
   });
   // Load any existing data from localStorage on component mount
   useEffect(() => {
@@ -22,7 +22,6 @@ const PackageTourFeedback = ({  }) => {
       setFormData(storedData);
     }
   }, []);
-
 
   const [feedback, setFeedback] = useState('');
   const [selectedOption, setSelectedOption] = useState(null);
@@ -42,12 +41,7 @@ const PackageTourFeedback = ({  }) => {
 
     // Navigate to the next step
 
-
-
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-    
-
-
   };
 
   return (
@@ -56,7 +50,6 @@ const PackageTourFeedback = ({  }) => {
       onNext={handleNext}
       squestion_identifier={'PKG'}
       initialValue={formData} // Pass initialValue correctly
-
     />
   );
 };

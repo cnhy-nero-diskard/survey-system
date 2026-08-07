@@ -48,13 +48,13 @@ codebase. This is the one step that is not an audit.
 > `server/middleware/hmacMiddleware.js`, and `server/middleware/anonymousUserMiddleware.js`.
 >
 > Do not aim for coverage percentages. Propose a **characterization test suite**: tests
-> that pin down what the code does *today*, including its quirks, so a refactor that
+> that pin down what the code does _today_, including its quirks, so a refactor that
 > changes behavior fails loudly. For each proposed test, state the exact assertion and
 > what refactoring mistake it would catch.
 >
 > Create an OpenSpec change named `characterization-test-baseline` with the proposal,
 > design, and tasks. Note explicitly in the design which existing behaviors you believe
-> are *bugs* being pinned — those need separate proposals, not preservation.
+> are _bugs_ being pinned — those need separate proposals, not preservation.
 
 ---
 
@@ -65,6 +65,7 @@ codebase. This is the one step that is not an audit.
 > actual file.
 >
 > Known starting points:
+>
 > - `client/src copy/` — a tracked duplicate directory containing a stray `survey.jsql`-like
 >   `survey.jsx`. Determine whether anything in it is referenced anywhere; if not, it goes.
 > - `server/surveymockup1_backend.code-workspace` — tracked editor config.
@@ -101,6 +102,7 @@ and the dead-code half.
 >
 > **Part A — client dependencies.** `client/package.json` has ~50 runtime dependencies for
 > a 29k-line CRA app. Specific suspicions to verify, plus find the ones I missed:
+>
 > - `style-components` — this looks like a typo-squat/mistake alongside the real
 >   `styled-components`. Check if anything imports it.
 > - `helmet` — a server-side Express library listed as a client dependency (note
@@ -135,6 +137,7 @@ and the dead-code half.
 > The shape is `routes/ → controllers/ → services/`, with `middleware/`, `config/`, `utils/`.
 >
 > Concrete targets:
+>
 > - `server/services/adminCRUD.js` (1228 lines) and `server/services/analyticsCRUD.js`
 >   (1074 lines) — what distinct responsibilities are fused in each? Propose a split along
 >   real seams, not arbitrary line counts.
@@ -254,7 +257,7 @@ Run this after implementing a batch of proposals. It mirrors the method of
 >
 > For each change I name: confirm every task in its `tasks.md` is genuinely done (not
 > partially done, not done-differently), confirm the delta specs match the shipped
-> behavior, and confirm no requirement was silently dropped. Then surface any *new* risk
+> behavior, and confirm no requirement was silently dropped. Then surface any _new_ risk
 > the implementation introduced.
 >
 > Write the report to `docs/audit-<YYYY-MM-DD>-<phase-name>.md` and tell me which changes
@@ -264,17 +267,17 @@ Run this after implementing a batch of proposals. It mirrors the method of
 
 ## Ordering rationale
 
-| Order | Why here |
-|---|---|
-| 0. Context block | Improves the output of every prompt after it. Cheapest win in the file. |
-| 1. Tests | The only prompt that must precede refactoring. Everything after it is safer with it in place. |
-| 2. Hygiene | Deleting junk shrinks the surface every later audit has to read. |
-| 3. Dead code + deps | Same reason, one level deeper. Do not refactor code you're about to delete. |
-| 4. Server arch | Smaller (5k LOC), better-specified, and already has some test coverage. Build confidence here. |
-| 5. Client arch | Biggest and rustiest. Do it last, with a net and a clean tree. |
-| 6. Tooling | After the big moves, so the lint baseline isn't invalidated by mass renames. |
-| 7. Docs | Last, so the docs describe the refurbished system rather than a moving target. |
-| 8. Verification | Repeat after every implementation batch. |
+| Order               | Why here                                                                                       |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| 0. Context block    | Improves the output of every prompt after it. Cheapest win in the file.                        |
+| 1. Tests            | The only prompt that must precede refactoring. Everything after it is safer with it in place.  |
+| 2. Hygiene          | Deleting junk shrinks the surface every later audit has to read.                               |
+| 3. Dead code + deps | Same reason, one level deeper. Do not refactor code you're about to delete.                    |
+| 4. Server arch      | Smaller (5k LOC), better-specified, and already has some test coverage. Build confidence here. |
+| 5. Client arch      | Biggest and rustiest. Do it last, with a net and a clean tree.                                 |
+| 6. Tooling          | After the big moves, so the lint baseline isn't invalidated by mass renames.                   |
+| 7. Docs             | Last, so the docs describe the refurbished system rather than a moving target.                 |
+| 8. Verification     | Repeat after every implementation batch.                                                       |
 
 ## Notes
 

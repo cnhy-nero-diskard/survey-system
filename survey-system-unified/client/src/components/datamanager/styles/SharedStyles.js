@@ -36,7 +36,7 @@ export const SectionHeader = styled.div`
   color: white;
   padding: 20px 24px;
   margin: -24px -24px 24px -24px;
-  
+
   h2 {
     font-family: ${fontFamily};
     font-size: 24px;
@@ -46,7 +46,7 @@ export const SectionHeader = styled.div`
     align-items: center;
     gap: 12px;
   }
-  
+
   p {
     font-family: ${fontFamily};
     margin: 8px 0 0 0;
@@ -63,7 +63,7 @@ export const ModernForm = styled.form`
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(102, 126, 234, 0.1);
   margin-bottom: 24px;
-  
+
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 16px;
@@ -144,8 +144,10 @@ export const ModernButton = styled.button`
   gap: 8px;
   justify-content: center;
   min-height: 44px;
-  
-  ${props => props.variant === 'primary' && `
+
+  ${(props) =>
+    props.variant === 'primary' &&
+    `
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     
@@ -158,8 +160,10 @@ export const ModernButton = styled.button`
       transform: translateY(0);
     }
   `}
-  
-  ${props => props.variant === 'secondary' && `
+
+  ${(props) =>
+    props.variant === 'secondary' &&
+    `
     background: #f7fafc;
     color: #4a5568;
     border: 2px solid #e2e8f0;
@@ -170,7 +174,9 @@ export const ModernButton = styled.button`
     }
   `}
   
-  ${props => props.variant === 'danger' && `
+  ${(props) =>
+    props.variant === 'danger' &&
+    `
     background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
     color: white;
     
@@ -184,7 +190,9 @@ export const ModernButton = styled.button`
     }
   `}
   
-  ${props => props.variant === 'success' && `
+  ${(props) =>
+    props.variant === 'success' &&
+    `
     background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
     color: white;
     
@@ -222,7 +230,7 @@ export const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   h3 {
     font-family: ${fontFamily};
     font-weight: 600;
@@ -235,20 +243,20 @@ export const TableHeader = styled.div`
 export const TableContainer = styled.div`
   max-height: 600px;
   overflow-y: auto;
-  
+
   &::-webkit-scrollbar {
     width: 8px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 4px;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, #5a6fd8, #6a4c93);
   }
@@ -266,7 +274,7 @@ export const ModernTableHead = styled.thead`
   position: sticky;
   top: 0;
   z-index: 10;
-  
+
   th {
     padding: 16px 24px;
     text-align: left;
@@ -278,11 +286,11 @@ export const ModernTableHead = styled.thead`
 
 export const ModernTableRow = styled.tr`
   transition: all 0.2s ease;
-  
+
   &:nth-child(even) {
     background-color: #f8fafc;
   }
-  
+
   &:hover {
     background-color: #e6fffa;
     transform: scale(1.001);
@@ -315,8 +323,10 @@ export const ActionButton = styled.button`
   display: flex;
   align-items: center;
   gap: 4px;
-  
-  ${props => props.variant === 'edit' && `
+
+  ${(props) =>
+    props.variant === 'edit' &&
+    `
     background: linear-gradient(135deg, #ffd93d 0%, #ff9500 100%);
     color: white;
     
@@ -325,8 +335,10 @@ export const ActionButton = styled.button`
       box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
     }
   `}
-  
-  ${props => props.variant === 'delete' && `
+
+  ${(props) =>
+    props.variant === 'delete' &&
+    `
     background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
     color: white;
     
@@ -345,10 +357,14 @@ export const LoadingSpinner = styled.div`
   border-top: 2px solid #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  
+
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -356,20 +372,20 @@ export const EmptyState = styled.div`
   text-align: center;
   padding: 48px 24px;
   color: #718096;
-  
+
   .icon {
     font-size: 48px;
     color: #cbd5e0;
     margin-bottom: 16px;
   }
-  
+
   h4 {
     font-family: ${fontFamily};
     font-size: 18px;
     margin: 0 0 8px 0;
     color: #4a5568;
   }
-  
+
   p {
     font-family: ${fontFamily};
     margin: 0;
@@ -384,14 +400,14 @@ export const StatsCard = styled.div`
   border-radius: 12px;
   text-align: center;
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
-  
+
   h4 {
     font-family: ${fontFamily};
     font-size: 24px;
     font-weight: 600;
     margin: 0 0 4px 0;
   }
-  
+
   p {
     font-family: ${fontFamily};
     margin: 0;

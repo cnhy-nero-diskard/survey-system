@@ -11,15 +11,12 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { NormOption, QuestionText } from '../../../components/utils/styles1';
-import { 
-  fetchCurrencies, 
-  fetchConversionRates, 
-  convertIncomeToPHP 
-} from '../../../components/utils/currencyUtils'; 
-import { 
-  saveToLocalStorage, 
-  loadFromLocalStorage 
-} from '../../../components/utils/storageUtils';
+import {
+  fetchCurrencies,
+  fetchConversionRates,
+  convertIncomeToPHP,
+} from '../../../components/utils/currencyUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -39,7 +36,8 @@ const shake = keyframes`
 const ExpenseInput = styled(animated.input)`
   font-size: 18px;
   padding: 5px;
-  border: ${({ hasError }) => (hasError ? '3px' : '1px')} solid ${({ hasError }) => (hasError ? 'red' : '#ddd')};
+  border: ${({ hasError }) => (hasError ? '3px' : '1px')} solid
+    ${({ hasError }) => (hasError ? 'red' : '#ddd')};
   border-radius: 4px;
   width: 100px;
   text-align: right;
@@ -92,10 +90,10 @@ const ForgetButton = styled(animated.button)`
 const customSelectStyles = {
   control: (provided) => ({
     ...provided,
-    backgroundColor: 'rgb(2, 119, 165)', 
-    borderColor: '#aaa', 
+    backgroundColor: 'rgb(2, 119, 165)',
+    borderColor: '#aaa',
     color: '#fff',
-    borderRadius:'15px'
+    borderRadius: '15px',
   }),
   singleValue: (provided) => ({
     ...provided,
@@ -111,11 +109,7 @@ const customSelectStyles = {
   }),
   option: (provided, state) => ({
     ...provided,
-    backgroundColor: state.isSelected
-      ? '#555'
-      : state.isFocused
-      ? '#444'
-      : '#222',
+    backgroundColor: state.isSelected ? '#555' : state.isFocused ? '#444' : '#222',
     color: '#fff',
     cursor: 'pointer',
   }),
@@ -138,7 +132,7 @@ function getInitialExpenses() {
 }
 
 function getInitialCurrency() {
-  const storedData = {selectedCurrency: loadFromLocalStorage('touristCurrency')};
+  const storedData = { selectedCurrency: loadFromLocalStorage('touristCurrency') };
   if (storedData && storedData.selectedCurrency) {
     return storedData.selectedCurrency;
   }
@@ -165,7 +159,7 @@ const ExpenseTracker = () => {
   useEffect(() => {
     saveToLocalStorage('expenseTrackerData', {
       expenses,
-      selectedCurrency
+      selectedCurrency,
     });
     saveToLocalStorage('touristCurrency', selectedCurrency);
   }, [expenses, selectedCurrency]);
@@ -192,7 +186,7 @@ const ExpenseTracker = () => {
     0
   );
   const convertedTotal = convertIncomeToPHP(totalExpenses, selectedCurrency, conversionRates);
-  const hasAtLeastOneExpense = expenses.some(expense => expense.value.trim() !== '');
+  const hasAtLeastOneExpense = expenses.some((expense) => expense.value.trim() !== '');
 
   // 6. Handle user actions
   const navigate = useNavigate();
@@ -205,19 +199,19 @@ const ExpenseTracker = () => {
 
     const surveyResponses = expenses.map((expense, index) => ({
       surveyquestion_ref: `EXP${index + 1}`,
-      response_value: expense.value || '0'
+      response_value: expense.value || '0',
     }));
 
     surveyResponses.push({
       surveyquestion_ref: 'EXPCURR',
-      response_value: selectedCurrency
+      response_value: selectedCurrency,
     });
 
     try {
       await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
-      console.error("Error submitting survey responses:", error);
+      console.error('Error submitting survey responses:', error);
     }
   };
 
@@ -257,7 +251,7 @@ const ExpenseTracker = () => {
   const buttonAnimation = useSpring({
     transform: 'scale(1)',
     from: { transform: 'scale(0.95)' },
-    config: { tension: 200, friction: 10 }
+    config: { tension: 200, friction: 10 },
   });
 
   const handleForgetButtonClick = () => {
@@ -308,7 +302,8 @@ const ExpenseTracker = () => {
           <Summary>
             <SummaryTitle>{translations.expenseTrackerSummaryTitle}</SummaryTitle>
             <SummaryValue>
-              {translations.expenseTrackerTotalInCurrency} {selectedCurrency}: {totalExpenses.toFixed(2)}
+              {translations.expenseTrackerTotalInCurrency} {selectedCurrency}:{' '}
+              {totalExpenses.toFixed(2)}
             </SummaryValue>
             <SummaryValue>
               <br />

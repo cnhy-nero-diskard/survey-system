@@ -3,7 +3,7 @@ import './Willrecom.css';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { motion } from 'framer-motion';
-import imgoverlay from "../../../components/img/shutter.png";
+import imgoverlay from '../../../components/img/shutter.png';
 import { Container, NextButtonU } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
@@ -26,7 +26,7 @@ const Willrecom = () => {
   const handleOptionClick = (option) => {
     const newResponse = {
       surveyquestion_ref: 'WLRCM',
-      response_value: option
+      response_value: option,
     };
 
     setResponses([...responses, newResponse]);
@@ -36,7 +36,6 @@ const Willrecom = () => {
     submitSurveyResponses([newResponse])
       .then(() => {
         console.log('Response submitted successfully');
-
       })
       .catch((error) => {
         console.error('Failed to submit response:', error);
@@ -60,7 +59,7 @@ const Willrecom = () => {
             transition={{ duration: 0.5 }}
           >
             <motion.div
-            style={{fontSize:'1.5rem'}}
+              style={{ fontSize: '1.5rem' }}
               className="question"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -69,7 +68,7 @@ const Willrecom = () => {
               {translations.willrecomQuestion}
             </motion.div>
             <div className="options">
-              <NextButtonU style={{marginRight:10}} onClick={() => handleOptionClick('Yes')}>
+              <NextButtonU style={{ marginRight: 10 }} onClick={() => handleOptionClick('Yes')}>
                 {translations.willrecomOptionYes}
               </NextButtonU>
               <NextButtonU onClick={() => handleOptionClick('No')}>

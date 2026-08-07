@@ -10,15 +10,14 @@ import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/ut
 
 const VisitCounterAtt = () => {
   const [selectedOption, setSelectedOption] = useState(null);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);
   const [visitCount, setVisitCount] = useState(null);
-  
 
   const handleChoice = (value) => {
-    const numericalValue = value === "0" ? 0 : value === "1x" ? 1 : value === "2x" ? 2 : 3;
+    const numericalValue = value === '0' ? 0 : value === '1x' ? 1 : value === '2x' ? 2 : 3;
     setVisitCount(numericalValue);
     // Save the selected value to localStorage
     saveToLocalStorage('vcountatt', numericalValue);
@@ -31,8 +30,8 @@ const VisitCounterAtt = () => {
   }, []);
 
   const handleNextClick = () => {
-    console.log ('COMPONENT -- nextclick')
-    goToNextStep(currentStepIndex, navigate,routes,activeBlocks);
+    console.log('COMPONENT -- nextclick');
+    goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   // Retrieve the selected language from localStorage
@@ -45,15 +44,14 @@ const VisitCounterAtt = () => {
   const visitCounterTitle = translations.visitCounterAttTitle;
 
   return (
-    <VisitCounterR 
-      title={visitCounterTitle} 
-      selectedOption={selectedOption} 
-      setSelectedOption={setSelectedOption} 
-      handNext={handleNextClick} 
+    <VisitCounterR
+      title={visitCounterTitle}
+      selectedOption={selectedOption}
+      setSelectedOption={setSelectedOption}
+      handNext={handleNextClick}
       surveyquestion_ref={'VSCATT'}
       handleChoice={handleChoice}
       visitCount={visitCount}
-
     />
   );
 };

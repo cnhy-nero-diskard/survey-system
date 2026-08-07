@@ -13,7 +13,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-TEMPLATE_FILE="../survey-system-unified/context/db_template_survey.sql"
+TEMPLATE_FILE="../survey-system-unified/server/db/schema/db_template_survey.sql"
 
 echo -e "${BLUE}"
 echo "╔════════════════════════════════════════╗"

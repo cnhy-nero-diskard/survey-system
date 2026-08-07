@@ -66,7 +66,10 @@ export function setupMockAdapter() {
   });
 
   // eslint-disable-next-line no-console
-  console.info('%c[mock] Admin dashboard is serving dummy data (REACT_APP_MOCK_DATA=true)', 'color:#f59e0b;font-weight:bold');
+  console.info(
+    '%c[mock] Admin dashboard is serving dummy data (REACT_APP_MOCK_DATA=true)',
+    'color:#f59e0b;font-weight:bold'
+  );
 
   return mock;
 }

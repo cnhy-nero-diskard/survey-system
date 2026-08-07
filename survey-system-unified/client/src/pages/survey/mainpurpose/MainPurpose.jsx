@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import React, { useContext, useEffect, useState } from 'react';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgoverlay from "../../../components/img/question.png";
+import imgoverlay from '../../../components/img/question.png';
 import { useNavigate } from 'react-router-dom';
 import { MAINPURPOSE as COMPONENT } from '../../../components/utils/componentConstants';
 import useTranslations from '../../../components/utils/useTranslations';
@@ -56,7 +56,7 @@ export const OptionsGrid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-bottom: 40px;
-  
+
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
@@ -84,7 +84,9 @@ export const NextButton = styled.button`
   font-size: 1.2rem;
   border-radius: 25px;
   cursor: pointer;
-  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+  transition:
+    background 0.3s ease-in-out,
+    transform 0.2s ease-in-out;
   animation: ${pulse} 2s infinite;
 
   &:hover {
@@ -109,11 +111,11 @@ const MainPurpose = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [language] = useState(localStorage.getItem('selectedLanguage'));
   const navigate = useNavigate();
-  
+
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks } = useContext(UnifiedContext);
-  
+
   const translations = useTranslations(COMPONENT, language);
 
   // Load saved purposes from localStorage on mount
@@ -149,7 +151,11 @@ const MainPurpose = () => {
       { id: 'educationalFieldtrip', value: 'Educational/Fieldtrip', ref: 'PUR03' },
       { id: 'healthWellnessRetirement', value: 'Health/Wellness/Retirement', ref: 'PUR04' },
       { id: 'visitFriendsRelatives', value: 'Visit Friends and Relatives', ref: 'PUR05' },
-      { id: 'meetingIncentiveConventionExhibition', value: 'Meeting, Incentive, Convention, Exhibition', ref: 'PUR06' },
+      {
+        id: 'meetingIncentiveConventionExhibition',
+        value: 'Meeting, Incentive, Convention, Exhibition',
+        ref: 'PUR06',
+      },
     ];
 
     try {

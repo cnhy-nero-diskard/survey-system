@@ -76,13 +76,13 @@ const NextButton = styled(Button)`
  */
 const ratingOptions = {
   '': '⛔',
-  '1': '☹️',
-  '2': '😐',
-  '3': '🙂',
-  '4': '😄',
+  1: '☹️',
+  2: '😐',
+  3: '🙂',
+  4: '😄',
 };
 
-const surveyQuestionRefs = ["LOCARTS", "APPAR", "FOODDE", "ACCESS", "COSM", "PERSO"];
+const surveyQuestionRefs = ['LOCARTS', 'APPAR', 'FOODDE', 'ACCESS', 'COSM', 'PERSO'];
 
 const DestinationShoppingList = () => {
   const { routes } = useContext(UnifiedContext);
@@ -103,11 +103,13 @@ const DestinationShoppingList = () => {
     if (storedItems) {
       setItems(storedItems);
     } else if (translations.destinationShoppingListItems) {
-      const parsedItems = JSON.parse(translations.destinationShoppingListItems).map((item, index) => ({
-        name: item.name,
-        rating: '',
-        surveyquestion_ref: surveyQuestionRefs[index % surveyQuestionRefs.length]
-      }));
+      const parsedItems = JSON.parse(translations.destinationShoppingListItems).map(
+        (item, index) => ({
+          name: item.name,
+          rating: '',
+          surveyquestion_ref: surveyQuestionRefs[index % surveyQuestionRefs.length],
+        })
+      );
       setItems(parsedItems);
     }
   }, [translations]);
@@ -119,9 +121,9 @@ const DestinationShoppingList = () => {
   };
 
   const handleNextClick = async () => {
-    const formattedResponses = items.map(item => ({
+    const formattedResponses = items.map((item) => ({
       surveyquestion_ref: item.surveyquestion_ref,
-      response_value: item.rating
+      response_value: item.rating,
     }));
 
     await submitSurveyResponses(formattedResponses);
@@ -132,7 +134,11 @@ const DestinationShoppingList = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imageoverlay} opacity={0.15} handleNextClick={handleNextClick}>
+      <GradientBackground
+        overlayImage={imageoverlay}
+        opacity={0.15}
+        handleNextClick={handleNextClick}
+      >
         <Container>
           <Title>{translations.destinationShoppingListTitle}</Title>
           <ItemList>

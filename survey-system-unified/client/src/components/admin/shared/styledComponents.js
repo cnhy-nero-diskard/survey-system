@@ -26,7 +26,6 @@ export const ChartContainer = styled(Box)`
   font-size: ${fontSize};
   font-weight: ${fontWeight};
   align-items: center;
-
 `;
 
 export const CustomTypography = styled(Typography)`

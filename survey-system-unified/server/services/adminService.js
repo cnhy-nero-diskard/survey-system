@@ -1,7 +1,7 @@
 // services/adminService.js
-import { Logger } from "winston";
-import pool from "../config/db.js";
-import logger from "../middleware/logger.js";
+import { Logger } from 'winston';
+import pool from '../config/db.js';
+import logger from '../middleware/logger.js';
 
 export const getAdminDataFromDB = async () => {
   const result = await pool.query(
@@ -25,9 +25,20 @@ export const addTourismAttraction = async (attraction) => {
       RETURNING *;
     `;
   const values = [
-    attraction.TA_Name, attraction.Type_Code, attraction.Region, attraction.Prov_HUC, attraction.City_Mun,
-    attraction.Report_Year, attraction.Brgy, attraction.Latitude, attraction.Longitude, attraction.TA_Category,
-    attraction.NTDP_Category, attraction.Devt_Lvl, attraction.Mgt, attraction.Online_Connectivity
+    attraction.TA_Name,
+    attraction.Type_Code,
+    attraction.Region,
+    attraction.Prov_HUC,
+    attraction.City_Mun,
+    attraction.Report_Year,
+    attraction.Brgy,
+    attraction.Latitude,
+    attraction.Longitude,
+    attraction.TA_Category,
+    attraction.NTDP_Category,
+    attraction.Devt_Lvl,
+    attraction.Mgt,
+    attraction.Online_Connectivity,
   ];
   const result = await pool.query(query, values);
   return result.rows[0];
@@ -67,7 +78,6 @@ export const updateTourismAttraction = async (id, updatedAttraction) => {
 };
 
 export const fetchAnonymousUsers = async () => {
-
   const query = `
         SELECT
           anonymous_user_id,
@@ -84,17 +94,15 @@ export const fetchAnonymousUsers = async () => {
 export const purgeAnonymousUsers = async () => {
   const query = 'DELETE FROM anonymous_users';
   await pool.query(query);
-  return "anonymous_users successfully purged"
+  return 'anonymous_users successfully purged';
 };
-
 
 export const getEstablishmentEnglishNames = async () => {
   const query = 'SELECT id, est_name FROM establishments WHERE TRUE';
   const result = await pool.query(query);
-  const formattedResult = result.rows.map(row => ({ id: row.id, est_name: row.est_name }));
+  const formattedResult = result.rows.map((row) => ({ id: row.id, est_name: row.est_name }));
   return formattedResult;
 };
-
 
 export const fetchOpenEndedSurveyResponses = async () => {
   try {
@@ -126,7 +134,7 @@ export const fetchOpenEndedSurveyResponses = async () => {
 // export const fetchAllSurveyResponses = async () => {
 //   try {
 //     const query = `
-//       SELECT 
+//       SELECT
 //         anonymous_user_id,
 //         JSON_AGG(
 //           JSON_BUILD_OBJECT(
@@ -157,4 +165,3 @@ export const fetchSurveyQuestionsService = async () => {
   const result = await pool.query(query);
   return result.rows;
 };
-

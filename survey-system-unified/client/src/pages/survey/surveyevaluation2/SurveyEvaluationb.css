@@ -15,8 +15,6 @@
   font-size: 24px; /* Larger heading */
 }
 
-
-
 .form-section label {
   display: block;
   margin-bottom: 10px;
@@ -26,7 +24,7 @@
 }
 
 .form-section select,
-.form-section input[type="checkbox"] {
+.form-section input[type='checkbox'] {
   margin-left: 10px;
   padding: 8px;
   border: 1px solid #ffffff;
@@ -42,9 +40,12 @@
   text-align: start;
   cursor: pointer;
   border-radius: 20px;
-  transition: background-color 0.3s ease, transform 0.3s ease;}
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+}
 
-.radio-section input[type="radio"] {
+.radio-section input[type='radio'] {
   margin-right: 10px;
   width: 20px; /* Larger radio button */
   height: 20px; /* Larger radio button */

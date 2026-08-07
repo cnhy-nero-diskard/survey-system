@@ -57,13 +57,13 @@ const StatsGrid = styled.div`
 
 const CustomTableRow = styled(ModernTableRow)`
   font-size: 0.8rem;
-  
+
   ${({ status }) =>
     status === 'AT LEAST ONE ENTRY, HAS COMPLETED' &&
     css`
       background-color: #48bb78 !important;
       color: white;
-      
+
       &:hover {
         background-color: #38a169 !important;
       }
@@ -75,7 +75,7 @@ const CustomTableRow = styled(ModernTableRow)`
       background-color: #fc8181 !important;
       color: white;
       animation: ${pulse} 2s infinite;
-      
+
       &:hover {
         background-color: #f56565 !important;
       }
@@ -176,22 +176,35 @@ const AnonymousUsersHandler = () => {
   useEffect(() => {
     const fetchAnonymousUsersAndSurveyResponses = async () => {
       try {
-        const [usersResponse, spamUsersResponse, surveyResponsesResponse, surveyQuestionsResponse] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/anonymous-users`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/spam-anonymous-users`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-responses`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-questions`, { withCredentials: true })
-        ]);
+        const [usersResponse, spamUsersResponse, surveyResponsesResponse, surveyQuestionsResponse] =
+          await Promise.all([
+            axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/anonymous-users`, {
+              withCredentials: true,
+            }),
+            axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/spam-anonymous-users`, {
+              withCredentials: true,
+            }),
+            axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-responses`, {
+              withCredentials: true,
+            }),
+            axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/survey-questions`, {
+              withCredentials: true,
+            }),
+          ]);
 
         const anonymousUsers = usersResponse.data;
         setSpamUsers(spamUsersResponse.data);
         const allSurveyResponses = surveyResponsesResponse.data;
         setSurveyQuestions(surveyQuestionsResponse.data);
 
-        const userSurveyStatus = anonymousUsers.map(user => {
-          const userResponses = allSurveyResponses.filter(response => response.anonymous_user_id === user.anonymous_user_id);
-          const isSpam = spamUsersResponse.data.some(spamUser => spamUser.anonymous_user_id === user.anonymous_user_id);
-          
+        const userSurveyStatus = anonymousUsers.map((user) => {
+          const userResponses = allSurveyResponses.filter(
+            (response) => response.anonymous_user_id === user.anonymous_user_id
+          );
+          const isSpam = spamUsersResponse.data.some(
+            (spamUser) => spamUser.anonymous_user_id === user.anonymous_user_id
+          );
+
           let surveyStatus = {
             ...user,
             surveyEntries: userResponses,
@@ -199,13 +212,15 @@ const AnonymousUsersHandler = () => {
             completionStatus: 'INCOMPLETE',
             feedback: false,
             tpms: false,
-            isSpam
+            isSpam,
           };
 
           if (userResponses.length > 0) {
             surveyStatus.surveyStatus = 'NOT FINISHED';
-            const tpentResponse = userResponses.find(resp => resp.surveyquestion_ref === 'TPENT');
-            const finishResponse = userResponses.find(resp => resp.surveyquestion_ref === 'FINISH');
+            const tpentResponse = userResponses.find((resp) => resp.surveyquestion_ref === 'TPENT');
+            const finishResponse = userResponses.find(
+              (resp) => resp.surveyquestion_ref === 'FINISH'
+            );
 
             if (tpentResponse) {
               surveyStatus.feedback = true;
@@ -232,7 +247,9 @@ const AnonymousUsersHandler = () => {
 
   const handlePurge = async () => {
     try {
-      await axios.delete(`${process.env.REACT_APP_API_HOST}/api/admin/all-anonymous-users`, { withCredentials: true });
+      await axios.delete(`${process.env.REACT_APP_API_HOST}/api/admin/all-anonymous-users`, {
+        withCredentials: true,
+      });
       setUsers([]);
     } catch (err) {
       setError(err.message);
@@ -246,7 +263,7 @@ const AnonymousUsersHandler = () => {
   const groupResponsesByTitle = (responses) => {
     return responses.reduce((acc, response) => {
       const matchingQuestion = surveyQuestions.find(
-        question => question.surveyresponses_ref === response.surveyquestion_ref
+        (question) => question.surveyresponses_ref === response.surveyquestion_ref
       );
       const title = matchingQuestion ? matchingQuestion.title : 'Uncategorized';
 
@@ -263,10 +280,14 @@ const AnonymousUsersHandler = () => {
 
     sortedUsers.sort((a, b) => {
       // Priority 1: Sort by 'Present Data'
-      const aHasData = ["AT LEAST ONE ENTRY", "HAS COMPLETED"].includes(a.surveyStatus) ||
-                      a.feedback === true || a.tpms === true;
-      const bHasData = ["AT LEAST ONE ENTRY", "HAS COMPLETED"].includes(b.surveyStatus) ||
-                      b.feedback === true || b.tpms === true;
+      const aHasData =
+        ['AT LEAST ONE ENTRY', 'HAS COMPLETED'].includes(a.surveyStatus) ||
+        a.feedback === true ||
+        a.tpms === true;
+      const bHasData =
+        ['AT LEAST ONE ENTRY', 'HAS COMPLETED'].includes(b.surveyStatus) ||
+        b.feedback === true ||
+        b.tpms === true;
 
       if (aHasData && !bHasData) return -1;
       if (!aHasData && bHasData) return 1;
@@ -333,15 +354,15 @@ const AnonymousUsersHandler = () => {
           <p>Total Users</p>
         </StatsCard>
         <StatsCard>
-          <h4>{users.filter(u => u.completionStatus === 'HAS COMPLETED').length}</h4>
+          <h4>{users.filter((u) => u.completionStatus === 'HAS COMPLETED').length}</h4>
           <p>Completed Surveys</p>
         </StatsCard>
         <StatsCard>
-          <h4>{users.filter(u => u.feedback).length}</h4>
+          <h4>{users.filter((u) => u.feedback).length}</h4>
           <p>With Feedback</p>
         </StatsCard>
         <StatsCard style={{ background: 'linear-gradient(135deg, #fc8181 0%, #f56565 100%)' }}>
-          <h4>{users.filter(u => u.isSpam).length}</h4>
+          <h4>{users.filter((u) => u.isSpam).length}</h4>
           <p>Suspected Spam</p>
         </StatsCard>
       </StatsGrid>
@@ -355,7 +376,7 @@ const AnonymousUsersHandler = () => {
             <option value="present_data">Present Data</option>
           </ModernSelect>
         </InputGroup>
-        
+
         <ModernButton variant="danger" onClick={handlePurge}>
           <DeleteIcon />
           PURGE ALL USERS
@@ -381,9 +402,12 @@ const AnonymousUsersHandler = () => {
             </ModernTableHead>
             <tbody>
               {users.length > 0 ? (
-                users.map(user => (
+                users.map((user) => (
                   <React.Fragment key={user.anonymous_user_id}>
-                    <CustomTableRow status={`${user.surveyStatus}, ${user.completionStatus}`} isSpam={user.isSpam}>
+                    <CustomTableRow
+                      status={`${user.surveyStatus}, ${user.completionStatus}`}
+                      isSpam={user.isSpam}
+                    >
                       <CustomTableCell>
                         {user.anonymous_user_id}
                         {user.isSpam && (
@@ -393,9 +417,7 @@ const AnonymousUsersHandler = () => {
                           </SpamBadge>
                         )}
                       </CustomTableCell>
-                      <CustomTableCell>
-                        {user.nickname || 'Anonymous'}
-                      </CustomTableCell>
+                      <CustomTableCell>{user.nickname || 'Anonymous'}</CustomTableCell>
                       <CustomTableCell>
                         {user.surveyStatus}
                         {user.isSpam && user.surveyStatus === 'HAS NO SURVEY' && (
@@ -405,29 +427,45 @@ const AnonymousUsersHandler = () => {
                         )}
                       </CustomTableCell>
                       <CustomTableCell>
-                        <span style={{ 
-                          color: user.completionStatus === 'HAS COMPLETED' ? '#48bb78' : '#f56565',
-                          fontWeight: '500'
-                        }}>
+                        <span
+                          style={{
+                            color:
+                              user.completionStatus === 'HAS COMPLETED' ? '#48bb78' : '#f56565',
+                            fontWeight: '500',
+                          }}
+                        >
                           {user.completionStatus}
                         </span>
                       </CustomTableCell>
                       <CustomTableCell feedback={user.feedback ? 'Yes' : 'No'}>
                         <span style={{ display: 'flex', alignItems: 'center' }}>
-                          {user.feedback ? <CheckIcon style={{ color: '#48bb78', marginRight: '4px' }} /> : <CancelIcon style={{ color: '#f56565', marginRight: '4px' }} />}
+                          {user.feedback ? (
+                            <CheckIcon style={{ color: '#48bb78', marginRight: '4px' }} />
+                          ) : (
+                            <CancelIcon style={{ color: '#f56565', marginRight: '4px' }} />
+                          )}
                           {user.feedback ? 'Yes' : 'No'}
                         </span>
                       </CustomTableCell>
                       <CustomTableCell>
                         <span style={{ display: 'flex', alignItems: 'center' }}>
-                          {user.tpms ? <CheckIcon style={{ color: '#48bb78', marginRight: '4px' }} /> : <CancelIcon style={{ color: '#f56565', marginRight: '4px' }} />}
+                          {user.tpms ? (
+                            <CheckIcon style={{ color: '#48bb78', marginRight: '4px' }} />
+                          ) : (
+                            <CancelIcon style={{ color: '#f56565', marginRight: '4px' }} />
+                          )}
                           {user.tpms ? 'Yes' : 'No'}
                         </span>
                       </CustomTableCell>
                       <CustomTableCell>
                         <ActionButtonGroup>
-                          <ActionButton variant="edit" onClick={() => toggleDetails(user.anonymous_user_id)}>
-                            {detailsVisible === user.anonymous_user_id ? 'HIDE DETAILS' : 'SHOW DETAILS'}
+                          <ActionButton
+                            variant="edit"
+                            onClick={() => toggleDetails(user.anonymous_user_id)}
+                          >
+                            {detailsVisible === user.anonymous_user_id
+                              ? 'HIDE DETAILS'
+                              : 'SHOW DETAILS'}
                           </ActionButton>
                         </ActionButtonGroup>
                       </CustomTableCell>
@@ -440,32 +478,40 @@ const AnonymousUsersHandler = () => {
                             {user.isSpam && (
                               <SpamWarningBanner>
                                 <WarningIcon style={{ marginRight: '8px' }} />
-                                <span>WARNING: This user has been flagged as likely spam based on behavior patterns.</span>
+                                <span>
+                                  WARNING: This user has been flagged as likely spam based on
+                                  behavior patterns.
+                                </span>
                               </SpamWarningBanner>
                             )}
                             {user.surveyEntries.length > 0 ? (
-                              Object.entries(groupResponsesByTitle(user.surveyEntries)).map(([title, responses]) => (
-                                <GroupedDetails key={title}>
-                                  <GroupTitle>{title}</GroupTitle>
-                                  {responses.map((response, index) => {
-                                    const matchingQuestion = surveyQuestions.find(
-                                      question => question.surveyresponses_ref === response.surveyquestion_ref
-                                    );
+                              Object.entries(groupResponsesByTitle(user.surveyEntries)).map(
+                                ([title, responses]) => (
+                                  <GroupedDetails key={title}>
+                                    <GroupTitle>{title}</GroupTitle>
+                                    {responses.map((response, index) => {
+                                      const matchingQuestion = surveyQuestions.find(
+                                        (question) =>
+                                          question.surveyresponses_ref ===
+                                          response.surveyquestion_ref
+                                      );
 
-                                    return (
-                                      <ResponseItem key={index}>
-                                        <ResponseText>
-                                          <strong>Question:</strong> {matchingQuestion?.content || 'N/A'} <br />
-                                          <strong>Response:</strong> {response.response_value}
-                                        </ResponseText>
-                                        <Timestamp>
-                                          {new Date(response.created_at).toLocaleString()}
-                                        </Timestamp>
-                                      </ResponseItem>
-                                    );
-                                  })}
-                                </GroupedDetails>
-                              ))
+                                      return (
+                                        <ResponseItem key={index}>
+                                          <ResponseText>
+                                            <strong>Question:</strong>{' '}
+                                            {matchingQuestion?.content || 'N/A'} <br />
+                                            <strong>Response:</strong> {response.response_value}
+                                          </ResponseText>
+                                          <Timestamp>
+                                            {new Date(response.created_at).toLocaleString()}
+                                          </Timestamp>
+                                        </ResponseItem>
+                                      );
+                                    })}
+                                  </GroupedDetails>
+                                )
+                              )
                             ) : (
                               <EmptyState>
                                 <div className="icon">

@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 DB_HOST="${1:-localhost}"
 DB_USER="${2:-postgres}"
 DB_NAME="${3:-survey_system}"
-TEMPLATE_FILE="../survey-system-unified/context/db_template_survey.sql"
+TEMPLATE_FILE="../survey-system-unified/server/db/schema/db_template_survey.sql"
 
 echo -e "${YELLOW}Survey System Fresh Database Initialization${NC}"
 echo "========================================"

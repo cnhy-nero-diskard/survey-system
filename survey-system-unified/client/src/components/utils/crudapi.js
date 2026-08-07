@@ -1,4 +1,3 @@
-
 // utils/api.js
 import { getApiUrl } from '../../config/apiConfig.js';
 
@@ -45,8 +44,20 @@ export const deleteLocalization = async (id) => {
 
 export const createEstablishment = async (formData) => {
   const {
-    est_name, type, city_mun, barangay, latitude, longitude,
-    english, korean, chinese, japanese, russian, french, spanish, hindi
+    est_name,
+    type,
+    city_mun,
+    barangay,
+    latitude,
+    longitude,
+    english,
+    korean,
+    chinese,
+    japanese,
+    russian,
+    french,
+    spanish,
+    hindi,
   } = formData;
 
   console.log(`ESTABLISHMENT NAME CREATE --> ${est_name}`);
@@ -55,8 +66,20 @@ export const createEstablishment = async (formData) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      est_name, type, city_mun, barangay, latitude, longitude,
-      english, korean, chinese, japanese, russian, french, spanish, hindi,
+      est_name,
+      type,
+      city_mun,
+      barangay,
+      latitude,
+      longitude,
+      english,
+      korean,
+      chinese,
+      japanese,
+      russian,
+      french,
+      spanish,
+      hindi,
     }),
     credentials: 'include',
   });
@@ -74,16 +97,41 @@ export const fetchEstablishment = async (filters = {}) => {
 
 export const updateEstablishment = async (id, formData) => {
   const {
-    est_name, type, city_mun, barangay, latitude, longitude,
-    english, korean, chinese, japanese, russian, french, spanish, hindi
+    est_name,
+    type,
+    city_mun,
+    barangay,
+    latitude,
+    longitude,
+    english,
+    korean,
+    chinese,
+    japanese,
+    russian,
+    french,
+    spanish,
+    hindi,
   } = formData;
 
   const response = await fetch(getApiUrl('/api/admin/establishment'), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      id, est_name, type, city_mun, barangay, latitude, longitude,
-      english, korean, chinese, japanese, russian, french, spanish, hindi,
+      id,
+      est_name,
+      type,
+      city_mun,
+      barangay,
+      latitude,
+      longitude,
+      english,
+      korean,
+      chinese,
+      japanese,
+      russian,
+      french,
+      spanish,
+      hindi,
     }),
     credentials: 'include',
   });
@@ -147,7 +195,11 @@ export const deleteTourismAttraction = async (id) => {
   return response.json();
 };
 
-export const createSurveyResponse = async (anonymous_user_id, surveyquestion_ref, response_value) => {
+export const createSurveyResponse = async (
+  anonymous_user_id,
+  surveyquestion_ref,
+  response_value
+) => {
   const response = await fetch(getApiUrl('/api/admin/survey-responses'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

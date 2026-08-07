@@ -3,14 +3,13 @@ import './WhereLearn.css';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { useNavigate } from 'react-router-dom';
-import imgOverlay from "../../../components/img/soundwave.png";
+import imgOverlay from '../../../components/img/soundwave.png';
 import { Container, Option } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
-
 
 const WhereLearn = () => {
   const { routes } = useContext(UnifiedContext);
@@ -31,7 +30,7 @@ const WhereLearn = () => {
 
     const surveyResponse = {
       surveyquestion_ref: surveyQuestionRef,
-      response_value: value, 
+      response_value: value,
     };
 
     submitSurveyResponses([surveyResponse])
@@ -51,41 +50,46 @@ const WhereLearn = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.1} blendMode='screen' buttonAppear={false}>
-          <h2>{translations.whereLearnTitle}</h2>
-          <form>
-            <div className="text-button-group">
-              {/* Text Buttons */}
-              <Option
-                type="button"
-                className={`text-button ${selectedSource === 'Friends,Family/Relatives' ? 'selected' : ''}`}
-                onClick={() => handleSourceSelection('Friends,Family/Relatives')}
-              >
-                {translations.whereLearnOptionFriendsFamily}
-              </Option>
-              <Option
-                type="button"
-                className={`text-button ${selectedSource === 'Books,Magazines,Articles' ? 'selected' : ''}`}
-                onClick={() => handleSourceSelection('Books,Magazines,Articles')}
-              >
-                {translations.whereLearnOptionBooksMagazines}
-              </Option>
-              <Option
-                type="button"
-                className={`text-button ${selectedSource === 'Online/Social Media' ? 'selected' : ''}`}
-                onClick={() => handleSourceSelection('Online/Social Media')}
-              >
-                {translations.whereLearnOptionOnlineSocialMedia}
-              </Option>
-              <Option
-                type="button"
-                className={`text-button ${selectedSource === 'Advertisements' ? 'selected' : ''}`}
-                onClick={() => handleSourceSelection('Advertisements')}
-              >
-                {translations.whereLearnOptionAdvertisements}
-              </Option>
-            </div>
-          </form>
+      <GradientBackground
+        overlayImage={imgOverlay}
+        opacity={0.1}
+        blendMode="screen"
+        buttonAppear={false}
+      >
+        <h2>{translations.whereLearnTitle}</h2>
+        <form>
+          <div className="text-button-group">
+            {/* Text Buttons */}
+            <Option
+              type="button"
+              className={`text-button ${selectedSource === 'Friends,Family/Relatives' ? 'selected' : ''}`}
+              onClick={() => handleSourceSelection('Friends,Family/Relatives')}
+            >
+              {translations.whereLearnOptionFriendsFamily}
+            </Option>
+            <Option
+              type="button"
+              className={`text-button ${selectedSource === 'Books,Magazines,Articles' ? 'selected' : ''}`}
+              onClick={() => handleSourceSelection('Books,Magazines,Articles')}
+            >
+              {translations.whereLearnOptionBooksMagazines}
+            </Option>
+            <Option
+              type="button"
+              className={`text-button ${selectedSource === 'Online/Social Media' ? 'selected' : ''}`}
+              onClick={() => handleSourceSelection('Online/Social Media')}
+            >
+              {translations.whereLearnOptionOnlineSocialMedia}
+            </Option>
+            <Option
+              type="button"
+              className={`text-button ${selectedSource === 'Advertisements' ? 'selected' : ''}`}
+              onClick={() => handleSourceSelection('Advertisements')}
+            >
+              {translations.whereLearnOptionAdvertisements}
+            </Option>
+          </div>
+        </form>
       </GradientBackground>
     </>
   );

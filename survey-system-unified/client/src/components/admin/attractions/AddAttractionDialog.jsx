@@ -1,8 +1,21 @@
 // AddAttractionDialog.js
 import React from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from '@mui/material';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Button,
+} from '@mui/material';
 
-const AddAttractionDialog = ({ open, onClose, newAttraction, handleInputChange, handleAddAttraction }) => {
+const AddAttractionDialog = ({
+  open,
+  onClose,
+  newAttraction,
+  handleInputChange,
+  handleAddAttraction,
+}) => {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Add New Attraction</DialogTitle>

@@ -21,7 +21,7 @@ const TouchpointFeedback = () => {
   // State to hold user input
   const [formData, setFormData] = useState({
     selectedOptionValue: '',
-    feedback: ''
+    feedback: '',
   });
 
   // Load any existing data from localStorage on component mount
@@ -34,15 +34,15 @@ const TouchpointFeedback = () => {
 
   const handleNext = async (selectedOptionValue, feedbackk) => {
     console.log('Selected Option:', selectedOptionValue, 'Feedback:', feedbackk);
-    
+
     // Create the updated feedback object
     const updatedFeedback = {
-        ...feedback, // Spread the previous feedback properties
-        rating: selectedOptionValue, // Update rating
-        review: feedbackk, // Update review
-        is_analyzed: false,
-        submitted_at: new Date().toLocaleString(),
-        language: localStorage.getItem('selectedLanguage')
+      ...feedback, // Spread the previous feedback properties
+      rating: selectedOptionValue, // Update rating
+      review: feedbackk, // Update review
+      is_analyzed: false,
+      submitted_at: new Date().toLocaleString(),
+      language: localStorage.getItem('selectedLanguage'),
     };
 
     // Set the feedback state
@@ -50,16 +50,20 @@ const TouchpointFeedback = () => {
 
     // Persist to localStorage before proceeding to the next step
     saveToLocalStorage('AccomodationFeedback', { selectedOptionValue, feedback: feedbackk });
-    
+
     try {
-        console.log(`FEEDBACK ----> ${JSON.stringify(updatedFeedback)}`); // Log the updated feedback
-        // Send the updated feedback to the server (CUSTOM HANDLER FOR JSONB[])
-        const response = await axios.post(`${process.env.REACT_APP_API_HOST}/api/survey/feedback`, updatedFeedback, {
-            withCredentials: true
-        });
-        console.log(`POST FEEDBACK --> ${JSON.stringify(response.data)}`);
+      console.log(`FEEDBACK ----> ${JSON.stringify(updatedFeedback)}`); // Log the updated feedback
+      // Send the updated feedback to the server (CUSTOM HANDLER FOR JSONB[])
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_HOST}/api/survey/feedback`,
+        updatedFeedback,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(`POST FEEDBACK --> ${JSON.stringify(response.data)}`);
     } catch (error) {
-        console.error('Error posting feedback:', error);
+      console.error('Error posting feedback:', error);
     }
 
     // Navigate to the next step
@@ -74,13 +78,13 @@ const TouchpointFeedback = () => {
           `${process.env.REACT_APP_API_HOST}/api/touchpointlocal`,
           {
             languagecode: language,
-            entityname: feedback.entity // Assuming 'entity' is stored in feedback context
+            entityname: feedback.entity, // Assuming 'entity' is stored in feedback context
           },
           {
-            withCredentials: true
+            withCredentials: true,
           }
         );
-        
+
         // Directly set the translated text to header
         console.log(`LOCALIZED ENTITY ${JSON.stringify(response.data)}`);
         setHeaderText(response.data.translatedName || feedback.entity);
@@ -105,7 +109,7 @@ const TouchpointFeedback = () => {
     <OpenFormat1
       title={translations.estabFeedBackTitle} // Use the translation variable for the title
       onNext={handleNext} // Pass the handleNext function to the FeedbackForm
-      squestion_identifier={"TPNTF"} // Unique identifier for the feedback form
+      squestion_identifier={'TPNTF'} // Unique identifier for the feedback form
       initialValue={formData} // Pass initialValue correctly
     />
   );

@@ -20,111 +20,110 @@ import { useCurrentStepIndex } from '../components/utils/useCurrentIndex';
  * containing the survey routes content
  */
 const SurveyRoutes = () => {
-    return (
-        <LanguageProvider>
-            <UnifiedProvider routes={sroutes}> {/* Pass sroutes as a prop */}
-                <FeedbackProvider>
-                    <SurveyRoutesContent />
-                </FeedbackProvider>
-            </UnifiedProvider>
-        </LanguageProvider>
-    );
+  return (
+    <LanguageProvider>
+      <UnifiedProvider routes={sroutes}>
+        {' '}
+        {/* Pass sroutes as a prop */}
+        <FeedbackProvider>
+          <SurveyRoutesContent />
+        </FeedbackProvider>
+      </UnifiedProvider>
+    </LanguageProvider>
+  );
 };
 
 // 2) Create a styled component for your header text
 const SurveyHeader = styled.div`
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 1em;
-    color:white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1em;
+  color: white;
 `;
 
 const SurveyRoutesContent = () => {
-    const location = useLocation();
-    const { routes, removeActiveBlocks, headerText } = useContext(UnifiedContext);
-    const { setFeedback, feedback } = useFeedback();
-    const currentStepIndex = useCurrentStepIndex(routes);
+  const location = useLocation();
+  const { routes, removeActiveBlocks, headerText } = useContext(UnifiedContext);
+  const { setFeedback, feedback } = useFeedback();
+  const currentStepIndex = useCurrentStepIndex(routes);
 
-    // components/utils/styles.css centers survey screens via body.survey-mode.
-    // Toggle it only while a survey/feedback route is mounted so it doesn't
-    // leak onto other parts of the app (e.g. the admin dashboard).
-    useEffect(() => {
-        document.body.classList.add('survey-mode');
-        return () => document.body.classList.remove('survey-mode');
-    }, []);
+  // components/utils/styles.css centers survey screens via body.survey-mode.
+  // Toggle it only while a survey/feedback route is mounted so it doesn't
+  // leak onto other parts of the app (e.g. the admin dashboard).
+  useEffect(() => {
+    document.body.classList.add('survey-mode');
+    return () => document.body.classList.remove('survey-mode');
+  }, []);
 
-    useEffect(() => {
-        if (location.pathname === "/feedback") {
-            const queryParams = new URLSearchParams(location.search);
-            const idx = queryParams.get('idx');
+  useEffect(() => {
+    if (location.pathname === '/feedback') {
+      const queryParams = new URLSearchParams(location.search);
+      const idx = queryParams.get('idx');
 
-            if (idx) {
-                axios.get(`${process.env.REACT_APP_API_HOST}/api/surveytouchpoints`, {
-                    withCredentials: true
-                })
-                    .then(response => {
-                        console.log('Touchpoints API response:', response.data);
+      if (idx) {
+        axios
+          .get(`${process.env.REACT_APP_API_HOST}/api/surveytouchpoints`, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            console.log('Touchpoints API response:', response.data);
 
-                        // Search through all categories in the response
-                        let foundEntity = null;
-                        let foundTouchpoint = null;
+            // Search through all categories in the response
+            let foundEntity = null;
+            let foundTouchpoint = null;
 
-                        // Iterate through each category in the response
-                        Object.keys(response.data).forEach(category => {
-                            response.data[category].forEach(item => {
-                                if (item.short_id === idx) {
-                                    foundEntity = item.short_id;
-                                    foundTouchpoint = category;
-                                }
-                            });
-                        });
+            // Iterate through each category in the response
+            Object.keys(response.data).forEach((category) => {
+              response.data[category].forEach((item) => {
+                if (item.short_id === idx) {
+                  foundEntity = item.short_id;
+                  foundTouchpoint = category;
+                }
+              });
+            });
 
-                        console.log(`FOUND TOUCHPOINT --> ${foundEntity} -- ${foundTouchpoint}`);
-                        if (foundEntity) {
-                            setFeedback(prevFeedback => ({
-                                ...prevFeedback,
-                                entity: foundEntity,
-                                touchpoint: foundTouchpoint
-                            }));
-                            console.log(`FEEDBACK STATE ${JSON.stringify(feedback)}`);
-                        } else {
-                            console.log('No matching touchpoint found for idx:', idx);
-                        }
-                        submitSurveyResponses([{ surveyquestion_ref: 'TPENT', response_value: 'PROMISE FEEDBACK' }]);
-                    })
-                    .catch(error => {
-                        console.error('Error making API request:', error);
-                    });
+            console.log(`FOUND TOUCHPOINT --> ${foundEntity} -- ${foundTouchpoint}`);
+            if (foundEntity) {
+              setFeedback((prevFeedback) => ({
+                ...prevFeedback,
+                entity: foundEntity,
+                touchpoint: foundTouchpoint,
+              }));
+              console.log(`FEEDBACK STATE ${JSON.stringify(feedback)}`);
             } else {
-                console.log('No "idx" query parameter found, skipping API request.');
+              console.log('No matching touchpoint found for idx:', idx);
             }
-        }
-    }, [location, setFeedback]); // Re-run effect when location or setFeedback changes
+            submitSurveyResponses([
+              { surveyquestion_ref: 'TPENT', response_value: 'PROMISE FEEDBACK' },
+            ]);
+          })
+          .catch((error) => {
+            console.error('Error making API request:', error);
+          });
+      } else {
+        console.log('No "idx" query parameter found, skipping API request.');
+      }
+    }
+  }, [location, setFeedback]); // Re-run effect when location or setFeedback changes
 
-    return (
-        <>
-            {/* 3) Use the SurveyHeader styled component instead of a regular <div> */}
-            {headerText && <SurveyHeader>{headerText}</SurveyHeader>}
+  return (
+    <>
+      {/* 3) Use the SurveyHeader styled component instead of a regular <div> */}
+      {headerText && <SurveyHeader>{headerText}</SurveyHeader>}
 
-                    <Routes>
-                        {routes.map((route, index) => (
-                            <Route
-                                key={route.path}
-                                path={route.path}
-                                element={
-                                    <SurveyStepGuard
-                                        route={route}
-                                        index={index}
-                                        totalSteps={routes.length}
-                                    />
-                                }
-                            />
-                        ))}
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
-        </>
-    );
+      <Routes>
+        {routes.map((route, index) => (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={<SurveyStepGuard route={route} index={index} totalSteps={routes.length} />}
+          />
+        ))}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
 };
 
 export default SurveyRoutes;

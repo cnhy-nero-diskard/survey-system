@@ -14,16 +14,13 @@ import {
   Input,
   NextButtonU,
   QuestionText,
-  fontColorU
+  fontColorU,
 } from '../../../components/utils/styles1';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { toast } from 'react-toastify';
-import {
-  saveToLocalStorage,
-  loadFromLocalStorage
-} from '../../../components/utils/storageUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 // Animations
 const fadeIn = keyframes`
@@ -98,7 +95,9 @@ const Suggestions = styled.ul`
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   opacity: ${({ show }) => (show ? 1 : 0)};
   transform: ${({ show }) => (show ? 'translateY(0)' : 'translateY(-10px)')};
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   position: absolute;
   top: 64px; /* positions the suggestions below the input */
   left: 0;
@@ -163,9 +162,7 @@ const FadeTransition = styled(CSSTransition)`
  * Returns the original name if not found in countries-list.
  */
 function convertNativeToEnglishOrReturn(nativeName) {
-  const foundCode = Object.keys(countries).find(
-    (code) => countries[code].native === nativeName
-  );
+  const foundCode = Object.keys(countries).find((code) => countries[code].native === nativeName);
   return foundCode ? countries[foundCode].name : nativeName;
 }
 
@@ -174,9 +171,7 @@ function convertNativeToEnglishOrReturn(nativeName) {
  * Returns the original name if not found.
  */
 function convertEnglishToNativeOrReturn(englishName) {
-  const foundCode = Object.keys(countries).find(
-    (code) => countries[code].name === englishName
-  );
+  const foundCode = Object.keys(countries).find((code) => countries[code].name === englishName);
   return foundCode ? countries[foundCode].native : englishName;
 }
 
@@ -214,14 +209,11 @@ const Residence1 = () => {
   /**
    * Identify language from localStorage first.
    */
-  const [language, setLanguage] = useState(
-    localStorage.getItem('selectedLanguage') || 'en'
-  );
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage') || 'en');
 
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } =
-    useContext(UnifiedContext);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
   const navigate = useNavigate();
   const translations = useTranslations('residence1', language);
@@ -236,24 +228,22 @@ const Residence1 = () => {
     initialSpecifyValue = getDefaultCountryByLanguage(language);
   }
 
-  // Convert that default or loaded English value to the native 
+  // Convert that default or loaded English value to the native
   // for display if it exists in `countries-list`.
   initialSpecifyValue = convertEnglishToNativeOrReturn(initialSpecifyValue);
 
   /**
    * Location states
    */
-  const [location, setLocation] = useState(storedData.location || {
-    inCity: false,
-    outsideCity: false,
-    foreignCountry: false
-  });
-  const [provinceInput, setProvinceInput] = useState(
-    storedData.provinceInput || ''
+  const [location, setLocation] = useState(
+    storedData.location || {
+      inCity: false,
+      outsideCity: false,
+      foreignCountry: false,
+    }
   );
-  const [cityMunInput, setCityMunInput] = useState(
-    storedData.cityMunInput || ''
-  );
+  const [provinceInput, setProvinceInput] = useState(storedData.provinceInput || '');
+  const [cityMunInput, setCityMunInput] = useState(storedData.cityMunInput || '');
   const [specifyInput, setSpecifyInput] = useState(initialSpecifyValue);
 
   const [provinceSuggestions, setProvinceSuggestions] = useState([]);
@@ -264,8 +254,7 @@ const Residence1 = () => {
   const [showSpecifySuggestions, setShowSpecifySuggestions] = useState(false);
   const [error, setError] = useState('');
 
-  const [provincesWithMunicipalities, setProvincesWithMunicipalities] =
-    useState({});
+  const [provincesWithMunicipalities, setProvincesWithMunicipalities] = useState({});
   const provinceRef = useRef(null);
   const cityMunRef = useRef(null);
   const specifyRef = useRef(null);
@@ -276,12 +265,9 @@ const Residence1 = () => {
   useEffect(() => {
     const fetchMunicipalities = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_HOST}/api/municipalities`,
-          {
-            withCredentials: true
-          }
-        );
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/municipalities`, {
+          withCredentials: true,
+        });
         const data = response.data;
 
         const formattedData = data.reduce((acc, row) => {
@@ -314,7 +300,7 @@ const Residence1 = () => {
       specifyInput:
         specifyInput && specifyInput.trim()
           ? convertNativeToEnglishOrReturn(specifyInput.trim())
-          : ''
+          : '',
     };
     saveToLocalStorage('Residence1Data', dataToSave);
   }, [location, provinceInput, cityMunInput, specifyInput]);
@@ -339,7 +325,7 @@ const Residence1 = () => {
       inCity: false,
       outsideCity: false,
       foreignCountry: false,
-      [name]: checked
+      [name]: checked,
     };
 
     removeActiveBlocks('iprovblock');
@@ -364,55 +350,55 @@ const Residence1 = () => {
     setError('');
   };
 
-// --------------
-// 1) Create a helper that checks for Bohol if 'outsideCity' is active
-const handleProvinceBlockCheck = (provinceValue) => {
-  if (location.outsideCity) {
-    removeActiveBlocks('iprovblock');
-    removeActiveBlocks('oprovblock');
+  // --------------
+  // 1) Create a helper that checks for Bohol if 'outsideCity' is active
+  const handleProvinceBlockCheck = (provinceValue) => {
+    if (location.outsideCity) {
+      removeActiveBlocks('iprovblock');
+      removeActiveBlocks('oprovblock');
 
-    if (provinceValue.trim().toLowerCase() === 'bohol') {
-      appendActiveBlocks(['iprovblock']);
-    } else {
-      appendActiveBlocks(['oprovblock']);
+      if (provinceValue.trim().toLowerCase() === 'bohol') {
+        appendActiveBlocks(['iprovblock']);
+      } else {
+        appendActiveBlocks(['oprovblock']);
+      }
     }
-  }
-};
+  };
 
-// 2) Call that helper as needed in handleProvinceInputChange
-const handleProvinceInputChange = (e) => {
-  const value = e.target.value;
-  setProvinceInput(value);
+  // 2) Call that helper as needed in handleProvinceInputChange
+  const handleProvinceInputChange = (e) => {
+    const value = e.target.value;
+    setProvinceInput(value);
 
-  // ∆ Moved logic into helper
-  handleProvinceBlockCheck(value);
+    // ∆ Moved logic into helper
+    handleProvinceBlockCheck(value);
 
-  // Filter suggestions as before
-  const filtered = Object.keys(provincesWithMunicipalities).filter((province) =>
-    province.toLowerCase().startsWith(value.toLowerCase())
-  );
-  setProvinceSuggestions(filtered);
-  setShowProvinceSuggestions(true);
-  setCityMunInput('');
-  setCityMunSuggestions([]);
-};
+    // Filter suggestions as before
+    const filtered = Object.keys(provincesWithMunicipalities).filter((province) =>
+      province.toLowerCase().startsWith(value.toLowerCase())
+    );
+    setProvinceSuggestions(filtered);
+    setShowProvinceSuggestions(true);
+    setCityMunInput('');
+    setCityMunSuggestions([]);
+  };
 
-// 3) Also call the helper in handleSuggestionClick
-const handleSuggestionClick = (inputSetter, suggestion) => {
-  inputSetter(suggestion);
+  // 3) Also call the helper in handleSuggestionClick
+  const handleSuggestionClick = (inputSetter, suggestion) => {
+    inputSetter(suggestion);
 
-  // When it’s the Province input field being updated...
-  if (inputSetter === setProvinceInput) {
-    // ∆ The same check if "outside the city" is selected
-    handleProvinceBlockCheck(suggestion);
-  }
+    // When it’s the Province input field being updated...
+    if (inputSetter === setProvinceInput) {
+      // ∆ The same check if "outside the city" is selected
+      handleProvinceBlockCheck(suggestion);
+    }
 
-  setShowProvinceSuggestions(false);
-  setShowCityMunSuggestions(false);
-  setShowSpecifySuggestions(false);
-};
+    setShowProvinceSuggestions(false);
+    setShowCityMunSuggestions(false);
+    setShowSpecifySuggestions(false);
+  };
 
-//-----------
+  //-----------
 
   /**
    * City/Municipality input changes
@@ -422,8 +408,8 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
     setCityMunInput(value);
     const selectedProvince = provinceInput;
     if (provincesWithMunicipalities[selectedProvince]) {
-      const filtered = provincesWithMunicipalities[selectedProvince].filter(
-        (city) => city.toLowerCase().startsWith(value.toLowerCase())
+      const filtered = provincesWithMunicipalities[selectedProvince].filter((city) =>
+        city.toLowerCase().startsWith(value.toLowerCase())
       );
       setCityMunSuggestions(filtered);
       setShowCityMunSuggestions(true);
@@ -452,7 +438,6 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
    * Clicking on a suggestion sets the input
    */
 
-
   const handleCloseSuggestions = () => {
     setShowProvinceSuggestions(false);
     setShowCityMunSuggestions(false);
@@ -463,12 +448,10 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
    * Validations on next click
    */
   const handleNextClick = async () => {
-    const isLocationSelected =
-      location.inCity || location.outsideCity || location.foreignCountry;
+    const isLocationSelected = location.inCity || location.outsideCity || location.foreignCountry;
     const isProvinceFilled =
       !location.outsideCity || (location.outsideCity && provinceInput && cityMunInput);
-    const isCountryFilled =
-      !location.foreignCountry || (location.foreignCountry && specifyInput);
+    const isCountryFilled = !location.foreignCountry || (location.foreignCountry && specifyInput);
 
     if (!isLocationSelected || !isProvinceFilled || !isCountryFilled) {
       setError('Please complete all required fields.');
@@ -477,29 +460,27 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
 
     setError('');
 
-    const finalCountryEnglish = specifyInput
-      ? convertNativeToEnglishOrReturn(specifyInput)
-      : ' ';
+    const finalCountryEnglish = specifyInput ? convertNativeToEnglishOrReturn(specifyInput) : ' ';
 
     const surveyResponses = [
       {
         surveyquestion_ref: 'LOCIN',
-        response_value: location.inCity ? 'Yes' : 'No'
+        response_value: location.inCity ? 'Yes' : 'No',
       },
       {
         surveyquestion_ref: 'LOCOUT',
-        response_value: location.outsideCity ? 'Yes' : 'No'
+        response_value: location.outsideCity ? 'Yes' : 'No',
       },
       {
         surveyquestion_ref: 'LOCFRN',
-        response_value: location.foreignCountry ? 'Yes' : 'No'
+        response_value: location.foreignCountry ? 'Yes' : 'No',
       },
       { surveyquestion_ref: 'PROV', response_value: provinceInput || ' ' },
       { surveyquestion_ref: 'CITY', response_value: cityMunInput || ' ' },
       {
         surveyquestion_ref: 'CNTRY',
-        response_value: finalCountryEnglish || ' '
-      }
+        response_value: finalCountryEnglish || ' ',
+      },
     ];
 
     try {
@@ -529,9 +510,7 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
               checked={location.inCity}
               onChange={handleLocationChange}
             />
-            <CustomCheckbox htmlFor="in-city">
-              {translations.inCity}
-            </CustomCheckbox>
+            <CustomCheckbox htmlFor="in-city">{translations.inCity}</CustomCheckbox>
           </Option>
 
           <Option>
@@ -542,9 +521,7 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
               checked={location.outsideCity}
               onChange={handleLocationChange}
             />
-            <CustomCheckbox htmlFor="outside-city">
-              {translations.outsideCity}
-            </CustomCheckbox>
+            <CustomCheckbox htmlFor="outside-city">{translations.outsideCity}</CustomCheckbox>
           </Option>
 
           <FadeTransition
@@ -567,15 +544,11 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
               />
               {showProvinceSuggestions && provinceSuggestions.length > 0 && (
                 <Suggestions show={showProvinceSuggestions}>
-                  <CloseSuggestions onClick={handleCloseSuggestions}>
-                    ×
-                  </CloseSuggestions>
+                  <CloseSuggestions onClick={handleCloseSuggestions}>×</CloseSuggestions>
                   {provinceSuggestions.map((suggestion, index) => (
                     <SuggestionItem
                       key={index}
-                      onClick={() =>
-                        handleSuggestionClick(setProvinceInput, suggestion)
-                      }
+                      onClick={() => handleSuggestionClick(setProvinceInput, suggestion)}
                     >
                       {suggestion}
                     </SuggestionItem>
@@ -606,15 +579,11 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
               />
               {showCityMunSuggestions && cityMunSuggestions.length > 0 && (
                 <Suggestions show={showCityMunSuggestions}>
-                  <CloseSuggestions onClick={handleCloseSuggestions}>
-                    ×
-                  </CloseSuggestions>
+                  <CloseSuggestions onClick={handleCloseSuggestions}>×</CloseSuggestions>
                   {cityMunSuggestions.map((suggestion, index) => (
                     <SuggestionItem
                       key={index}
-                      onClick={() =>
-                        handleSuggestionClick(setCityMunInput, suggestion)
-                      }
+                      onClick={() => handleSuggestionClick(setCityMunInput, suggestion)}
                     >
                       {suggestion}
                     </SuggestionItem>
@@ -632,9 +601,7 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
               checked={location.foreignCountry}
               onChange={handleLocationChange}
             />
-            <CustomCheckbox htmlFor="foreign-country">
-              {translations.foreignCountry}
-            </CustomCheckbox>
+            <CustomCheckbox htmlFor="foreign-country">{translations.foreignCountry}</CustomCheckbox>
           </Option>
 
           <FadeTransition
@@ -657,17 +624,12 @@ const handleSuggestionClick = (inputSetter, suggestion) => {
               />
               {showSpecifySuggestions && specifySuggestions.length > 0 && (
                 <Suggestions show={showSpecifySuggestions}>
-                  <CloseSuggestions onClick={handleCloseSuggestions}>
-                    ×
-                  </CloseSuggestions>
+                  <CloseSuggestions onClick={handleCloseSuggestions}>×</CloseSuggestions>
                   {specifySuggestions.map((countryCode, index) => (
                     <SuggestionItem
                       key={index}
                       onClick={() =>
-                        handleSuggestionClick(
-                          setSpecifyInput,
-                          countries[countryCode].native
-                        )
+                        handleSuggestionClick(setSpecifyInput, countries[countryCode].native)
                       }
                     >
                       {/* Display both English and native forms */}

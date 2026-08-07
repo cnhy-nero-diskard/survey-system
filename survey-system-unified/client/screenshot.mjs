@@ -49,7 +49,7 @@ const sroutes = [
   { path: 'surveyevaluation05' },
   { path: 'survey-complete' },
   { path: 'estopenfeedback' },
-  { path: 'feedback-complete' }
+  { path: 'feedback-complete' },
 ];
 
 (async () => {
@@ -65,11 +65,13 @@ const sroutes = [
 
   const pagesToScreenshot = [
     `${BASE_URL}/survey`,
-    ...sroutes.map(route => `${BASE_URL}/survey/${route.path}`).filter(url => !url.endsWith('/'))
+    ...sroutes
+      .map((route) => `${BASE_URL}/survey/${route.path}`)
+      .filter((url) => !url.endsWith('/')),
   ];
-  
+
   console.log(pagesToScreenshot);
-  
+
   // Define the language you want to set in localStorage
   const selectedLanguage = 'ja'; // Example: Japanese
 
@@ -98,7 +100,7 @@ const sroutes = [
     await page.goto(url, { waitUntil: 'domcontentloaded' });
 
     // Give the page time to fully animate and render
-    await setTimeout(800 ); // Adjust the time as needed
+    await setTimeout(800); // Adjust the time as needed
     // Take a screenshot, named by its number in sequence
     const fileName = `${i + 1}.png`;
     const filePath = path.join(saveDir, fileName);
@@ -109,6 +111,5 @@ const sroutes = [
   // Close the browser
   await browser.close();
 })();
-
 
 //HIDDEN LOCALIZATION PAGES:   bookingform, accomodationform, attractionform, wherestayed

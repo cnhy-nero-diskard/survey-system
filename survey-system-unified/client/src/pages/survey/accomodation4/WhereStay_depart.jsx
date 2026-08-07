@@ -48,7 +48,7 @@ const Input = styled.input`
 `;
 
 const NextButton = styled(motion.button)`
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -72,83 +72,86 @@ const DurationSelect = styled(Select)`
 `;
 
 const WhereStayDeparture = () => {
-    const [selectedOption, setSelectedOption] = useState('');
-    const [duration, setDuration] = useState('');
-    const [durationUnit, setDurationUnit] = useState('days');
-    const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
-    const translations = useTranslations('WhereStayArrival', language);
+  const [selectedOption, setSelectedOption] = useState('');
+  const [duration, setDuration] = useState('');
+  const [durationUnit, setDurationUnit] = useState('days');
+  const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
+  const translations = useTranslations('WhereStayArrival', language);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Selected Option:', selectedOption);
-        console.log('Duration:', duration);
-        console.log('Duration Unit:', durationUnit);
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Selected Option:', selectedOption);
+    console.log('Duration:', duration);
+    console.log('Duration Unit:', durationUnit);
+  };
 
-    const navigate = useNavigate();
-    const handleNext = () => {
-        navigate('/'); // Navigate to the home page
-    }
+  const navigate = useNavigate();
+  const handleNext = () => {
+    navigate('/'); // Navigate to the home page
+  };
 
-    useEffect(() => {
-        setLanguage(localStorage.getItem('selectedLanguage'));
-    }, []);
+  useEffect(() => {
+    setLanguage(localStorage.getItem('selectedLanguage'));
+  }, []);
 
-    return (
-        <><BodyPartial />
+  return (
+    <>
+      <BodyPartial />
       <GradientBackground overlayImage={imgoverlay} opacity={0.1} blendMode="multiply">
-      <Container
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <Title>{translations.whereStayDepartureTitle}</Title>
-                    <Form onSubmit={handleSubmit}>
-                        <Label htmlFor="stay-options">{translations.whereStayArrivalSelectLabel}</Label>
-                        <Select
-                            id="stay-options"
-                            value={selectedOption}
-                            onChange={(e) => setSelectedOption(e.target.value)}
-                        >
-                            <option value="">{translations.whereStayArrivalDefaultOption}</option>
-                            <option value="Home of Friends or Relatives">{translations.whereStayArrivalOptionHome}</option>
-                            <option value="Campsite">{translations.whereStayArrivalOptionCampsite}</option>
-                            <option value="Cruise Ship">{translations.whereStayArrivalOptionCruise}</option>
-                            <option value="Own Home">{translations.whereStayArrivalOptionOwnHome}</option>
-                        </Select>
+        <Container
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Title>{translations.whereStayDepartureTitle}</Title>
+          <Form onSubmit={handleSubmit}>
+            <Label htmlFor="stay-options">{translations.whereStayArrivalSelectLabel}</Label>
+            <Select
+              id="stay-options"
+              value={selectedOption}
+              onChange={(e) => setSelectedOption(e.target.value)}
+            >
+              <option value="">{translations.whereStayArrivalDefaultOption}</option>
+              <option value="Home of Friends or Relatives">
+                {translations.whereStayArrivalOptionHome}
+              </option>
+              <option value="Campsite">{translations.whereStayArrivalOptionCampsite}</option>
+              <option value="Cruise Ship">{translations.whereStayArrivalOptionCruise}</option>
+              <option value="Own Home">{translations.whereStayArrivalOptionOwnHome}</option>
+            </Select>
 
-                        <Label htmlFor="duration">{translations.whereStayArrivalDurationLabel}</Label>
-                        <DurationContainer>
-                            <DurationInput
-                                type="number"
-                                id="duration"
-                                value={duration}
-                                onChange={(e) => setDuration(e.target.value)}
-                                placeholder={translations.whereStayArrivalDurationPlaceholder}
-                            />
-                            <DurationSelect
-                                value={durationUnit}
-                                onChange={(e) => setDurationUnit(e.target.value)}
-                            >
-                                <option value="days">Days</option>
-                                <option value="months">Months</option>
-                                <option value="years">Years</option>
-                            </DurationSelect>
-                        </DurationContainer>
+            <Label htmlFor="duration">{translations.whereStayArrivalDurationLabel}</Label>
+            <DurationContainer>
+              <DurationInput
+                type="number"
+                id="duration"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                placeholder={translations.whereStayArrivalDurationPlaceholder}
+              />
+              <DurationSelect
+                value={durationUnit}
+                onChange={(e) => setDurationUnit(e.target.value)}
+              >
+                <option value="days">Days</option>
+                <option value="months">Months</option>
+                <option value="years">Years</option>
+              </DurationSelect>
+            </DurationContainer>
 
-                        <NextButton
-                            type="submit"
-                            onClick={handleNext}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                        >
-                            {translations.whereStayArrivalNextButton}
-                        </NextButton>
-                    </Form>
-                </Container>
-            </GradientBackground>
-
-        </>);
+            <NextButton
+              type="submit"
+              onClick={handleNext}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              {translations.whereStayArrivalNextButton}
+            </NextButton>
+          </Form>
+        </Container>
+      </GradientBackground>
+    </>
+  );
 };
 
 export default WhereStayDeparture;

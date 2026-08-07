@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgOverlay from "../../../components/img/peoples.png";
-import { useNavigate } from "react-router-dom";
+import imgOverlay from '../../../components/img/peoples.png';
+import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { NextButtonU, QuestionText } from '../../../components/utils/styles1';
@@ -59,20 +59,21 @@ const NextButton = styled(animated.button)`
 const ExpenseCompanions = () => {
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive } = useContext(UnifiedContext);
+  const { activeBlocks, appendActiveBlocks, removeActiveBlocks, isBlockActive } =
+    useContext(UnifiedContext);
 
   const [inputs, setInputs] = useState([
     { key: 'EXPC', value: '' }, // Example key, you can add more fields as needed
   ]);
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('ExpenseCompanions', language);
-    useEffect (() => {
-        if (isBlockActive('isalone')){
-            console.log('COUNTER IS ALONE FOR ENUMERATION');
-            submitSurveyResponses({ surveyquestion_ref: "EXPC", response_value: "1" })
-            goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-        }
-    }, []);
+  useEffect(() => {
+    if (isBlockActive('isalone')) {
+      console.log('COUNTER IS ALONE FOR ENUMERATION');
+      submitSurveyResponses({ surveyquestion_ref: 'EXPC', response_value: '1' });
+      goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
+    }
+  }, []);
 
   const navigate = useNavigate();
 
@@ -87,7 +88,7 @@ const ExpenseCompanions = () => {
   };
 
   const handleNextClick = async () => {
-    const surveyResponses = inputs.map(input => ({
+    const surveyResponses = inputs.map((input) => ({
       surveyquestion_ref: input.key,
       response_value: input.value,
     }));
@@ -105,16 +106,20 @@ const ExpenseCompanions = () => {
   }, []);
 
   // Check if the input has a valid number
-  const hasValidNumber = inputs.every(input => input.value !== '' && !isNaN(input.value));
+  const hasValidNumber = inputs.every((input) => input.value !== '' && !isNaN(input.value));
 
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.3} blendMode="screen" handleNextClick={handleNextClick} buttonAppear={hasValidNumber}>
+      <GradientBackground
+        overlayImage={imgOverlay}
+        opacity={0.3}
+        blendMode="screen"
+        handleNextClick={handleNextClick}
+        buttonAppear={hasValidNumber}
+      >
         <QuestionContainer>
-          <QuestionText>
-            {translations.expenseCompanionsQuestionText}
-          </QuestionText>
+          <QuestionText>{translations.expenseCompanionsQuestionText}</QuestionText>
           {inputs.map((input, index) => (
             <InputContainer key={input.key}>
               <Input

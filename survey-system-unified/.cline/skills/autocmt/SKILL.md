@@ -22,14 +22,17 @@ message is a one-liner in the format `committype: (message here)`.
 ## Behavior
 
 ### 0. Preliminaries
+
 - Note the current branch: `git branch --show-current`.
 - Enumerate every changed, staged, and untracked path:
   `git status --short` and `git diff --stat` (include untracked files too).
 - If there is nothing to commit, report "Nothing to commit" and stop.
 
 ### 1. Group the changes into coherent increments
+
 Inspect the modified/untracked files and split them into logical chunks by **concern**,
 not by file count:
+
 - Files changed together for the same feature or behavior → one chunk.
 - A refactor touching related modules → one chunk.
 - Docs changes → their own chunk; config/seed data → its own; dependency bumps → its own;
@@ -40,7 +43,9 @@ A good rule of thumb: each chunk must be internally self-consistent and describa
 single short one-liner.
 
 ### 2. Choose a commit type (prefix)
+
 Pick the most specific single type for each chunk:
+
 - `feat:` — new feature or capability
 - `fix:` — a bug fix
 - `refactor:` — behavior-preserving restructuring
@@ -56,7 +61,9 @@ Pick the most specific single type for each chunk:
 Match the tone of the repo's existing history (lowercase, conventional one-liners).
 
 ### 3. Commit each chunk (never all at once when separable)
+
 For each chunk, in dependency order:
+
 - Stage ONLY the files in that chunk: `git add <paths...>`
 - Confirm what is staged: `git status --short`
 - Commit with a one-liner: `git commit -m "type: message"` — lowercase type, `: `, then a short
@@ -65,18 +72,23 @@ For each chunk, in dependency order:
   separable changes into a single commit.
 
 ### 4. Push to the current branch
+
 After all chunks are committed:
+
 - `git push origin <current-branch>`
 - If the remote-tracking branch does not exist yet, use `git push -u origin <current-branch>`.
 - Report the pushed branch and surface any push errors clearly.
 
 ## Output / summary
+
 After finishing, report:
+
 - The current branch.
 - Each commit created (type + message).
 - Push result / any errors.
 
 ## Guardrails
+
 - NEVER create one giant commit when the changes are separable into meaningful chunks.
 - Keep every message a single line in `type: message` form; one line only.
 - Stage only the files belonging to each chunk — never `git add -A` across unrelated concerns.

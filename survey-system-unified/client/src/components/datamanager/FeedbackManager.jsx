@@ -62,7 +62,7 @@ const CollapsibleHeader = styled.div`
   align-items: center;
   cursor: pointer;
   padding: 12px 0;
-  
+
   h3 {
     margin: 0;
     color: #4a5568;
@@ -86,8 +86,10 @@ const Snackbar = styled.div`
   z-index: 1000;
   font-family: 'Poppins';
   font-weight: 500;
-  
-  ${props => props.type === 'error' && `
+
+  ${(props) =>
+    props.type === 'error' &&
+    `
     background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
     box-shadow: 0 8px 25px rgba(245, 101, 101, 0.3);
   `}
@@ -117,7 +119,7 @@ const SurveyFeedbackCRUD = () => {
     surveyquestion_ref: '', // Will be disabled in form
     language: 'en',
     relevance: 'UNKNOWN',
-  });  
+  });
   const [editingId, setEditingId] = useState(null);
   const [filters, setFilters] = useState({
     anonymous_user_id: '',
@@ -125,7 +127,7 @@ const SurveyFeedbackCRUD = () => {
     touchpoint: '',
     is_analyzed: '',
   });
-  
+
   const [isFormVisible, setIsFormVisible] = useState(false); // State to toggle form visibility
 
   // Fetch feedback data
@@ -137,7 +139,7 @@ const SurveyFeedbackCRUD = () => {
       const apiFilters = Object.fromEntries(
         Object.entries(filters).map(([key, value]) => [key, value || undefined])
       );
-      
+
       const response = await api.get('/', { params: apiFilters });
       setFeedbacks(response.data);
     } catch (err) {
@@ -154,13 +156,13 @@ const SurveyFeedbackCRUD = () => {
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle filter changes
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   // Reset form
@@ -188,12 +190,13 @@ const SurveyFeedbackCRUD = () => {
       if (editingId) {
         // Update existing feedback
         const response = await api.put(`/${editingId}`, formData);
-        setFeedbacks(prev =>
-          prev.map(item => (item.response_id === editingId ? response.data : item)));
+        setFeedbacks((prev) =>
+          prev.map((item) => (item.response_id === editingId ? response.data : item))
+        );
       } else {
         // Create new feedback
         const response = await api.post('/', formData);
-        setFeedbacks(prev => [...prev, response.data]);
+        setFeedbacks((prev) => [...prev, response.data]);
       }
       resetForm();
       fetchFeedbacks(); // Refresh the list
@@ -218,14 +221,14 @@ const SurveyFeedbackCRUD = () => {
     });
     setEditingId(feedback.response_id);
   };
-    // Delete feedback
+  // Delete feedback
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this feedback?')) {
       setLoading(true);
       setError(null);
       try {
         await api.delete(`/${id}`);
-        setFeedbacks(prev => prev.filter(item => item.response_id !== id));
+        setFeedbacks((prev) => prev.filter((item) => item.response_id !== id));
       } catch (err) {
         setError(err.response?.data?.message || err.message);
       } finally {
@@ -250,15 +253,15 @@ const SurveyFeedbackCRUD = () => {
           <p>Total Feedback</p>
         </StatsCard>
         <StatsCard>
-          <h4>{feedbacks.filter(f => f.is_analyzed).length}</h4>
+          <h4>{feedbacks.filter((f) => f.is_analyzed).length}</h4>
           <p>Analyzed</p>
         </StatsCard>
         <StatsCard>
-          <h4>{feedbacks.filter(f => !f.is_analyzed).length}</h4>
+          <h4>{feedbacks.filter((f) => !f.is_analyzed).length}</h4>
           <p>Not Analyzed</p>
         </StatsCard>
         <StatsCard>
-          <h4>{new Set(feedbacks.map(f => f.entity)).size}</h4>
+          <h4>{new Set(feedbacks.map((f) => f.entity)).size}</h4>
           <p>Unique Entities</p>
         </StatsCard>
       </StatsGrid>
@@ -273,8 +276,14 @@ const SurveyFeedbackCRUD = () => {
         <CollapsibleHeader>
           <h3>Filter Options</h3>
         </CollapsibleHeader>
-        
-        <ModernForm style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+
+        <ModernForm
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '16px',
+          }}
+        >
           <InputGroup>
             <Label>User ID</Label>
             <ModernInput
@@ -329,7 +338,7 @@ const SurveyFeedbackCRUD = () => {
           <CollapsibleHeader>
             <h3>Edit Feedback</h3>
           </CollapsibleHeader>
-          
+
           <ModernForm onSubmit={handleSubmit}>
             <InputGroup>
               <Label>Entity</Label>
@@ -374,7 +383,7 @@ const SurveyFeedbackCRUD = () => {
                 name="touchpoint"
                 value={formData.touchpoint}
                 onChange={handleInputChange}
-                disabled 
+                disabled
               />
             </InputGroup>
 
@@ -385,7 +394,7 @@ const SurveyFeedbackCRUD = () => {
                 name="anonymous_user_id"
                 value={formData.anonymous_user_id}
                 onChange={handleInputChange}
-                disabled 
+                disabled
               />
             </InputGroup>
 
@@ -396,7 +405,7 @@ const SurveyFeedbackCRUD = () => {
                 name="surveyquestion_ref"
                 value={formData.surveyquestion_ref}
                 onChange={handleInputChange}
-                disabled 
+                disabled
               />
             </InputGroup>
 
@@ -474,7 +483,7 @@ const SurveyFeedbackCRUD = () => {
               </ModernTableHead>
               <tbody>
                 {feedbacks.length > 0 ? (
-                  feedbacks.map(feedback => (
+                  feedbacks.map((feedback) => (
                     <ModernTableRow key={feedback.response_id}>
                       <ModernTableCell>{feedback.response_id}</ModernTableCell>
                       <ModernTableCell>{feedback.entity}</ModernTableCell>
@@ -488,10 +497,12 @@ const SurveyFeedbackCRUD = () => {
                       <ModernTableCell>{feedback.anonymous_user_id}</ModernTableCell>
                       <ModernTableCell>{feedback.language}</ModernTableCell>
                       <ModernTableCell>
-                        <span style={{ 
-                          color: feedback.is_analyzed ? '#48bb78' : '#f56565',
-                          fontWeight: '500'
-                        }}>
+                        <span
+                          style={{
+                            color: feedback.is_analyzed ? '#48bb78' : '#f56565',
+                            fontWeight: '500',
+                          }}
+                        >
                           {feedback.is_analyzed ? 'Yes' : 'No'}
                         </span>
                       </ModernTableCell>
@@ -501,7 +512,10 @@ const SurveyFeedbackCRUD = () => {
                             <EditIcon />
                             Edit
                           </ActionButton>
-                          <ActionButton variant="delete" onClick={() => handleDelete(feedback.response_id)}>
+                          <ActionButton
+                            variant="delete"
+                            onClick={() => handleDelete(feedback.response_id)}
+                          >
                             <DeleteIcon />
                             Delete
                           </ActionButton>

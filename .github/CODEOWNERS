@@ -1,0 +1,7 @@
+# Default owner for everything not matched below
+* @cnhy-nero-diskard
+
+# Repository automation and security-sensitive server code
+/.github/ @cnhy-nero-diskard
+/survey-system-unified/server/config/ @cnhy-nero-diskard
+/survey-system-unified/server/middleware/ @cnhy-nero-diskard

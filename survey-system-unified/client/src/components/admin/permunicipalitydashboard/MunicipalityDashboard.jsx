@@ -71,18 +71,20 @@ const MunicipalityDashboard = () => {
         const filteredData = data;
 
         if (filteredData.length === 0) {
-          setMetrics([{
-            entity: "No Data Available",
-            total_responses: "0",
-            rating: {
-              Dissatisfied: "0",
-              Neutral: "0",
-              Satisfied: "0",
-              VerySatisfied: "0",
+          setMetrics([
+            {
+              entity: 'No Data Available',
+              total_responses: '0',
+              rating: {
+                Dissatisfied: '0',
+                Neutral: '0',
+                Satisfied: '0',
+                VerySatisfied: '0',
+              },
+              mentionedTerms: {},
+              language: {},
             },
-            mentionedTerms: {},
-            language: {},
-          }]);
+          ]);
         } else {
           // Aggregate data for "PANGLAO" from all objects
           const aggregatedData = aggregatePanglaoData(filteredData);
@@ -104,14 +106,14 @@ const MunicipalityDashboard = () => {
     // DataDashboard forwards this identifier to the topic-sentiment endpoint.
     // Prefer Panglao's location record for the municipality aggregate and use
     // the first available ID as a defensive fallback.
-    const municipalityShortId = data.find(
-      (item) => item.entity?.toUpperCase() === 'PANGLAO' && item.short_id
-    )?.short_id || data.find((item) => item.short_id)?.short_id;
+    const municipalityShortId =
+      data.find((item) => item.entity?.toUpperCase() === 'PANGLAO' && item.short_id)?.short_id ||
+      data.find((item) => item.short_id)?.short_id;
 
     const panglaoData = {
-      entity: "PANGLAO",
+      entity: 'PANGLAO',
       short_id: municipalityShortId,
-      touchpoint: "muncity",
+      touchpoint: 'muncity',
       total_responses: 0,
       rating: {
         Dissatisfied: 0,
@@ -128,10 +130,12 @@ const MunicipalityDashboard = () => {
       panglaoData.total_responses += Number(item.total_responses) || 0;
 
       // Sum ratings
-      panglaoData.rating.Dissatisfied += Number(item.rating?.Dissatisfied ?? item.rating?.['1']) || 0;
+      panglaoData.rating.Dissatisfied +=
+        Number(item.rating?.Dissatisfied ?? item.rating?.['1']) || 0;
       panglaoData.rating.Neutral += Number(item.rating?.Neutral ?? item.rating?.['2']) || 0;
       panglaoData.rating.Satisfied += Number(item.rating?.Satisfied ?? item.rating?.['3']) || 0;
-      panglaoData.rating.VerySatisfied += Number(item.rating?.VerySatisfied ?? item.rating?.['4']) || 0;
+      panglaoData.rating.VerySatisfied +=
+        Number(item.rating?.VerySatisfied ?? item.rating?.['4']) || 0;
 
       // Sum language counts
       for (const [lang, count] of Object.entries(item.language || {})) {
@@ -180,11 +184,10 @@ const MunicipalityDashboard = () => {
   if (error) {
     return (
       <ErrorContainer>
-        <ErrorTitle>
-          ⚠️ Error Loading Municipality Data
-        </ErrorTitle>
+        <ErrorTitle>⚠️ Error Loading Municipality Data</ErrorTitle>
         <ErrorMessage>
-          We encountered an issue while loading the municipality dashboard data. Please try refreshing the page or contact support if the problem persists.
+          We encountered an issue while loading the municipality dashboard data. Please try
+          refreshing the page or contact support if the problem persists.
         </ErrorMessage>
         <Box sx={{ mt: 2, p: 2, bgcolor: '#fed7d7', borderRadius: 2, maxWidth: 500 }}>
           <Typography variant="caption" sx={{ fontFamily: fontFamily, color: '#c53030' }}>

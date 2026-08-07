@@ -1,14 +1,13 @@
 // services/adminCRUD.js
-import pool from "../config/db.js";
-import logger from "../middleware/logger.js";
+import pool from '../config/db.js';
+import logger from '../middleware/logger.js';
 //EACH ONE OF THESE ARE HELPER FUNCTIONS. A CONTROLLER MAY CHOOSE TO AGGREGATE THEM
 
-
-// Function tally languages according to 'LANGPERF' returns 
+// Function tally languages according to 'LANGPERF' returns
 export const countLangPerfSurveyResponsesService = async () => {
-    logger.database("METHOD api/admin/countLangPerfSurveyResponses");
-    try {
-        const query = `
+  logger.database('METHOD api/admin/countLangPerfSurveyResponses');
+  try {
+    const query = `
 
       WITH langperf_responses AS (
         SELECT 
@@ -29,61 +28,61 @@ export const countLangPerfSurveyResponsesService = async () => {
     ORDER BY 
         response_value;
           `;
-        const result = await pool.query(query);
-        // Return the count of rows
-        return result.rows[0];
-    } catch (err) {
-        logger.error({ error: err.message });
-        throw err;
-    }
+    const result = await pool.query(query);
+    // Return the count of rows
+    return result.rows[0];
+  } catch (err) {
+    logger.error({ error: err.message });
+    throw err;
+  }
 };
 // Function to fetch all rows with surveyquestion_ref value of 'LANGPERF'
 export const fetchLangPerfSurveyResponsesService = async () => {
-    logger.database("METHOD api/admin/fetchLangPerfSurveyResponses");
-    try {
-        const query = `
+  logger.database('METHOD api/admin/fetchLangPerfSurveyResponses');
+  try {
+    const query = `
             SELECT * FROM public.survey_responses
             WHERE surveyquestion_ref = 'LANGPERF';
         `;
-        const result = await pool.query(query);
-        // Return all rows
-        return result.rows;
-    } catch (err) {
-        logger.error({ error: err.message });
-        throw err;
-    }
+    const result = await pool.query(query);
+    // Return all rows
+    return result.rows;
+  } catch (err) {
+    logger.error({ error: err.message });
+    throw err;
+  }
 };
 // Function to fetch all rows with surveyquestion_ref value of 'AGE01'
 export const fetchAgeSurveyResponsesService = async () => {
-    logger.database("METHOD api/admin/fetchAgeSurveyResponses");
-    try {
-        const query = `
+  logger.database('METHOD api/admin/fetchAgeSurveyResponses');
+  try {
+    const query = `
             SELECT response_value FROM public.survey_responses
             WHERE surveyquestion_ref = 'AGE01';
         `;
-        const result = await pool.query(query);
-        // Return all ages as an array
-        return result.rows.map(row => row.response_value);
-    } catch (err) {
-        logger.error({ error: err.message });
-        throw err;
-    }
+    const result = await pool.query(query);
+    // Return all ages as an array
+    return result.rows.map((row) => row.response_value);
+  } catch (err) {
+    logger.error({ error: err.message });
+    throw err;
+  }
 };
 // Function to fetch and group rows with surveyquestion_ref value of 'FINISH' by month
 
 export const fetchAndGroupFinishedSurveyResponsesByMonthService = async () => {
-    logger.database("METHOD api/admin/fetchAndGroupFinishedSurveyResponsesByMonth");
-    const restructureData = (data) => {
-        return data.reduce((acc, item) => {
-            const { month_bucket, response_count } = item;
-            // Replace multiple spaces with a single space and trim whitespace
-            const cleanedMonth = month_bucket.replace(/\s+/g, ' ').trim();
-            acc[cleanedMonth] = response_count;
-            return acc;
-        }, {});
-    };
-    try {
-        const query = `
+  logger.database('METHOD api/admin/fetchAndGroupFinishedSurveyResponsesByMonth');
+  const restructureData = (data) => {
+    return data.reduce((acc, item) => {
+      const { month_bucket, response_count } = item;
+      // Replace multiple spaces with a single space and trim whitespace
+      const cleanedMonth = month_bucket.replace(/\s+/g, ' ').trim();
+      acc[cleanedMonth] = response_count;
+      return acc;
+    }, {});
+  };
+  try {
+    const query = `
             SELECT TO_CHAR(created_at, 'Month YYYY') AS month_bucket, 
                    COUNT(response_id) AS response_count
             FROM public.survey_responses
@@ -91,24 +90,22 @@ export const fetchAndGroupFinishedSurveyResponsesByMonthService = async () => {
             GROUP BY month_bucket
             ORDER BY MIN(created_at);
         `;
-        const result = await pool.query(query);
-        const clresult = restructureData(result.rows);
-        // Return the grouped result
-        return clresult;
-    } catch (err) {
-        logger.error({ error: err.message });
-        throw err;
-    }
+    const result = await pool.query(query);
+    const clresult = restructureData(result.rows);
+    // Return the grouped result
+    return clresult;
+  } catch (err) {
+    logger.error({ error: err.message });
+    throw err;
+  }
 };
-
-
 
 // Function to calculate the average time to complete the survey (in minutes)
 
 export const calculateAverageCompletionTimeService = async () => {
-    logger.database("METHOD api/admin/calculateAverageCompletionTime");
-    try {
-        const query = `
+  logger.database('METHOD api/admin/calculateAverageCompletionTime');
+  try {
+    const query = `
             WITH langperf_times AS (
                 SELECT anonymous_user_id, created_at AS langperf_time
                 FROM public.survey_responses
@@ -129,61 +126,61 @@ export const calculateAverageCompletionTimeService = async () => {
             SELECT AVG(completion_time_minutes) AS average_completion_time
             FROM completion_times;
         `;
-        const result = await pool.query(query);
+    const result = await pool.query(query);
 
-        // Get the average completion time in minutes
-        const average = result.rows[0].average_completion_time;
+    // Get the average completion time in minutes
+    const average = result.rows[0].average_completion_time;
 
-        if (average === null) {
-            return null;
-        }
-
-        // Convert minutes to a formatted time string
-        const minutes = Math.floor(average);
-        const seconds = Math.round((average - minutes) * 60);
-
-        // If seconds equal 60, increment minutes and set seconds to 0
-        let formattedTime;
-        if (seconds === 60) {
-            formattedTime = `${minutes + 1} mins 0 secs`;
-        } else {
-            formattedTime = `${minutes} mins ${seconds} secs`;
-        }
-
-        return formattedTime;
-    } catch (err) {
-        logger.error({ error: err.message });
-        throw err;
+    if (average === null) {
+      return null;
     }
+
+    // Convert minutes to a formatted time string
+    const minutes = Math.floor(average);
+    const seconds = Math.round((average - minutes) * 60);
+
+    // If seconds equal 60, increment minutes and set seconds to 0
+    let formattedTime;
+    if (seconds === 60) {
+      formattedTime = `${minutes + 1} mins 0 secs`;
+    } else {
+      formattedTime = `${minutes} mins ${seconds} secs`;
+    }
+
+    return formattedTime;
+  } catch (err) {
+    logger.error({ error: err.message });
+    throw err;
+  }
 };
 
 // Function to group and count rows by sentiment
 export const countSentimentAnalysisService = async () => {
-    logger.database("METHOD api/admin/countSentimentAnalysis");
-    try {
-        const query = `
+  logger.database('METHOD api/admin/countSentimentAnalysis');
+  try {
+    const query = `
             SELECT sentiment, COUNT(*) as count
             FROM public.sentiment_analysis
             GROUP BY sentiment;
         `;
-        const result = await pool.query(query);
-        // Transform the result into the desired structure
-        const sentimentCounts = result.rows.reduce((acc, row) => {
-            acc[row.sentiment] = parseInt(row.count, 10);
-            return acc;
-        }, {});
-        return sentimentCounts;
-    } catch (err) {
-        logger.error({ error: err.message });
-        throw err;
-    }
+    const result = await pool.query(query);
+    // Transform the result into the desired structure
+    const sentimentCounts = result.rows.reduce((acc, row) => {
+      acc[row.sentiment] = parseInt(row.count, 10);
+      return acc;
+    }, {});
+    return sentimentCounts;
+  } catch (err) {
+    logger.error({ error: err.message });
+    throw err;
+  }
 };
 
 // Function to group survey responses by question title
 export const groupResponsesByQuestionTitleService = async () => {
-    logger.database("METHOD api/admin/groupResponsesByQuestionTitle");
-    try {
-        const query = `
+  logger.database('METHOD api/admin/groupResponsesByQuestionTitle');
+  try {
+    const query = `
             SELECT 
             sq.title,
             sq.content,
@@ -198,41 +195,41 @@ export const groupResponsesByQuestionTitleService = async () => {
             ORDER BY 
             sq.title;
         `;
-        const result = await pool.query(query);
-        // logger.warn(`RESULT --> ${JSON.stringify(result)}`);
-        return result.rows;
-    } catch (err) {
-        logger.error({ error: err.message });
-        throw err;
-    }
+    const result = await pool.query(query);
+    // logger.warn(`RESULT --> ${JSON.stringify(result)}`);
+    return result.rows;
+  } catch (err) {
+    logger.error({ error: err.message });
+    throw err;
+  }
 };
 
 // Function to count establishments by type
 export const countEstablishmentsByTypeService = async () => {
-    logger.database("METHOD api/admin/countEstablishmentsByType");
-    try {
-        const query = `
+  logger.database('METHOD api/admin/countEstablishmentsByType');
+  try {
+    const query = `
             SELECT type, COUNT(*) as count
             FROM public.establishments
             GROUP BY type
             ORDER BY type;
         `;
-        const result = await pool.query(query);
-        const typeCounts = result.rows.reduce((acc, row) => {
-            acc[row.type] = parseInt(row.count, 10);
-            return acc;
-        }, {});
-        return typeCounts;
-    } catch (err) {
-        logger.error({ error: err.message });
-        throw err;
-    }
+    const result = await pool.query(query);
+    const typeCounts = result.rows.reduce((acc, row) => {
+      acc[row.type] = parseInt(row.count, 10);
+      return acc;
+    }, {});
+    return typeCounts;
+  } catch (err) {
+    logger.error({ error: err.message });
+    throw err;
+  }
 };
 
 // Function to group all rows in surveyresponses according to surveyquestion_ref
 // IF the fkey corresponds to a row of questiontype "RATINGSCALE" within survey_questions
 export const groupByLikertRatingService = async () => {
-    const query = `
+  const query = `
       SELECT
         sq.content,
         sq.surveytopic,
@@ -247,13 +244,13 @@ export const groupByLikertRatingService = async () => {
       GROUP BY sr.surveyquestion_ref, sq.content, sq.surveytopic;
     `;
 
-    try {
-        const result = await pool.query(query);
-        return result.rows;
-    } catch (error) {
-        console.error('Error executing query:', error);
-        throw error;
-    }
+  try {
+    const result = await pool.query(query);
+    return result.rows;
+  } catch (error) {
+    console.error('Error executing query:', error);
+    throw error;
+  }
 };
 
 //FETCH ALL THE COMPLETED 'FINISH' SIGNAL ROWS IN SURVEY_RESPONSES
@@ -262,28 +259,25 @@ export const groupByLikertRatingService = async () => {
 //     "finished": "8"
 //   }
 export const fetchAllFinishedRows = async () => {
-    logger.database("METHOD COUNT FINISHED USERS");
+  logger.database('METHOD COUNT FINISHED USERS');
 
-    try {
-        const query = `
+  try {
+    const query = `
       SELECT COUNT(*) as Finished
       FROM survey_responses 
-      WHERE surveyquestion_ref = 'FINISH' ;`
-        const result = await pool.query(query);
-        return result.rows[0];
-
-
-    } catch (err) {
-        logger.error({ error: err.message });
-        throw err;
-
-    }
-}
+      WHERE surveyquestion_ref = 'FINISH' ;`;
+    const result = await pool.query(query);
+    return result.rows[0];
+  } catch (err) {
+    logger.error({ error: err.message });
+    throw err;
+  }
+};
 
 export const fetchUnfinishedSurveys = async () => {
-    logger.database("METHOD COUNT UNFINISHED USERS ");
-    try {
-        const query = `
+  logger.database('METHOD COUNT UNFINISHED USERS ');
+  try {
+    const query = `
         SELECT COUNT(DISTINCT anonymous_user_id)
         FROM survey_responses
         WHERE anonymous_user_id IN (
@@ -292,31 +286,30 @@ export const fetchUnfinishedSurveys = async () => {
         WHERE surveyquestion_ref IN ('LANGPERF', 'FINISH')
         GROUP BY anonymous_user_id
         HAVING COUNT(DISTINCT surveyquestion_ref) < 2
-        );`
-        const result = await pool.query(query);
-        return result.rows[0];
-    } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
-
-    }
-}
+        );`;
+    const result = await pool.query(query);
+    return result.rows[0];
+  } catch (error) {
+    logger.error({ error: error.message });
+    throw error;
+  }
+};
 
 export const fetchTouchpointsService = async () => {
-    const restructureData = (data) => {
-        return data.reduce((acc, item) => {
-            const { touchpoint, total_count } = item;
-            // Check if the touchpoint is not null before adding it to the accumulator
-            if (touchpoint !== null) {
-                acc[touchpoint] = parseInt(total_count);
-            }
-            return acc;
-        }, {});
-    };
+  const restructureData = (data) => {
+    return data.reduce((acc, item) => {
+      const { touchpoint, total_count } = item;
+      // Check if the touchpoint is not null before adding it to the accumulator
+      if (touchpoint !== null) {
+        acc[touchpoint] = parseInt(total_count);
+      }
+      return acc;
+    }, {});
+  };
 
-    logger.database("METHOD COUNT TOUCHPOINTS");
-    try {
-        const query = `
+  logger.database('METHOD COUNT TOUCHPOINTS');
+  try {
+    const query = `
         
 SELECT
     COALESCE(sr.touchpoint, sf.touchpoint) AS touchpoint,
@@ -333,30 +326,30 @@ FULL OUTER JOIN
 WHERE
     COALESCE(sr.touchpoint, sf.touchpoint) IS NOT NULL;
 `;
-        const result = await pool.query(query);
-        const clresult = restructureData(result.rows);
-        logger.warn(`RESULT RAW: ${JSON.stringify(result.rows)}`);
-        logger.warn(`RESULT CL: ${JSON.stringify(clresult)}`);
+    const result = await pool.query(query);
+    const clresult = restructureData(result.rows);
+    logger.warn(`RESULT RAW: ${JSON.stringify(result.rows)}`);
+    logger.warn(`RESULT CL: ${JSON.stringify(clresult)}`);
 
-        return clresult;
-    } catch (error) {
-        logger.error({ error: error.message });
-        throw error;
-    }
-}
+    return clresult;
+  } catch (error) {
+    logger.error({ error: error.message });
+    throw error;
+  }
+};
 
 export const fetchByTimeOfDay = async () => {
-    const restructureData = (data) => {
-        return data.reduce((acc, item) => {
-            const { time_period, distinct_user_count } = item;
-            acc[time_period] = distinct_user_count;
-            return acc;
-        }, {});
-    };
+  const restructureData = (data) => {
+    return data.reduce((acc, item) => {
+      const { time_period, distinct_user_count } = item;
+      acc[time_period] = distinct_user_count;
+      return acc;
+    }, {});
+  };
 
-    logger.database("METHOD COUNTING TIME OF DAY FOR SURVEYS");
-    try {
-        const query = `SELECT 
+  logger.database('METHOD COUNTING TIME OF DAY FOR SURVEYS');
+  try {
+    const query = `SELECT 
         CASE 
             WHEN EXTRACT(HOUR FROM created_at) < 6 THEN 'Dusk'
             WHEN EXTRACT(HOUR FROM created_at) < 12 THEN 'Morning'
@@ -367,83 +360,79 @@ export const fetchByTimeOfDay = async () => {
         FROM public.survey_responses
         GROUP BY 1
         ORDER BY 1;`;
-        const result = await pool.query(query);
-        return restructureData(result.rows);
-    } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
-    }
-}
+    const result = await pool.query(query);
+    return restructureData(result.rows);
+  } catch (error) {
+    logger.error({ error: error.message });
+    throw error;
+  }
+};
 
 export const fetchByCountryResidence = async () => {
-    logger.database('METHOD FETCHING TALLY BY COUNTRY OF RESIDENCE');
-    const restructureData = (data) => {
-        return data.reduce((acc, item) => {
-            const { response_value, count_response_value } = item;
-            acc[response_value] = count_response_value;
-            return acc;
-        }, {});
-    };
+  logger.database('METHOD FETCHING TALLY BY COUNTRY OF RESIDENCE');
+  const restructureData = (data) => {
+    return data.reduce((acc, item) => {
+      const { response_value, count_response_value } = item;
+      acc[response_value] = count_response_value;
+      return acc;
+    }, {});
+  };
 
-    try {
-        const query = `
+  try {
+    const query = `
 
                 -- Tally similar response_value for surveyquestion_ref = 'NAT01'
                 SELECT response_value, COUNT(*) AS count_response_value
                 FROM public.survey_responses
                 WHERE surveyquestion_ref = 'CNTRY'
                 GROUP BY response_value
-                ORDER BY count_response_value DESC;`
-        const result = await pool.query(query);
-        return restructureData(result.rows);
-
-    } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
-
-    }
-}
+                ORDER BY count_response_value DESC;`;
+    const result = await pool.query(query);
+    return restructureData(result.rows);
+  } catch (error) {
+    logger.error({ error: error.message });
+    throw error;
+  }
+};
 export const fetchByNationality = async () => {
-    logger.database('METHOD FETCHING TALLY BY NATIONALITY');
-    const restructureData = (data) => {
-        return data.reduce((acc, item) => {
-            const { response_value, count_response_value } = item;
-            acc[response_value] = count_response_value;
-            return acc;
-        }, {});
-    };
+  logger.database('METHOD FETCHING TALLY BY NATIONALITY');
+  const restructureData = (data) => {
+    return data.reduce((acc, item) => {
+      const { response_value, count_response_value } = item;
+      acc[response_value] = count_response_value;
+      return acc;
+    }, {});
+  };
 
-    try {
-        const query = `
+  try {
+    const query = `
 
                 -- Tally similar response_value for surveyquestion_ref = 'NAT01'
                 SELECT response_value, COUNT(*) AS count_response_value
                 FROM public.survey_responses
                 WHERE surveyquestion_ref = 'NAT01'
                 GROUP BY response_value
-                ORDER BY count_response_value DESC;`
-        const result = await pool.query(query);
-        return restructureData(result.rows);
-
-    } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
-
-    }
-}
+                ORDER BY count_response_value DESC;`;
+    const result = await pool.query(query);
+    return restructureData(result.rows);
+  } catch (error) {
+    logger.error({ error: error.message });
+    throw error;
+  }
+};
 
 export const fetchByAgeGroup = async () => {
-    const restructureData = (data) => {
-        return data.reduce((acc, item) => {
-            const { age_group, response_count } = item;
-            acc[age_group] = response_count;
-            return acc;
-        }, {});
-    };
+  const restructureData = (data) => {
+    return data.reduce((acc, item) => {
+      const { age_group, response_count } = item;
+      acc[age_group] = response_count;
+      return acc;
+    }, {});
+  };
 
-    logger.database("METHOD FETCH BY AGE GROUP");
-    try {
-        const query = `SELECT
+  logger.database('METHOD FETCH BY AGE GROUP');
+  try {
+    const query = `SELECT
         CASE
             WHEN CAST(response_value AS INTEGER) BETWEEN 0 AND 9 THEN '0-9'
             WHEN CAST(response_value AS INTEGER) BETWEEN 10 AND 19 THEN '10-19'
@@ -465,28 +454,27 @@ export const fetchByAgeGroup = async () => {
         GROUP BY
             age_group
         ORDER BY
-            age_group;`
+            age_group;`;
 
-        const result = await pool.query(query);
-        return restructureData(result.rows)
-    } catch (error) {
-        logger.error({ error: error.message });
-        throw err;
-
-    }
-}
+    const result = await pool.query(query);
+    return restructureData(result.rows);
+  } catch (error) {
+    logger.error({ error: error.message });
+    throw error;
+  }
+};
 
 export const fetchByGender = async () => {
-    const restructureData = (data) => {
-        return data.reduce((acc, item) => {
-            const { response_value, response_count } = item;
-            acc[response_value] = response_count;
-            return acc;
-        }, {});
-    }
+  const restructureData = (data) => {
+    return data.reduce((acc, item) => {
+      const { response_value, response_count } = item;
+      acc[response_value] = response_count;
+      return acc;
+    }, {});
+  };
 
-    try {
-        const query = `
+  try {
+    const query = `
         SELECT
             response_value,
             COUNT(*) AS response_count
@@ -497,40 +485,41 @@ export const fetchByGender = async () => {
         GROUP BY
             response_value
         ORDER BY
-        response_count DESC;`
-        const result = await pool.query(query);
+        response_count DESC;`;
+    const result = await pool.query(query);
 
-        return restructureData(result.rows)
-    } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
-
-    }
-}
+    return restructureData(result.rows);
+  } catch (error) {
+    logger.error({ error: error.message });
+    throw error;
+  }
+};
 
 export const fetchEntityinSurveyFeedbackService = async (year = null, quarter = null) => {
-    try {
-        // Build date range filter if year and quarter are provided
-        let dateFilter = '';
-        const queryParams = [];
-        
-        if (year && quarter) {
-            const startMonth = (quarter - 1) * 3 + 1;
-            const endMonth = quarter * 3;
-            const startDate = `${year}-${startMonth.toString().padStart(2, '0')}-01`;
-            const endDate = new Date(year, endMonth, 0); // Last day of quarter
-            const endDateStr = `${year}-${endMonth.toString().padStart(2, '0')}-${endDate.getDate()}`;
-            
-            dateFilter = `WHERE created_at >= $1 AND created_at <= $2`;
-            queryParams.push(startDate, endDateStr);
-            
-            logger.info(`fetchEntityinSurveyFeedbackService: Applying date filter - Year: ${year}, Quarter: Q${quarter} (${startDate} to ${endDateStr})`);
-        } else {
-            logger.info('fetchEntityinSurveyFeedbackService: No date filter applied - fetching all data');
-        }
-        
-        // Query to group by entity (short_id) and count ratings, languages, and touchpoints
-        const feedbackQuery = `
+  try {
+    // Build date range filter if year and quarter are provided
+    let dateFilter = '';
+    const queryParams = [];
+
+    if (year && quarter) {
+      const startMonth = (quarter - 1) * 3 + 1;
+      const endMonth = quarter * 3;
+      const startDate = `${year}-${startMonth.toString().padStart(2, '0')}-01`;
+      const endDate = new Date(year, endMonth, 0); // Last day of quarter
+      const endDateStr = `${year}-${endMonth.toString().padStart(2, '0')}-${endDate.getDate()}`;
+
+      dateFilter = `WHERE created_at >= $1 AND created_at <= $2`;
+      queryParams.push(startDate, endDateStr);
+
+      logger.info(
+        `fetchEntityinSurveyFeedbackService: Applying date filter - Year: ${year}, Quarter: Q${quarter} (${startDate} to ${endDateStr})`
+      );
+    } else {
+      logger.info('fetchEntityinSurveyFeedbackService: No date filter applied - fetching all data');
+    }
+
+    // Query to group by entity (short_id) and count ratings, languages, and touchpoints
+    const feedbackQuery = `
             SELECT
                 sf.entity,
                 sf.touchpoint,
@@ -557,12 +546,13 @@ export const fetchEntityinSurveyFeedbackService = async (year = null, quarter = 
                 sf.entity, sf.touchpoint;
         `;
 
-        const feedbackResult = queryParams.length > 0
-            ? await pool.query(feedbackQuery, queryParams)
-            : await pool.query(feedbackQuery);
+    const feedbackResult =
+      queryParams.length > 0
+        ? await pool.query(feedbackQuery, queryParams)
+        : await pool.query(feedbackQuery);
 
-        // Query to get entity details from establishments, tourismattractions, tourismactivities, and locations using short_id
-        const entityDetailsQuery = `
+    // Query to get entity details from establishments, tourismattractions, tourismactivities, and locations using short_id
+    const entityDetailsQuery = `
             SELECT
                 'establishment' AS type,
                 short_id,
@@ -620,26 +610,26 @@ export const fetchEntityinSurveyFeedbackService = async (year = null, quarter = 
                 public.locations;
         `;
 
-        const entityDetailsResult = await pool.query(entityDetailsQuery);
+    const entityDetailsResult = await pool.query(entityDetailsQuery);
 
-        // Create a map of short_id to their details
-        const entityDetailsMap = entityDetailsResult.rows.reduce((acc, row) => {
-            acc[row.short_id] = {
-                name: row.name,
-                type: row.type,
-                establishment_type: row.establishment_type,
-                location_type: row.location_type,
-                barangay: row.barangay,
-                city_mun: row.city_mun,
-                short_id: row.short_id,
-                ta_category: row.ta_category,
-                ntdp_category: row.ntdp_category
-            };
-            return acc;
-        }, {});
+    // Create a map of short_id to their details
+    const entityDetailsMap = entityDetailsResult.rows.reduce((acc, row) => {
+      acc[row.short_id] = {
+        name: row.name,
+        type: row.type,
+        establishment_type: row.establishment_type,
+        location_type: row.location_type,
+        barangay: row.barangay,
+        city_mun: row.city_mun,
+        short_id: row.short_id,
+        ta_category: row.ta_category,
+        ntdp_category: row.ntdp_category,
+      };
+      return acc;
+    }, {});
 
-        // Query to get mentioned terms from tm_topics and count occurrences for each entity
-        const mentionedTermsQuery = `
+    // Query to get mentioned terms from tm_topics and count occurrences for each entity
+    const mentionedTermsQuery = `
             SELECT
                 "customFilter" AS entity,
                 custom_label,
@@ -652,201 +642,207 @@ export const fetchEntityinSurveyFeedbackService = async (year = null, quarter = 
                 "customFilter", custom_label;
         `;
 
-        const mentionedTermsResult = await pool.query(mentionedTermsQuery);
+    const mentionedTermsResult = await pool.query(mentionedTermsQuery);
 
-        // Create a map of entity to its mentioned terms and their counts
-        const mentionedTermsMap = mentionedTermsResult.rows.reduce((acc, row) => {
-            if (!acc[row.entity]) {
-                acc[row.entity] = {};
-            }
-            acc[row.entity][row.custom_label] = row.count;
-            return acc;
-        }, {});
+    // Create a map of entity to its mentioned terms and their counts
+    const mentionedTermsMap = mentionedTermsResult.rows.reduce((acc, row) => {
+      if (!acc[row.entity]) {
+        acc[row.entity] = {};
+      }
+      acc[row.entity][row.custom_label] = row.count;
+      return acc;
+    }, {});
 
-        // Transform the feedback result to include touchpoint and entity details
-        const transformedResult = feedbackResult.rows.map(row => {
-            const entityDetails = entityDetailsMap[row.entity] || {};
-            const mentionedTerms = mentionedTermsMap[row.entity] || {};
+    // Transform the feedback result to include touchpoint and entity details
+    const transformedResult = feedbackResult.rows.map((row) => {
+      const entityDetails = entityDetailsMap[row.entity] || {};
+      const mentionedTerms = mentionedTermsMap[row.entity] || {};
 
-            return {
-                entity: entityDetails.name || row.entity, // Fallback to short_id if name not found
-                touchpoint: row.touchpoint,
-                total_responses: row.total_responses,
-                short_id: entityDetails.short_id,
-                rating: {
-                    Dissatisfied: row.rating_1,
-                    Neutral: row.rating_2,
-                    Satisfied: row.rating_3,
-                    VerySatisfied: row.rating_4
-                },
-                language: row.language_counts,
-                mentionedTerms: mentionedTerms,
-                details: {
-                    type: entityDetails.type,
-                    establishment_type: entityDetails.establishment_type,
-                    location_type: entityDetails.location_type,
-                    barangay: entityDetails.barangay,
-                    city_mun: entityDetails.city_mun,
-                    ta_category: entityDetails.ta_category,
-                    ntdp_category: entityDetails.ntdp_category
-                }
-            };
-        });
+      return {
+        entity: entityDetails.name || row.entity, // Fallback to short_id if name not found
+        touchpoint: row.touchpoint,
+        total_responses: row.total_responses,
+        short_id: entityDetails.short_id,
+        rating: {
+          Dissatisfied: row.rating_1,
+          Neutral: row.rating_2,
+          Satisfied: row.rating_3,
+          VerySatisfied: row.rating_4,
+        },
+        language: row.language_counts,
+        mentionedTerms: mentionedTerms,
+        details: {
+          type: entityDetails.type,
+          establishment_type: entityDetails.establishment_type,
+          location_type: entityDetails.location_type,
+          barangay: entityDetails.barangay,
+          city_mun: entityDetails.city_mun,
+          ta_category: entityDetails.ta_category,
+          ntdp_category: entityDetails.ntdp_category,
+        },
+      };
+    });
 
-        // Log summary statistics
-        const touchpointCounts = transformedResult.reduce((acc, item) => {
-            acc[item.touchpoint] = (acc[item.touchpoint] || 0) + parseInt(item.total_responses);
-            return acc;
-        }, {});
-        
-        logger.info(`fetchEntityinSurveyFeedbackService: Returning ${transformedResult.length} entities with ${Object.entries(touchpointCounts).map(([tp, count]) => `${tp}: ${count}`).join(', ')} responses`);
+    // Log summary statistics
+    const touchpointCounts = transformedResult.reduce((acc, item) => {
+      acc[item.touchpoint] = (acc[item.touchpoint] || 0) + parseInt(item.total_responses);
+      return acc;
+    }, {});
 
-        return transformedResult;
+    logger.info(
+      `fetchEntityinSurveyFeedbackService: Returning ${transformedResult.length} entities with ${Object.entries(
+        touchpointCounts
+      )
+        .map(([tp, count]) => `${tp}: ${count}`)
+        .join(', ')} responses`
+    );
 
-    } catch (error) {
-        console.error('Error fetching survey feedback:', error);
-    }
+    return transformedResult;
+  } catch (error) {
+    console.error('Error fetching survey feedback:', error);
+  }
 };
 export const getAllSurveyTally = async () => {
-    const client = await pool.connect();
-    try {
-        // Step 1: Retrieve all surveyresponses_ref from survey_questions
-        const surveyRefsQuery = 'SELECT surveyresponses_ref, title, content FROM survey_questions';
-        const surveyRefsResult = await client.query(surveyRefsQuery);
-        const surveyRefs = surveyRefsResult.rows;
+  const client = await pool.connect();
+  try {
+    // Step 1: Retrieve all surveyresponses_ref from survey_questions
+    const surveyRefsQuery = 'SELECT surveyresponses_ref, title, content FROM survey_questions';
+    const surveyRefsResult = await client.query(surveyRefsQuery);
+    const surveyRefs = surveyRefsResult.rows;
 
-        // Step 2: For each surveyresponses_ref, query survey_responses
-        const results = [];
-        for (const ref of surveyRefs) {
-            const responseQuery = `
+    // Step 2: For each surveyresponses_ref, query survey_responses
+    const results = [];
+    for (const ref of surveyRefs) {
+      const responseQuery = `
                 SELECT surveyquestion_ref, response_value, COUNT(*) AS occurrence
                 FROM survey_responses
                 WHERE surveyquestion_ref = $1
                 GROUP BY surveyquestion_ref, response_value
             `;
-            const responseResult = await client.query(responseQuery, [ref.surveyresponses_ref]);
+      const responseResult = await client.query(responseQuery, [ref.surveyresponses_ref]);
 
-            // Step 3: Construct the array object
-            const occurrences = {};
-            responseResult.rows.forEach(row => {
-                occurrences[row.response_value] = row.occurrence;
-            });
+      // Step 3: Construct the array object
+      const occurrences = {};
+      responseResult.rows.forEach((row) => {
+        occurrences[row.response_value] = row.occurrence;
+      });
 
-            results.push({
-                division: ref.title,
-                question: ref.content,
-                surveyquestion_ref: ref.surveyresponses_ref,
-                occurrences: occurrences
-            });
-        }
-
-        return results;
-    } finally {
-        client.release();
+      results.push({
+        division: ref.title,
+        question: ref.content,
+        surveyquestion_ref: ref.surveyresponses_ref,
+        occurrences: occurrences,
+      });
     }
+
+    return results;
+  } finally {
+    client.release();
+  }
 };
 
 export const getAllSurveyTallyPaginated = async (page = 1, limit = 10, search = '') => {
-    const client = await pool.connect();
-    try {
-        const offset = (page - 1) * limit;
-        
-        // Step 1: Get total count for pagination
-        let countQuery = 'SELECT COUNT(*) FROM survey_questions';
-        let countParams = [];
-        
-        if (search) {
-            countQuery += ' WHERE title ILIKE $1 OR content ILIKE $1';
-            countParams = [`%${search}%`];
-        }
-        
-        const countResult = await client.query(countQuery, countParams);
-        const totalCount = parseInt(countResult.rows[0].count);
-        
-        // Step 2: Retrieve paginated surveyresponses_ref from survey_questions
-        let surveyRefsQuery = 'SELECT surveyresponses_ref, title, content FROM survey_questions';
-        let queryParams = [];
-        
-        if (search) {
-            surveyRefsQuery += ' WHERE title ILIKE $1 OR content ILIKE $1';
-            queryParams.push(`%${search}%`);
-        }
-        
-        surveyRefsQuery += ` ORDER BY title, content LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
-        queryParams.push(limit, offset);
-        
-        const surveyRefsResult = await client.query(surveyRefsQuery, queryParams);
-        const surveyRefs = surveyRefsResult.rows;
+  const client = await pool.connect();
+  try {
+    const offset = (page - 1) * limit;
 
-        // Step 3: For each surveyresponses_ref, query survey_responses
-        const results = [];
-        for (const ref of surveyRefs) {
-            const responseQuery = `
+    // Step 1: Get total count for pagination
+    let countQuery = 'SELECT COUNT(*) FROM survey_questions';
+    let countParams = [];
+
+    if (search) {
+      countQuery += ' WHERE title ILIKE $1 OR content ILIKE $1';
+      countParams = [`%${search}%`];
+    }
+
+    const countResult = await client.query(countQuery, countParams);
+    const totalCount = parseInt(countResult.rows[0].count);
+
+    // Step 2: Retrieve paginated surveyresponses_ref from survey_questions
+    let surveyRefsQuery = 'SELECT surveyresponses_ref, title, content FROM survey_questions';
+    let queryParams = [];
+
+    if (search) {
+      surveyRefsQuery += ' WHERE title ILIKE $1 OR content ILIKE $1';
+      queryParams.push(`%${search}%`);
+    }
+
+    surveyRefsQuery += ` ORDER BY title, content LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
+    queryParams.push(limit, offset);
+
+    const surveyRefsResult = await client.query(surveyRefsQuery, queryParams);
+    const surveyRefs = surveyRefsResult.rows;
+
+    // Step 3: For each surveyresponses_ref, query survey_responses
+    const results = [];
+    for (const ref of surveyRefs) {
+      const responseQuery = `
                 SELECT surveyquestion_ref, response_value, COUNT(*) AS occurrence
                 FROM survey_responses
                 WHERE surveyquestion_ref = $1
                 GROUP BY surveyquestion_ref, response_value
             `;
-            const responseResult = await client.query(responseQuery, [ref.surveyresponses_ref]);
+      const responseResult = await client.query(responseQuery, [ref.surveyresponses_ref]);
 
-            // Step 4: Construct the array object
-            const occurrences = {};
-            let totalResponses = 0;
-            responseResult.rows.forEach(row => {
-                occurrences[row.response_value] = parseInt(row.occurrence);
-                totalResponses += parseInt(row.occurrence);
-            });
+      // Step 4: Construct the array object
+      const occurrences = {};
+      let totalResponses = 0;
+      responseResult.rows.forEach((row) => {
+        occurrences[row.response_value] = parseInt(row.occurrence);
+        totalResponses += parseInt(row.occurrence);
+      });
 
-            results.push({
-                division: ref.title,
-                question: ref.content,
-                surveyquestion_ref: ref.surveyresponses_ref,
-                occurrences: occurrences,
-                totalResponses: totalResponses
-            });
-        }
-
-        return {
-            data: results,
-            pagination: {
-                currentPage: page,
-                totalPages: Math.ceil(totalCount / limit),
-                totalCount: totalCount,
-                hasNextPage: page < Math.ceil(totalCount / limit),
-                hasPrevPage: page > 1
-            }
-        };
-    } finally {
-        client.release();
+      results.push({
+        division: ref.title,
+        question: ref.content,
+        surveyquestion_ref: ref.surveyresponses_ref,
+        occurrences: occurrences,
+        totalResponses: totalResponses,
+      });
     }
+
+    return {
+      data: results,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+        totalCount: totalCount,
+        hasNextPage: page < Math.ceil(totalCount / limit),
+        hasPrevPage: page > 1,
+      },
+    };
+  } finally {
+    client.release();
+  }
 };
 
 export const getSentimentAnalysis = async (year = null, quarter = null) => {
+  const client = await pool.connect();
 
-    const client = await pool.connect();
+  try {
+    // Build date range filter if year and quarter are provided
+    let dateFilter = '';
+    const queryParams = [];
 
-    try {
-        // Build date range filter if year and quarter are provided
-        let dateFilter = '';
-        const queryParams = [];
-        
-        if (year && quarter) {
-            const startMonth = (quarter - 1) * 3 + 1;
-            const endMonth = quarter * 3;
-            const startDate = `${year}-${startMonth.toString().padStart(2, '0')}-01`;
-            const endDate = new Date(year, endMonth, 0); // Last day of quarter
-            const endDateStr = `${year}-${endMonth.toString().padStart(2, '0')}-${endDate.getDate()}`;
-            
-            dateFilter = `AND sf.created_at >= $1 AND sf.created_at <= $2`;
-            queryParams.push(startDate, endDateStr);
-            
-            logger.info(`getSentimentAnalysis: Applying date filter - Year: ${year}, Quarter: Q${quarter} (${startDate} to ${endDateStr})`);
-        } else {
-            logger.info('getSentimentAnalysis: No date filter applied - fetching all data');
-        }
+    if (year && quarter) {
+      const startMonth = (quarter - 1) * 3 + 1;
+      const endMonth = quarter * 3;
+      const startDate = `${year}-${startMonth.toString().padStart(2, '0')}-01`;
+      const endDate = new Date(year, endMonth, 0); // Last day of quarter
+      const endDateStr = `${year}-${endMonth.toString().padStart(2, '0')}-${endDate.getDate()}`;
 
-        // Count the positive, neutral, and negative rows with date filter
-        const countQuery = `
+      dateFilter = `AND sf.created_at >= $1 AND sf.created_at <= $2`;
+      queryParams.push(startDate, endDateStr);
+
+      logger.info(
+        `getSentimentAnalysis: Applying date filter - Year: ${year}, Quarter: Q${quarter} (${startDate} to ${endDateStr})`
+      );
+    } else {
+      logger.info('getSentimentAnalysis: No date filter applied - fetching all data');
+    }
+
+    // Count the positive, neutral, and negative rows with date filter
+    const countQuery = `
         SELECT sa.sentiment, COUNT(*) 
         FROM sentiment_analysis sa
         JOIN survey_feedback sf ON sa.response_id = sf.response_id
@@ -854,71 +850,78 @@ export const getSentimentAnalysis = async (year = null, quarter = null) => {
         GROUP BY sa.sentiment;
       `;
 
-        const countResult = queryParams.length > 0 
-            ? await client.query(countQuery, queryParams)
-            : await client.query(countQuery);
+    const countResult =
+      queryParams.length > 0
+        ? await client.query(countQuery, queryParams)
+        : await client.query(countQuery);
 
-        // Extract counts
-        const counts = {
-            positive: 0,
-            neutral: 0,
-            negative: 0,
-        };
+    // Extract counts
+    const counts = {
+      positive: 0,
+      neutral: 0,
+      negative: 0,
+    };
 
-        countResult.rows.forEach(row => {
-            counts[row.sentiment] = row.count;
-        });
+    countResult.rows.forEach((row) => {
+      counts[row.sentiment] = row.count;
+    });
 
-        // Fetch response_values for each sentiment with date filter
-        const positiveQuery = `
+    // Fetch response_values for each sentiment with date filter
+    const positiveQuery = `
         SELECT sf.response_value 
         FROM survey_feedback sf
         JOIN sentiment_analysis sa ON sf.response_id = sa.response_id
         WHERE sa.sentiment = 'positive' AND sf.relevance = 'RELEVANT' ${dateFilter};
       `;
 
-        const neutralQuery = `
+    const neutralQuery = `
         SELECT sf.response_value 
         FROM survey_feedback sf
         JOIN sentiment_analysis sa ON sf.response_id = sa.response_id
         WHERE sa.sentiment = 'neutral' AND sf.relevance = 'RELEVANT' ${dateFilter};
       `;
 
-        const negativeQuery = `
+    const negativeQuery = `
         SELECT sf.response_value 
         FROM survey_feedback sf
         JOIN sentiment_analysis sa ON sf.response_id = sa.response_id
         WHERE sa.sentiment = 'negative' AND sf.relevance = 'RELEVANT' ${dateFilter};
       `;
 
-        const [positiveResult, neutralResult, negativeResult] = await Promise.all([
-            queryParams.length > 0 ? client.query(positiveQuery, queryParams) : client.query(positiveQuery),
-            queryParams.length > 0 ? client.query(neutralQuery, queryParams) : client.query(neutralQuery),
-            queryParams.length > 0 ? client.query(negativeQuery, queryParams) : client.query(negativeQuery),
-        ]);
+    const [positiveResult, neutralResult, negativeResult] = await Promise.all([
+      queryParams.length > 0
+        ? client.query(positiveQuery, queryParams)
+        : client.query(positiveQuery),
+      queryParams.length > 0 ? client.query(neutralQuery, queryParams) : client.query(neutralQuery),
+      queryParams.length > 0
+        ? client.query(negativeQuery, queryParams)
+        : client.query(negativeQuery),
+    ]);
 
-        // Prepare the final result
-        const result = {
-            counts,
-            positive: positiveResult.rows.map(row => row.response_value),
-            neutral: neutralResult.rows.map(row => row.response_value),
-            negative: negativeResult.rows.map(row => row.response_value),
-        };
+    // Prepare the final result
+    const result = {
+      counts,
+      positive: positiveResult.rows.map((row) => row.response_value),
+      neutral: neutralResult.rows.map((row) => row.response_value),
+      negative: negativeResult.rows.map((row) => row.response_value),
+    };
 
-        logger.info(`getSentimentAnalysis: Returning ${Object.values(counts).reduce((a, b) => parseInt(a) + parseInt(b), 0)} total sentiment records (Positive: ${counts.positive}, Neutral: ${counts.neutral}, Negative: ${counts.negative})`);
+    logger.info(
+      `getSentimentAnalysis: Returning ${Object.values(counts).reduce((a, b) => parseInt(a) + parseInt(b), 0)} total sentiment records (Positive: ${counts.positive}, Neutral: ${counts.neutral}, Negative: ${counts.negative})`
+    );
 
-        return result;
-    } finally {
-        client.release();
-    }
+    return result;
+  } finally {
+    client.release();
+  }
 };
 
 export const getSentimentLocation = async (filter) => {
-    const client = await pool.connect();
+  const client = await pool.connect();
 
-    try {
-        // Base query for sentiment counts with entity filter
-        const countQuery = `
+  try {
+    // Base query for sentiment counts with entity filter
+    const countQuery = `
             SELECT sa.sentiment, COUNT(*) 
             FROM sentiment_analysis sa
             JOIN survey_feedback sf ON sa.response_id = sf.response_id
@@ -926,84 +929,86 @@ export const getSentimentLocation = async (filter) => {
             GROUP BY sa.sentiment;
         `;
 
-        const countResult = await client.query(countQuery, [filter]);
+    const countResult = await client.query(countQuery, [filter]);
 
-        // Extract counts
-        const counts = {
-            positive: 0,
-            neutral: 0,
-            negative: 0,
-        };
+    // Extract counts
+    const counts = {
+      positive: 0,
+      neutral: 0,
+      negative: 0,
+    };
 
-        countResult.rows.forEach(row => {
-            counts[row.sentiment] = parseInt(row.count, 10);
-        });
+    countResult.rows.forEach((row) => {
+      counts[row.sentiment] = parseInt(row.count, 10);
+    });
 
-        // Fetch response_values for each sentiment with entity filter
-        const positiveQuery = `
+    // Fetch response_values for each sentiment with entity filter
+    const positiveQuery = `
             SELECT sf.response_value 
             FROM survey_feedback sf
             JOIN sentiment_analysis sa ON sf.response_id = sa.response_id
             WHERE sa.sentiment = 'positive' AND sf.entity = $1;
         `;
 
-        const neutralQuery = `
+    const neutralQuery = `
             SELECT sf.response_value 
             FROM survey_feedback sf
             JOIN sentiment_analysis sa ON sf.response_id = sa.response_id
             WHERE sa.sentiment = 'neutral' AND sf.entity = $1;
         `;
 
-        const negativeQuery = `
+    const negativeQuery = `
             SELECT sf.response_value 
             FROM survey_feedback sf
             JOIN sentiment_analysis sa ON sf.response_id = sa.response_id
             WHERE sa.sentiment = 'negative' AND sf.entity = $1;
         `;
 
-        // Execute queries with filter
-        const [positiveResult, neutralResult, negativeResult] = await Promise.all([
-            client.query(positiveQuery, [filter]),
-            client.query(neutralQuery, [filter]),
-            client.query(negativeQuery, [filter]),
-        ]);
+    // Execute queries with filter
+    const [positiveResult, neutralResult, negativeResult] = await Promise.all([
+      client.query(positiveQuery, [filter]),
+      client.query(neutralQuery, [filter]),
+      client.query(negativeQuery, [filter]),
+    ]);
 
-        // Prepare the final result
-        const result = {
-            counts,
-            positive: positiveResult.rows.map(row => row.response_value),
-            neutral: neutralResult.rows.map(row => row.response_value),
-            negative: negativeResult.rows.map(row => row.response_value),
-        };
+    // Prepare the final result
+    const result = {
+      counts,
+      positive: positiveResult.rows.map((row) => row.response_value),
+      neutral: neutralResult.rows.map((row) => row.response_value),
+      negative: negativeResult.rows.map((row) => row.response_value),
+    };
 
-        return result;
-    } finally {
-        client.release();
-    }
+    return result;
+  } finally {
+    client.release();
+  }
 };
 export const getSurveyResponseByTopic = async (year = null, quarter = null) => {
-    try {
-        // Build date range filter if year and quarter are provided
-        let dateFilter = '';
-        const queryParams = [];
-        
-        if (year && quarter) {
-            const startMonth = (quarter - 1) * 3 + 1;
-            const endMonth = quarter * 3;
-            const startDate = `${year}-${startMonth.toString().padStart(2, '0')}-01`;
-            const endDate = new Date(year, endMonth, 0); // Last day of quarter
-            const endDateStr = `${year}-${endMonth.toString().padStart(2, '0')}-${endDate.getDate()}`;
-            
-            dateFilter = `AND sr.created_at >= $1 AND sr.created_at <= $2`;
-            queryParams.push(startDate, endDateStr);
-            
-            logger.info(`getSurveyResponseByTopic: Applying date filter - Year: ${year}, Quarter: Q${quarter} (${startDate} to ${endDateStr})`);
-        } else {
-            logger.info('getSurveyResponseByTopic: No date filter applied - fetching all data');
-        }
-        
-        // Step 1: Fetch data from the database, excluding rows with blank response_value
-        const query = `
+  try {
+    // Build date range filter if year and quarter are provided
+    let dateFilter = '';
+    const queryParams = [];
+
+    if (year && quarter) {
+      const startMonth = (quarter - 1) * 3 + 1;
+      const endMonth = quarter * 3;
+      const startDate = `${year}-${startMonth.toString().padStart(2, '0')}-01`;
+      const endDate = new Date(year, endMonth, 0); // Last day of quarter
+      const endDateStr = `${year}-${endMonth.toString().padStart(2, '0')}-${endDate.getDate()}`;
+
+      dateFilter = `AND sr.created_at >= $1 AND sr.created_at <= $2`;
+      queryParams.push(startDate, endDateStr);
+
+      logger.info(
+        `getSurveyResponseByTopic: Applying date filter - Year: ${year}, Quarter: Q${quarter} (${startDate} to ${endDateStr})`
+      );
+    } else {
+      logger.info('getSurveyResponseByTopic: No date filter applied - fetching all data');
+    }
+
+    // Step 1: Fetch data from the database, excluding rows with blank response_value
+    const query = `
           SELECT 
             sq.surveytopic,
             sr.response_value,
@@ -1024,52 +1029,53 @@ export const getSurveyResponseByTopic = async (year = null, quarter = null) => {
           ORDER BY 
             sq.surveytopic, sr.response_value;
         `;
-    
-        const { rows } = queryParams.length > 0 
-            ? await pool.query(query, queryParams)
-            : await pool.query(query);
-    
-        // Step 2: Initialize the result object
-        const result = {
-          ACCOMODATION: { dissatisfied: 0, neutral: 0, satisfied: 0, very_satisfied: 0 },
-          TRANSPORTATION: { dissatisfied: 0, neutral: 0, satisfied: 0, very_satisfied: 0 },
-          ATTRACTION: { dissatisfied: 0, neutral: 0, satisfied: 0, very_satisfied: 0 },
-          SERVICES: { dissatisfied: 0, neutral: 0, satisfied: 0, very_satisfied: 0 },
-        };
-    
-        // Step 3: Process each row
-        rows.forEach((row) => {
-          const topic = row.surveytopic.toUpperCase();
-          const value = parseInt(row.response_value, 10); // Convert response_value to a number
-          const count = parseInt(row.count, 10); // Convert count to a number
-    
-          // Only process valid topics and values
-          if (result[topic] && !isNaN(value) && !isNaN(count)) {
-            if (value === 1) {
-              result[topic].dissatisfied += count;
-            } else if (value === 2) {
-              result[topic].neutral += count;
-            } else if (value === 3) {
-              result[topic].satisfied += count;
-            } else if (value === 4) {
-              result[topic].very_satisfied += count;
-            }
-          }
-        });
-    
-        // Calculate totals for logging
-        const totals = Object.entries(result).reduce((acc, [topic, ratings]) => {
-          const topicTotal = Object.values(ratings).reduce((sum, val) => sum + val, 0);
-          acc[topic] = topicTotal;
-          return acc;
-        }, {});
-        
-        logger.info(`getSurveyResponseByTopic: Returning data - ACCOMODATION: ${totals.ACCOMODATION}, TRANSPORTATION: ${totals.TRANSPORTATION}, ATTRACTION: ${totals.ATTRACTION}, SERVICES: ${totals.SERVICES}`);
-    
-        // Step 4: Return the formatted result
-        return result;
-      } catch (error) {
-        console.error('Error fetching survey stats:', error);
-        throw new Error('Failed to fetch survey stats');
-      }
+
+    const { rows } =
+      queryParams.length > 0 ? await pool.query(query, queryParams) : await pool.query(query);
+
+    // Step 2: Initialize the result object
+    const result = {
+      ACCOMODATION: { dissatisfied: 0, neutral: 0, satisfied: 0, very_satisfied: 0 },
+      TRANSPORTATION: { dissatisfied: 0, neutral: 0, satisfied: 0, very_satisfied: 0 },
+      ATTRACTION: { dissatisfied: 0, neutral: 0, satisfied: 0, very_satisfied: 0 },
+      SERVICES: { dissatisfied: 0, neutral: 0, satisfied: 0, very_satisfied: 0 },
     };
+
+    // Step 3: Process each row
+    rows.forEach((row) => {
+      const topic = row.surveytopic.toUpperCase();
+      const value = parseInt(row.response_value, 10); // Convert response_value to a number
+      const count = parseInt(row.count, 10); // Convert count to a number
+
+      // Only process valid topics and values
+      if (result[topic] && !isNaN(value) && !isNaN(count)) {
+        if (value === 1) {
+          result[topic].dissatisfied += count;
+        } else if (value === 2) {
+          result[topic].neutral += count;
+        } else if (value === 3) {
+          result[topic].satisfied += count;
+        } else if (value === 4) {
+          result[topic].very_satisfied += count;
+        }
+      }
+    });
+
+    // Calculate totals for logging
+    const totals = Object.entries(result).reduce((acc, [topic, ratings]) => {
+      const topicTotal = Object.values(ratings).reduce((sum, val) => sum + val, 0);
+      acc[topic] = topicTotal;
+      return acc;
+    }, {});
+
+    logger.info(
+      `getSurveyResponseByTopic: Returning data - ACCOMODATION: ${totals.ACCOMODATION}, TRANSPORTATION: ${totals.TRANSPORTATION}, ATTRACTION: ${totals.ATTRACTION}, SERVICES: ${totals.SERVICES}`
+    );
+
+    // Step 4: Return the formatted result
+    return result;
+  } catch (error) {
+    console.error('Error fetching survey stats:', error);
+    throw new Error('Failed to fetch survey stats');
+  }
+};

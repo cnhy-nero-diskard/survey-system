@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_PASSWORD: ${PG_PASSWORD}
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     networks:
@@ -34,14 +34,20 @@ services:
       HMAC_SECRET: ${HMAC_SECRET}
       SESSION_SECRET: ${SESSION_SECRET}
     ports:
-      - "5000:5000"
+      - '5000:5000'
     depends_on:
       - postgres
     networks:
       - survey-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "-e", "const http = require('http'); const options = { host: 'localhost', port: 5000, path: '/api/health' }; const req = http.request(options, (res) => { if (res.statusCode === 200) process.exit(0); else process.exit(1); }); req.on('error', () => process.exit(1)); req.end();"]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "const http = require('http'); const options = { host: 'localhost', port: 5000, path: '/api/health' }; const req = http.request(options, (res) => { if (res.statusCode === 200) process.exit(0); else process.exit(1); }); req.on('error', () => process.exit(1)); req.end();",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

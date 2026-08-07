@@ -14,20 +14,20 @@ import logger from '../middleware/logger.js';
  * @throws {Error} If there is an issue with the database query.
  */
 export const submitSurveyResponse = async (response, anonymousUserId) => {
-    try {
-        // Clean response by removing newline characters
-        const cleanedResponse = {
-            ...response,
-            surveyquestion_ref: response.surveyquestion_ref?.trim(),
-            response_value: typeof response.response_value === 'string' 
-                ? response.response_value.trim().replace(/\n/g, '') 
-                : response.response_value
-        };
+  try {
+    // Clean response by removing newline characters
+    const cleanedResponse = {
+      ...response,
+      surveyquestion_ref: response.surveyquestion_ref?.trim(),
+      response_value:
+        typeof response.response_value === 'string'
+          ? response.response_value.trim().replace(/\n/g, '')
+          : response.response_value,
+    };
 
-
-        const logtext = ` METHOD submit survey responses --> database`;
-        logger.database(logtext);
-        const query = `
+    const logtext = ` METHOD submit survey responses --> database`;
+    logger.database(logtext);
+    const query = `
     INSERT INTO survey_responses (
         anonymous_user_id, 
         surveyquestion_ref, 
@@ -44,23 +44,23 @@ export const submitSurveyResponse = async (response, anonymousUserId) => {
     RETURNING *;
     `;
 
-        const values = [
-            anonymousUserId,
-            cleanedResponse.surveyquestion_ref,
-            cleanedResponse.response_value,
-            cleanedResponse.touchpoint
-        ];
+    const values = [
+      anonymousUserId,
+      cleanedResponse.surveyquestion_ref,
+      cleanedResponse.response_value,
+      cleanedResponse.touchpoint,
+    ];
 
-        const result = await pool.query(query, values);
-        return result.rows[0];
-    } catch (err) {
-        logger.error(`METHOD Error INSERTING INTO DATABASE: ${err.message}`);
-        throw err;
-    }
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (err) {
+    logger.error(`METHOD Error INSERTING INTO DATABASE: ${err.message}`);
+    throw err;
+  }
 };
 
 export const fetchSurveyResponsesByUser = async (anonymousUserId) => {
-    const query = `
+  const query = `
         SELECT
             sr.*,
             au.created_at AS anonymous_user_created_at
@@ -68,6 +68,6 @@ export const fetchSurveyResponsesByUser = async (anonymousUserId) => {
         LEFT JOIN anonymous_users au ON sr.anonymous_user_id = au.anonymous_user_id
         WHERE sr.anonymous_user_id = $1;
     `;
-    const result = await pool.query(query, [anonymousUserId]);
-    return result.rows;
+  const result = await pool.query(query, [anonymousUserId]);
+  return result.rows;
 };

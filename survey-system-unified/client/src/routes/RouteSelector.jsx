@@ -55,7 +55,9 @@ const StyledButton = styled.button`
   color: #ffffff;
   border: none;
   border-radius: 6px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
 
   &:hover {
     background-color: #388e3c;

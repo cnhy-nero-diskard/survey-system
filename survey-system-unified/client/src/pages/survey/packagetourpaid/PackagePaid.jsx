@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useSpring } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgoverlay from "../../../components/img/money.png";
+import imgoverlay from '../../../components/img/money.png';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
@@ -16,7 +16,7 @@ import Select from 'react-select';
 import {
   fetchCurrencies,
   fetchConversionRates,
-  convertIncomeToPHP
+  convertIncomeToPHP,
 } from '../../../components/utils/currencyUtils';
 
 // Language-to-Currency Mapping
@@ -90,7 +90,7 @@ const PackagePaid = () => {
 
   const [responses, setResponses] = useState({
     price: '',
-    currency: 'USD' // Default currency, will be overridden based on language
+    currency: 'USD', // Default currency, will be overridden based on language
   });
   const [currencyOptions, setCurrencyOptions] = useState([]);
   const [conversionRates, setConversionRates] = useState({});
@@ -110,7 +110,10 @@ const PackagePaid = () => {
   useEffect(() => {
     const savedResponses = loadFromLocalStorage('packagePaidResponses');
     if (savedResponses) {
-      setResponses({price: savedResponses.price, currency: loadFromLocalStorage('touristCurrency')});
+      setResponses({
+        price: savedResponses.price,
+        currency: loadFromLocalStorage('touristCurrency'),
+      });
     }
   }, []);
 
@@ -155,7 +158,7 @@ const PackagePaid = () => {
     const surveyResponses = [
       { surveyquestion_ref: 'PRCAM', response_value: responses.price },
       { surveyquestion_ref: 'CURNC', response_value: responses.currency },
-      { surveyquestion_ref: 'CONVR', response_value: convertedPrice }
+      { surveyquestion_ref: 'CONVR', response_value: convertedPrice },
     ];
     await submitSurveyResponses(surveyResponses);
     setIsLoading(false);
@@ -175,9 +178,7 @@ const PackagePaid = () => {
         handleNextClick={handleNextClick}
       >
         <Container>
-          <QuestionText >
-            {translations.packagePaidQuestion}
-          </QuestionText>
+          <QuestionText>{translations.packagePaidQuestion}</QuestionText>
 
           <InputContainer>
             <InputLabel>({translations.packagePaidInputLabel})</InputLabel>
@@ -193,7 +194,7 @@ const PackagePaid = () => {
             <InputLabel>{translations.packagePaidInputLabel}</InputLabel>
             <Select
               options={currencyOptions}
-              value={currencyOptions.find(option => option.value === responses.currency)}
+              value={currencyOptions.find((option) => option.value === responses.currency)}
               onChange={handleCurrencyChange}
               placeholder="..."
               isSearchable
@@ -248,8 +249,6 @@ const PackagePaid = () => {
               }}
               menuPortalTarget={document.body}
               menuPosition="fixed"
-
-  
             />
           </InputContainer>
 

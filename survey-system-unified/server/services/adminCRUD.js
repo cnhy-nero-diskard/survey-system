@@ -1,12 +1,10 @@
 // services/adminCRUD.js
-import pool from "../config/db.js";
-import logger from "../middleware/logger.js";
-
-
+import pool from '../config/db.js';
+import logger from '../middleware/logger.js';
 
 // Function to create a new localization entry in the database
 export const createLocalizationService = async (key, language_code, textContent, component) => {
-  logger.database("METHOD api/admin/localization - CREATE");
+  logger.database('METHOD api/admin/localization - CREATE');
   try {
     // SQL query to insert a new localization record
     const query = `
@@ -27,7 +25,7 @@ export const createLocalizationService = async (key, language_code, textContent,
 
 // Function to fetch localizations based on optional filters
 export const fetchLocalizationsService = async (filters = {}) => {
-  logger.database("METHOD api/admin/localization - READ");
+  logger.database('METHOD api/admin/localization - READ');
   try {
     let query = `SELECT * FROM public.localization00`;
     const values = [];
@@ -63,7 +61,7 @@ export const fetchLocalizationsService = async (filters = {}) => {
 
 // Function to update a localization entry
 export const updateLocalizationService = async (id, key, languageCode, textContent, component) => {
-  logger.database("METHOD api/admin/localization - UPDATE");
+  logger.database('METHOD api/admin/localization - UPDATE');
   try {
     // SQL query to update a localization record by id
     const query = `
@@ -84,7 +82,7 @@ export const updateLocalizationService = async (id, key, languageCode, textConte
 
 // Function to delete a localization entry by id
 export const deleteLocalizationService = async (id) => {
-  logger.database("METHOD api/admin/localization - DELETE");
+  logger.database('METHOD api/admin/localization - DELETE');
   try {
     // SQL query to delete a localization record by id
     const query = `
@@ -104,10 +102,22 @@ export const deleteLocalizationService = async (id) => {
 
 // Function to create a new establishment entry in the database
 export const createEstablishmentService = async (
-  estName, type, cityMun, barangay, latitude, longitude,
-  english, korean, chinese, japanese, russian, french, spanish, hindi
+  estName,
+  type,
+  cityMun,
+  barangay,
+  latitude,
+  longitude,
+  english,
+  korean,
+  chinese,
+  japanese,
+  russian,
+  french,
+  spanish,
+  hindi
 ) => {
-  logger.database("METHOD api/admin/establishments - CREATE");
+  logger.database('METHOD api/admin/establishments - CREATE');
   try {
     // SQL query to insert a new establishment record
     const query = `
@@ -119,8 +129,20 @@ export const createEstablishmentService = async (
       RETURNING *;
     `;
     const values = [
-      estName, type, cityMun, barangay, latitude, longitude,
-      english, korean, chinese, japanese, russian, french, spanish, hindi
+      estName,
+      type,
+      cityMun,
+      barangay,
+      latitude,
+      longitude,
+      english,
+      korean,
+      chinese,
+      japanese,
+      russian,
+      french,
+      spanish,
+      hindi,
     ];
     const result = await pool.query(query, values);
     // Return the newly created row
@@ -133,7 +155,7 @@ export const createEstablishmentService = async (
 
 // Function to fetch establishments based on optional filters
 export const fetchEstablishmentsService = async (filters = {}) => {
-  logger.database("METHOD api/admin/establishments - READ");
+  logger.database('METHOD api/admin/establishments - READ');
   try {
     let query = `SELECT * FROM public.establishments`;
     const values = [];
@@ -173,10 +195,23 @@ export const fetchEstablishmentsService = async (filters = {}) => {
 
 // Function to update an establishment entry
 export const updateEstablishmentService = async (
-  id, estName, type, cityMun, barangay, latitude, longitude,
-  english, korean, chinese, japanese, russian, french, spanish, hindi
+  id,
+  estName,
+  type,
+  cityMun,
+  barangay,
+  latitude,
+  longitude,
+  english,
+  korean,
+  chinese,
+  japanese,
+  russian,
+  french,
+  spanish,
+  hindi
 ) => {
-  logger.database("METHOD api/admin/establishments - UPDATE");
+  logger.database('METHOD api/admin/establishments - UPDATE');
   try {
     // SQL query to update an establishment record by id
     const query = `
@@ -188,8 +223,21 @@ export const updateEstablishmentService = async (
       RETURNING *;
     `;
     const values = [
-      estName, type, cityMun, barangay, latitude, longitude,
-      english, korean, chinese, japanese, russian, french, spanish, hindi, id
+      estName,
+      type,
+      cityMun,
+      barangay,
+      latitude,
+      longitude,
+      english,
+      korean,
+      chinese,
+      japanese,
+      russian,
+      french,
+      spanish,
+      hindi,
+      id,
     ];
     const result = await pool.query(query, values);
     // Return the updated row
@@ -202,7 +250,7 @@ export const updateEstablishmentService = async (
 
 // Function to delete an establishment entry by id
 export const deleteEstablishmentService = async (id) => {
-  logger.database("METHOD api/admin/establishments - DELETE");
+  logger.database('METHOD api/admin/establishments - DELETE');
   try {
     // SQL query to delete an establishment record by id
     const query = `
@@ -222,10 +270,22 @@ export const deleteEstablishmentService = async (id) => {
 
 // Function to create a new tourism attraction entry in the database
 export const createTourismAttractionService = async (
-  taName, typeCode, region, provHuc, cityMun, reportYear, brgy,
-  latitude, longitude, taCategory, ntdpCategory, devtLvl, mgt, onlineConnectivity
+  taName,
+  typeCode,
+  region,
+  provHuc,
+  cityMun,
+  reportYear,
+  brgy,
+  latitude,
+  longitude,
+  taCategory,
+  ntdpCategory,
+  devtLvl,
+  mgt,
+  onlineConnectivity
 ) => {
-  logger.database("METHOD api/admin/tourismattractions - CREATE");
+  logger.database('METHOD api/admin/tourismattractions - CREATE');
   try {
     // SQL query to insert a new tourism attraction record
     const query = `
@@ -237,8 +297,20 @@ export const createTourismAttractionService = async (
       RETURNING *;
     `;
     const values = [
-      taName, typeCode, region, provHuc, cityMun, reportYear, brgy,
-      latitude, longitude, taCategory, ntdpCategory, devtLvl, mgt, onlineConnectivity
+      taName,
+      typeCode,
+      region,
+      provHuc,
+      cityMun,
+      reportYear,
+      brgy,
+      latitude,
+      longitude,
+      taCategory,
+      ntdpCategory,
+      devtLvl,
+      mgt,
+      onlineConnectivity,
     ];
     const result = await pool.query(query, values);
     // Return the newly created row
@@ -251,7 +323,7 @@ export const createTourismAttractionService = async (
 
 // Function to fetch tourism attractions based on optional filters
 export const fetchTourismAttractionsService = async (filters = {}) => {
-  logger.database("METHOD api/admin/tourismattractions - READ");
+  logger.database('METHOD api/admin/tourismattractions - READ');
   try {
     let query = `SELECT * FROM public.tourismattractions`;
     const values = [];
@@ -299,10 +371,23 @@ export const fetchTourismAttractionsService = async (filters = {}) => {
 
 // Function to update a tourism attraction entry
 export const updateTourismAttractionService = async (
-  id, taName, typeCode, region, provHuc, cityMun, reportYear, brgy,
-  latitude, longitude, taCategory, ntdpCategory, devtLvl, mgt, onlineConnectivity
+  id,
+  taName,
+  typeCode,
+  region,
+  provHuc,
+  cityMun,
+  reportYear,
+  brgy,
+  latitude,
+  longitude,
+  taCategory,
+  ntdpCategory,
+  devtLvl,
+  mgt,
+  onlineConnectivity
 ) => {
-  logger.database("METHOD api/admin/tourismattractions - UPDATE");
+  logger.database('METHOD api/admin/tourismattractions - UPDATE');
   try {
     // SQL query to update a tourism attraction record by id
     const query = `
@@ -314,8 +399,21 @@ export const updateTourismAttractionService = async (
       RETURNING *;
     `;
     const values = [
-      taName, typeCode, region, provHuc, cityMun, reportYear, brgy,
-      latitude, longitude, taCategory, ntdpCategory, devtLvl, mgt, onlineConnectivity, id
+      taName,
+      typeCode,
+      region,
+      provHuc,
+      cityMun,
+      reportYear,
+      brgy,
+      latitude,
+      longitude,
+      taCategory,
+      ntdpCategory,
+      devtLvl,
+      mgt,
+      onlineConnectivity,
+      id,
     ];
     const result = await pool.query(query, values);
     // Return the updated row
@@ -328,7 +426,7 @@ export const updateTourismAttractionService = async (
 
 // Function to delete a tourism attraction entry by id
 export const deleteTourismAttractionService = async (id) => {
-  logger.database("METHOD api/admin/tourismattractions - DELETE");
+  logger.database('METHOD api/admin/tourismattractions - DELETE');
   try {
     // SQL query to delete a tourism attraction record by id
     const query = `
@@ -347,8 +445,12 @@ export const deleteTourismAttractionService = async (id) => {
 };
 
 // Function to create a new survey response entry
-export const createSurveyResponseService = async (anonymous_user_id, surveyquestion_ref, response_value) => {
-  logger.database("METHOD api/admin/createSurveyResponse");
+export const createSurveyResponseService = async (
+  anonymous_user_id,
+  surveyquestion_ref,
+  response_value
+) => {
+  logger.database('METHOD api/admin/createSurveyResponse');
   try {
     // SQL query to insert a new survey response record
     const query = `
@@ -369,7 +471,7 @@ export const createSurveyResponseService = async (anonymous_user_id, surveyquest
 // Function to fetch all survey responses
 // Function to fetch survey responses with optional ID filter
 export const fetchSurveyResponsesService = async (anonid = null) => {
-  logger.database("METHOD api/admin/fetchSurveyResponses");
+  logger.database('METHOD api/admin/fetchSurveyResponses');
   try {
     let query = 'SELECT * FROM public.survey_responses';
     const values = [];
@@ -381,7 +483,7 @@ export const fetchSurveyResponsesService = async (anonid = null) => {
 
     const result = await pool.query(query, values);
     // Always return all matching rows
-    logger.warn(result.rowCount)
+    logger.warn(result.rowCount);
     return result.rows;
   } catch (err) {
     logger.error({ error: err.message });
@@ -391,7 +493,7 @@ export const fetchSurveyResponsesService = async (anonid = null) => {
 
 // Function to update a survey response by response ID
 export const updateSurveyResponseService = async (response_id, response_value) => {
-  logger.database("METHOD api/admin/updateSurveyResponse");
+  logger.database('METHOD api/admin/updateSurveyResponse');
   try {
     // SQL query to update a survey response record
     const query = `
@@ -412,7 +514,7 @@ export const updateSurveyResponseService = async (response_id, response_value) =
 
 // Function to delete a survey response by response ID
 export const deleteSurveyResponseService = async (anonymous_user_id) => {
-  logger.database("METHOD api/admin/deleteSurveyResponse");
+  logger.database('METHOD api/admin/deleteSurveyResponse');
   try {
     // SQL query to delete all survey response records for a given anonymous_user_id
     const query = `
@@ -432,7 +534,7 @@ export const deleteSurveyResponseService = async (anonymous_user_id) => {
 
 // Function to fetch survey responses by user ID and question reference
 export const fetchResponsesByUserAndQuestion = async (anonymous_user_id, surveyquestion_ref) => {
-  logger.database("METHOD api/admin/fetchResponsesByUserAndQuestion");
+  logger.database('METHOD api/admin/fetchResponsesByUserAndQuestion');
   try {
     const query = `
       SELECT * FROM public.survey_responses
@@ -449,7 +551,7 @@ export const fetchResponsesByUserAndQuestion = async (anonymous_user_id, surveyq
 };
 
 export const deleteSurveyResponseServiceByUserId = async (anonymous_user_id) => {
-  logger.database("METHOD api/admin/deleteSurveyResponse");
+  logger.database('METHOD api/admin/deleteSurveyResponse');
   try {
     const query = `
       DELETE FROM public.survey_responses
@@ -467,7 +569,7 @@ export const deleteSurveyResponseServiceByUserId = async (anonymous_user_id) => 
 
 // Function to create a new location entry
 export const createLocationService = async (locationData) => {
-  logger.database("METHOD api/admin/locations - CREATE");
+  logger.database('METHOD api/admin/locations - CREATE');
   try {
     const { parent_id, location_type, name, latitude, longitude, short_id } = locationData;
 
@@ -489,7 +591,7 @@ export const createLocationService = async (locationData) => {
 
 // Function to fetch locations with optional filters
 export const fetchLocationsWithFilterService = async (filters = {}) => {
-  logger.database("METHOD api/admin/locations - READ WITH FILTER");
+  logger.database('METHOD api/admin/locations - READ WITH FILTER');
   try {
     let query = `SELECT * FROM public.locations`;
     const values = [];
@@ -505,7 +607,7 @@ export const fetchLocationsWithFilterService = async (filters = {}) => {
     }
 
     if (conditions.length > 0) {
-      query += ` WHERE ${conditions.join(" AND ")}`;
+      query += ` WHERE ${conditions.join(' AND ')}`;
     }
 
     const result = await pool.query(query, values);
@@ -518,7 +620,7 @@ export const fetchLocationsWithFilterService = async (filters = {}) => {
 
 // Function to update a location entry
 export const updateLocationService = async (id, updateData) => {
-  logger.database("METHOD api/admin/locations - UPDATE");
+  logger.database('METHOD api/admin/locations - UPDATE');
   try {
     const { parent_id, location_type, name, latitude, longitude, short_id } = updateData;
 
@@ -546,7 +648,7 @@ export const updateLocationService = async (id, updateData) => {
 
 // Function to delete a location entry by ID
 export const deleteLocationService = async (id) => {
-  logger.database("METHOD api/admin/locations - DELETE");
+  logger.database('METHOD api/admin/locations - DELETE');
   try {
     const query = `
       DELETE FROM public.locations
@@ -563,7 +665,7 @@ export const deleteLocationService = async (id) => {
 };
 
 export const fetchEstTypes = async () => {
-  logger.database("METHOD api/admin/estabtypes - READ ");
+  logger.database('METHOD api/admin/estabtypes - READ ');
   try {
     let query = `SELECT type_name FROM public.est_types`;
     const values = [];
@@ -615,11 +717,9 @@ export const fetchEstTypes = async () => {
 //   }
 // };
 
-
-
 // Function to fetch anonymous users based on optional filters
 export const fetchAnonymousUsersService = async (filters = {}) => {
-  logger.database("METHOD api/admin/anonymous_users - READ");
+  logger.database('METHOD api/admin/anonymous_users - READ');
   try {
     let query = `SELECT * FROM public.anonymous_users`;
     const values = [];
@@ -649,10 +749,9 @@ export const fetchAnonymousUsersService = async (filters = {}) => {
   }
 };
 
-
 // Function to delete an anonymous user entry by id
 export const deleteAnonymousUserService = async (anonymous_user_id) => {
-  logger.database("METHOD api/admin/anonymous_users - DELETE");
+  logger.database('METHOD api/admin/anonymous_users - DELETE');
   try {
     // SQL query to delete an anonymous user record by id
     const query = `
@@ -671,20 +770,22 @@ export const deleteAnonymousUserService = async (anonymous_user_id) => {
 };
 
 export const createSentimentAnalysisService = async (results) => {
-  logger.database("METHOD api/admin/sentiment_analysis - CREATE BULK");
+  logger.database('METHOD api/admin/sentiment_analysis - CREATE BULK');
 
   try {
     // Prepare values and build placeholders for each record in the array
     const placeholders = [];
     const values = [];
 
-    results.forEach(({ response_id, user_id, review_date, rating, sqref, sentiment, confidence }, index) => {
-      const startIdx = index * 7; // Adjusted for 7 fields including response_id
-      placeholders.push(
-        `($${startIdx + 1}, $${startIdx + 2}, $${startIdx + 3}, $${startIdx + 4}, $${startIdx + 5}, $${startIdx + 6}, $${startIdx + 7})`
-      );
-      values.push(response_id, user_id, review_date, rating, sqref, sentiment, confidence);
-    });
+    results.forEach(
+      ({ response_id, user_id, review_date, rating, sqref, sentiment, confidence }, index) => {
+        const startIdx = index * 7; // Adjusted for 7 fields including response_id
+        placeholders.push(
+          `($${startIdx + 1}, $${startIdx + 2}, $${startIdx + 3}, $${startIdx + 4}, $${startIdx + 5}, $${startIdx + 6}, $${startIdx + 7})`
+        );
+        values.push(response_id, user_id, review_date, rating, sqref, sentiment, confidence);
+      }
+    );
 
     // Build the SQL query for bulk insertion
     const query = `
@@ -718,7 +819,7 @@ export const createSentimentAnalysisService = async (results) => {
 };
 // Function to fetch sentiment analysis entries based on optional filters
 export const fetchSentimentAnalysisService = async (filters = {}) => {
-  logger.database("METHOD api/admin/sentiment_analysis - READ");
+  logger.database('METHOD api/admin/sentiment_analysis - READ');
   try {
     let query = `SELECT * FROM public.sentiment_analysis`;
     const values = [];
@@ -753,8 +854,16 @@ export const fetchSentimentAnalysisService = async (filters = {}) => {
 };
 
 // Function to update a sentiment analysis entry
-export const updateSentimentAnalysisService = async (id, user_id, review_date, rating, sqref, sentiment, confidence) => {
-  logger.database("METHOD api/admin/sentiment_analysis - UPDATE");
+export const updateSentimentAnalysisService = async (
+  id,
+  user_id,
+  review_date,
+  rating,
+  sqref,
+  sentiment,
+  confidence
+) => {
+  logger.database('METHOD api/admin/sentiment_analysis - UPDATE');
   try {
     // SQL query to update a sentiment analysis record by id
     const query = `
@@ -775,7 +884,7 @@ export const updateSentimentAnalysisService = async (id, user_id, review_date, r
 
 // Function to delete a sentiment analysis entry by id
 export const deleteSentimentAnalysisService = async (id) => {
-  logger.database("METHOD api/admin/sentiment_analysis - DELETE");
+  logger.database('METHOD api/admin/sentiment_analysis - DELETE');
   try {
     // SQL query to delete a sentiment analysis record by id
     const query = `
@@ -795,11 +904,19 @@ export const deleteSentimentAnalysisService = async (id) => {
 
 // Function to insert data into topics, top_words, and contributions tables
 export const insertTopicDataService = async (data) => {
-  logger.database("METHOD api/admin/insertTopicData");
+  logger.database('METHOD api/admin/insertTopicData');
   try {
-
     for (const item of [data]) {
-      const { topic, probability, top_words, customLabel, contribution, startDate, endDate,customFilter } = item;
+      const {
+        topic,
+        probability,
+        top_words,
+        customLabel,
+        contribution,
+        startDate,
+        endDate,
+        customFilter,
+      } = item;
       // Convert startDate and endDate to proper timestamp format
       const formattedStartDate = new Date(startDate).toISOString();
       const formattedEndDate = new Date(endDate).toISOString();
@@ -809,7 +926,14 @@ export const insertTopicDataService = async (data) => {
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id;
       `;
-      const topicValues = [topic, probability, customLabel, formattedStartDate, formattedEndDate, customFilter[0]];
+      const topicValues = [
+        topic,
+        probability,
+        customLabel,
+        formattedStartDate,
+        formattedEndDate,
+        customFilter[0],
+      ];
       const topicResult = await pool.query(topicQuery, topicValues);
       const topicId = topicResult.rows[0].id;
       logger.database(`topic id --> ${topicId}`);
@@ -829,11 +953,15 @@ export const insertTopicDataService = async (data) => {
           INSERT INTO tm_contributions (topic_id, related_topic, related_label, contribution_percentage)
           VALUES ($1, $2, $3, $4);
         `;
-        const contribValues = [topicId, relatedTopic, relatedLabel, parseFloat(contributionPercentage)];
+        const contribValues = [
+          topicId,
+          relatedTopic,
+          relatedLabel,
+          parseFloat(contributionPercentage),
+        ];
         await pool.query(contribQuery, contribValues);
       }
     }
-
   } catch (err) {
     logger.error({ error: err.message });
     throw err;
@@ -841,7 +969,7 @@ export const insertTopicDataService = async (data) => {
 };
 // Function to fetch locations based on optional filters
 export const fetchLocationsService = async (filters = {}) => {
-  logger.database("METHOD api/admin/locations - READ");
+  logger.database('METHOD api/admin/locations - READ');
   try {
     const query = `SELECT * FROM public.locations`;
     const result = await pool.query(query);
@@ -855,7 +983,7 @@ export const fetchLocationsService = async (filters = {}) => {
 // -------------------------- TOUCHPOINT ACQUISITION  --------------------------
 
 export const fetchLocationsServiceFiltered = async (filters = {}) => {
-  logger.database("METHOD api/admin/locations - READ");
+  logger.database('METHOD api/admin/locations - READ');
   try {
     const query = `
       SELECT location_type, name, short_id FROM public.locations 
@@ -882,7 +1010,7 @@ export const fetchLocationsServiceFiltered = async (filters = {}) => {
 
 // Function to fetch all tourism attractions
 export const fetchAllTourismAttractionsService = async () => {
-  logger.database("METHOD api/admin/tourismattractions - READ ALL");
+  logger.database('METHOD api/admin/tourismattractions - READ ALL');
   try {
     const query = 'SELECT ta_name as name, short_id FROM public.tourismattractions';
     const result = await pool.query(query);
@@ -893,7 +1021,7 @@ export const fetchAllTourismAttractionsService = async () => {
   }
 };
 export const fetchAllTourismActivitiesService = async () => {
-  logger.database("METHOD api/admin/tourismactivities - READ ALL");
+  logger.database('METHOD api/admin/tourismactivities - READ ALL');
   try {
     const query = 'SELECT ta_name as name, short_id FROM public.tourismactivities';
     const result = await pool.query(query);
@@ -907,7 +1035,7 @@ export const fetchAllTourismActivitiesService = async () => {
 
 // Function to fetch all establishments
 export const fetchAllEstablishmentsService = async () => {
-  logger.database("METHOD api/admin/establishments - READ ALL");
+  logger.database('METHOD api/admin/establishments - READ ALL');
   try {
     const query = 'SELECT est_name as name, short_id FROM public.establishments ORDER BY name ASC';
     const result = await pool.query(query);
@@ -920,14 +1048,13 @@ export const fetchAllEstablishmentsService = async () => {
 
 // Helper function to fetch all location data at once
 export const fetchAllTouchpointsService = async () => {
-  logger.database("METHOD api/admin/locations - FETCH ALL DATA");
+  logger.database('METHOD api/admin/locations - FETCH ALL DATA');
   try {
     const [locations, attractions, establishments, activities] = await Promise.all([
       fetchLocationsServiceFiltered(),
       fetchAllTourismAttractionsService(),
       fetchAllEstablishmentsService(),
       fetchAllTourismActivitiesService(),
-
     ]);
 
     // Rename the 'Attractions' and 'Establishments' keys to lowercase
@@ -939,7 +1066,7 @@ export const fetchAllTouchpointsService = async () => {
       ...locations,
       attractions: attractionsData,
       establishments: establishmentsData,
-      activities: activitiesData
+      activities: activitiesData,
     };
   } catch (err) {
     logger.error({ error: err.message });
@@ -949,7 +1076,7 @@ export const fetchAllTouchpointsService = async () => {
 
 // Function to fetch translated tourism attraction name
 export const fetchTranslatedTouchpointService = async (entityName, languageCode) => {
-  logger.database("METHOD api/admin/tourismattractions - FETCH TRANSLATION");
+  logger.database('METHOD api/admin/tourismattractions - FETCH TRANSLATION');
 
   logger.warn(`entityName: ${entityName}, languageCode: ${languageCode}`);
   try {
@@ -1033,15 +1160,11 @@ export const fetchTranslatedTouchpointService = async (entityName, languageCode)
   }
 };
 
-
-
-
-
 // CRUD operations for survey_feedback table
 
 // Function to create a new survey feedback entry
 export const createSurveyFeedbackService = async (feedbackData) => {
-  logger.database("METHOD api/admin/survey_feedback - CREATE");
+  logger.database('METHOD api/admin/survey_feedback - CREATE');
   try {
     const {
       entity,
@@ -1082,7 +1205,7 @@ export const createSurveyFeedbackService = async (feedbackData) => {
 
 // Function to fetch survey feedback entries with optional filters
 export const fetchSurveyFeedbackService = async (filters = {}) => {
-  logger.database("METHOD api/admin/survey_feedback - READ");
+  logger.database('METHOD api/admin/survey_feedback - READ');
   try {
     let query = `
       SELECT 
@@ -1091,7 +1214,7 @@ export const fetchSurveyFeedbackService = async (filters = {}) => {
       FROM public.survey_feedback sf
       LEFT JOIN public.sentiment_analysis sa 
         ON sf.response_id = sa.response_id`;
-        
+
     const values = [];
     const conditions = [];
 
@@ -1113,7 +1236,7 @@ export const fetchSurveyFeedbackService = async (filters = {}) => {
     }
 
     if (conditions.length > 0) {
-      query += ` WHERE ${conditions.join(" AND ")}`;
+      query += ` WHERE ${conditions.join(' AND ')}`;
     }
 
     const result = await pool.query(query, values);
@@ -1126,7 +1249,7 @@ export const fetchSurveyFeedbackService = async (filters = {}) => {
 
 // Function to update a survey feedback entry
 export const updateSurveyFeedbackService = async (response_id, updateData) => {
-  logger.database("METHOD api/admin/survey_feedback - UPDATE");
+  logger.database('METHOD api/admin/survey_feedback - UPDATE');
   try {
     const {
       entity,
@@ -1174,7 +1297,7 @@ export const updateSurveyFeedbackService = async (response_id, updateData) => {
 
 // Function to delete a survey feedback entry by response ID
 export const deleteSurveyFeedbackService = async (response_id) => {
-  logger.database("METHOD api/admin/survey_feedback - DELETE");
+  logger.database('METHOD api/admin/survey_feedback - DELETE');
   try {
     const query = `
       DELETE FROM public.survey_feedback

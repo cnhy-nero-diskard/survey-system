@@ -19,8 +19,6 @@ Object.assign(process.env, {
   HMAC_SECRET: 'h'.repeat(32),
 });
 
-
-
 jest.unstable_mockModule('../../config/db.js', () => ({
   default: {
     query: jest.fn().mockResolvedValue({ rows: [{ submitted: true }] }),
@@ -52,11 +50,17 @@ describe('POST /api/survey/submit', () => {
     const response = await request(app)
       .post('/api/survey/submit')
       .send({
-        surveyResponses: [{
-          surveyquestion_ref: 'whereStay',
-          response_value: JSON.stringify({ selectedOption: 'Home', duration: 5, durationUnit: 'days' }),
-          touchpoint: 'Accommodation',
-        }],
+        surveyResponses: [
+          {
+            surveyquestion_ref: 'whereStay',
+            response_value: JSON.stringify({
+              selectedOption: 'Home',
+              duration: 5,
+              durationUnit: 'days',
+            }),
+            touchpoint: 'Accommodation',
+          },
+        ],
       });
 
     expect(response.status).toBe(200);
@@ -64,9 +68,7 @@ describe('POST /api/survey/submit', () => {
   });
 
   it('should return 400 for invalid input', async () => {
-    const response = await request(app)
-      .post('/api/survey/submit')
-      .send({}); // Send empty body
+    const response = await request(app).post('/api/survey/submit').send({}); // Send empty body
 
     expect(response.status).toBe(400);
     expect(response.text).toBe('Request body must be an array of response objects');

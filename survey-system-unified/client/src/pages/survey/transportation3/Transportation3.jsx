@@ -15,7 +15,7 @@ const Transportation3 = () => {
 
   const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const { activeBlocks, } = useContext(UnifiedContext);
+  const { activeBlocks } = useContext(UnifiedContext);
 
   const categories = [
     translations.transportation3RentalMotorcycleCarVan,
@@ -46,7 +46,6 @@ const Transportation3 = () => {
     entranslations.transportation3PrivateVehicleNoNeedToRate,
   ];
 
-
   const navigate = useNavigate();
 
   const handleRatingComplete = (sliderValues) => {
@@ -68,7 +67,7 @@ const Transportation3 = () => {
       title={translations.transportation3PleaseRateThisTouristAttractionEvent}
       categories={categories}
       onRatingComplete={handleRatingComplete}
-      surveyquestion_refs={"RTRA"}
+      surveyquestion_refs={'RTRA'}
       initialSliderValues={initialSliderValues}
 
       entranslations={encategories}

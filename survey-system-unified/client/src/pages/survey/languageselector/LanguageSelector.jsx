@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { Title } from '../../../components/utils/styles1';
-import translate from "../../../components/img/translate.png";
+import translate from '../../../components/img/translate.png';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../components/partials/LanguageContext';
 import axios from 'axios';
@@ -14,14 +14,12 @@ import '../../../components/utils/styles.css';
 import { FaGlobe } from 'react-icons/fa';
 import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
-
 const LanguageButtonsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 20px;
   justify-content: center;
   margin-bottom: 30px;
-  
 
   @media (max-width: 600px) {
     grid-template-columns: repeat(2, 1fr);
@@ -64,8 +62,14 @@ const LanguageButton = styled.button`
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 `;
 
@@ -153,25 +157,23 @@ const LanguageSelector = () => {
   const currentStepIndex = 0;
   const { activeBlocks, appendActiveBlocks } = useContext(UnifiedContext);
   const localization = {
-    en: "NEXT",
-    ko: "다음",
-    zh: "下一步",
-    ja: "次へ",
-    es: "SIGUIENTE",
-    fr: "SUIVANT",
-    ru: "ДАЛЕЕ",
-    hi: "अगला",
-    fl: "SUSUNOD"
-
+    en: 'NEXT',
+    ko: '다음',
+    zh: '下一步',
+    ja: '次へ',
+    es: 'SIGUIENTE',
+    fr: 'SUIVANT',
+    ru: 'ДАЛЕЕ',
+    hi: 'अगला',
+    fl: 'SUSUNOD',
   };
 
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_HOST}/api/survey/progress`,
-          { withCredentials: true }
-        );
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
+          withCredentials: true,
+        });
         setCurrentStep(response.data.currentStep);
       } catch (err) {
         console.error(err);
@@ -180,10 +182,9 @@ const LanguageSelector = () => {
 
     const fetchLanguages = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_HOST}/api/languageselect`,
-          { withCredentials: true }
-        );
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/languageselect`, {
+          withCredentials: true,
+        });
         setLanguages(response.data);
       } catch (error) {
         console.error('Error fetching languages:', error);
@@ -196,8 +197,6 @@ const LanguageSelector = () => {
     fetchProgress();
     fetchLanguages();
   }, [location.pathname, appendActiveBlocks, navigate]);
-
-
 
   const handleLanguageSelect = (code) => {
     setSelectedLanguageCode(code);
@@ -224,7 +223,7 @@ const LanguageSelector = () => {
       console.log(`LANGPERF: ${selectedLanguageCode}`);
       await axios.post(
         `${process.env.REACT_APP_API_HOST}/api/survey/submit`,
-        {surveyResponses: [postData]},
+        { surveyResponses: [postData] },
         { withCredentials: true }
       );
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
@@ -236,11 +235,12 @@ const LanguageSelector = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground 
-      overlayImage={translate}
-      handleNextClick={handleNextClick}
-      buttonAppear={selectedLanguageCode !== null}
-      nextmsg={localization[selectedLanguageCode]}>
+      <GradientBackground
+        overlayImage={translate}
+        handleNextClick={handleNextClick}
+        buttonAppear={selectedLanguageCode !== null}
+        nextmsg={localization[selectedLanguageCode]}
+      >
         <Title>
           <FaGlobe style={{ marginRight: '10px' }} />
           Select
@@ -270,8 +270,7 @@ const LanguageSelector = () => {
             })}
           </LanguageButtonsGrid>
         )}
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        </div>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}></div>
       </GradientBackground>
     </>
   );

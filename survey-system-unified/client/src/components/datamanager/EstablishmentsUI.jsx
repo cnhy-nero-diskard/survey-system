@@ -61,8 +61,10 @@ const Snackbar = styled.div`
   z-index: 1000;
   font-family: 'Poppins';
   font-weight: 500;
-  
-  ${props => props.type === 'error' && `
+
+  ${(props) =>
+    props.type === 'error' &&
+    `
     background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
     box-shadow: 0 8px 25px rgba(245, 101, 101, 0.3);
   `}
@@ -103,35 +105,34 @@ const EstablishmentsUI = () => {
     });
 
     // Fetch barangays
-    fetch(`${API_HOST}/api/admin/locations?location_type=barangay`,
+    fetch(
+      `${API_HOST}/api/admin/locations?location_type=barangay`,
 
       {
-        credentials: "include",
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
       }
     )
-      .then(response => response.json())
-      .then(data => {
-        setBarangays(data.map(item => item.name));
+      .then((response) => response.json())
+      .then((data) => {
+        setBarangays(data.map((item) => item.name));
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching barangays:', error);
       });
 
     // Fetch establishment types
-    fetch(`${API_HOST}/api/admin/estabtypes`,
-      {
-        credentials: "include",
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    )
-      .then(response => response.json())
-      .then(data => {
-        setEstablishmentTypes(data.map(item => item.type_name));
+    fetch(`${API_HOST}/api/admin/estabtypes`, {
+      credentials: 'include',
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setEstablishmentTypes(data.map((item) => item.type_name));
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching establishment types:', error);
       });
   }, []);
@@ -143,7 +144,7 @@ const EstablishmentsUI = () => {
       let updatedFormData = formData;
 
       if (commaSeparatedValues.trim()) {
-        const parsedValues = commaSeparatedValues.split(',').map(value => value.trim());
+        const parsedValues = commaSeparatedValues.split(',').map((value) => value.trim());
         updatedFormData = {
           est_name: parsedValues[0] || formData.est_name,
           type: parsedValues[1] || formData.type,
@@ -165,7 +166,9 @@ const EstablishmentsUI = () => {
       if (editMode) {
         // Update establishment
         const updatedEstablishment = await updateEstablishment(editMode, updatedFormData);
-        setEstablishments(establishments.map((est) => (est.id === editMode ? updatedEstablishment : est)));
+        setEstablishments(
+          establishments.map((est) => (est.id === editMode ? updatedEstablishment : est))
+        );
         setEditMode(null);
         setSnackbarMessage('Establishment successfully updated!');
         setSnackbarType('success');
@@ -232,7 +235,7 @@ const EstablishmentsUI = () => {
     try {
       return est.est_name.toLowerCase().includes(searchQuery.toLowerCase());
     } catch (error) {
-      console.error("Error filtering establishment:", error);
+      console.error('Error filtering establishment:', error);
       return false;
     }
   });
@@ -289,7 +292,9 @@ const EstablishmentsUI = () => {
           >
             <option value="">Select Type</option>
             {establishmentTypes.map((type, index) => (
-              <option key={index} value={type}>{type}</option>
+              <option key={index} value={type}>
+                {type}
+              </option>
             ))}
           </ModernSelect>
         </InputGroup>
@@ -316,7 +321,9 @@ const EstablishmentsUI = () => {
           >
             <option value="">Select Barangay</option>
             {barangays.map((barangay, index) => (
-              <option key={index} value={barangay}>{barangay}</option>
+              <option key={index} value={barangay}>
+                {barangay}
+              </option>
             ))}
           </ModernSelect>
         </InputGroup>
@@ -451,10 +458,10 @@ const EstablishmentsUI = () => {
           {editMode ? 'Update Establishment' : 'Create Establishment'}
         </ModernButton>
 
-        <ModernButton 
-          type="button" 
+        <ModernButton
+          type="button"
           variant="secondary"
-          onClick={() => fetchEstablishment().then(data => setEstablishments(data))}
+          onClick={() => fetchEstablishment().then((data) => setEstablishments(data))}
         >
           🔄 Reload Data
         </ModernButton>
@@ -470,9 +477,9 @@ const EstablishmentsUI = () => {
         />
       </InputGroup>
 
-      <ModernButton 
-        type="button" 
-        variant="secondary" 
+      <ModernButton
+        type="button"
+        variant="secondary"
         onClick={toggleCollapse}
         style={{ width: '100%', marginBottom: '24px' }}
       >
@@ -546,7 +553,7 @@ const EstablishmentsUI = () => {
                         </div>
                         <h4>No establishments found</h4>
                         <p>Try adjusting your search criteria or add a new establishment.</p>
-                      </EmptyState>  
+                      </EmptyState>
                     </ModernTableCell>
                   </tr>
                 )}

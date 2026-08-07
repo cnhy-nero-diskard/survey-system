@@ -5,7 +5,6 @@ import { useSpring, animated } from 'react-spring';
 import { Box } from '@mui/material';
 export const fontColorU = 'white';
 
-
 export const Container = styled(motion.div)`
   display: flex;
   flex-direction: column;
@@ -14,18 +13,17 @@ export const Container = styled(motion.div)`
   padding: 10px;
   border-radius: 10px;
   height: 100%;
-  
 `;
 
 export const Title = styled.h2`
   font-size: 1.5rem;
   color: #fff;
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   padding: 10px;
   justify-content: center;
   text-align: center;
-  max-width:600px;
+  max-width: 600px;
 `;
 
 export const Paragraph = styled.p`
@@ -52,7 +50,9 @@ export const EmojiButton = styled(Button)`
   color: #333;
   font-size: 1.2rem;
   border-radius: 20px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 
   /* Style for selected button */
   ${({ selected }) =>
@@ -91,7 +91,6 @@ export const TextField = styled.textarea`
 //   }
 // `;
 
-
 // Example pulse animation:
 const pulse = keyframes`
   0% {
@@ -111,7 +110,7 @@ export const OptionButton = styled.button`
   padding: 12px 24px;
   border-radius: 25px;
   border: 2px solid #ddd;
-  background-image: linear-gradient(135deg,rgba(2, 191, 248, 0.25) 0%, #e9ecef 100%);
+  background-image: linear-gradient(135deg, rgba(2, 191, 248, 0.25) 0%, #e9ecef 100%);
   background-color: #fff;
   color: #333;
   font-size: 1rem;
@@ -142,23 +141,23 @@ export const OptionButton = styled.button`
 
   /* Neutral (yellow gradient) */
   &.selected.Neutral {
-    background-image: linear-gradient(45deg,rgb(248, 204, 147) 0%, #ffeb3b 100%);
+    background-image: linear-gradient(45deg, rgb(248, 204, 147) 0%, #ffeb3b 100%);
     color: #000;
     border-color: #ffeb3b;
   }
 
   /* Satisfied (yellow-green gradient) */
   &.selected.Satisfied {
-    background-image: linear-gradient(45deg,rgb(90, 160, 69) 0%,rgb(90, 160, 69) 100%);
+    background-image: linear-gradient(45deg, rgb(90, 160, 69) 0%, rgb(90, 160, 69) 100%);
     color: #000;
-    border-color:rgb(48, 136, 51);
+    border-color: rgb(48, 136, 51);
   }
 
   /* Very Satisfied (green gradient) */
   &.selected.VerySatisfied {
-    background-image: linear-gradient(45deg,rgb(56, 172, 60) 0%, #45a049 100%);
+    background-image: linear-gradient(45deg, rgb(56, 172, 60) 0%, #45a049 100%);
     color: #fff;
-    border-color:rgb(21, 128, 24);
+    border-color: rgb(21, 128, 24);
   }
 `;
 export const NextButtonU = styled.button`
@@ -188,8 +187,6 @@ export const NextButtonU = styled.button`
     /* Intensify shadow on click for a pressed effect */
     box-shadow: 0 2px 5px rgba(17, 67, 203, 0.7);
   }
-
-
 `;
 // A subtle "bounce" or "pop-in" animation
 const popInAnimation = keyframes`
@@ -208,7 +205,11 @@ const popInAnimation = keyframes`
 `;
 
 export const CardContainer = styled(Box)`
-  background: linear-gradient(135deg, rgba(214, 214, 214, 0.74), rgba(242, 250, 255, 0.97)); // Gradient background
+  background: linear-gradient(
+    135deg,
+    rgba(214, 214, 214, 0.74),
+    rgba(242, 250, 255, 0.97)
+  ); // Gradient background
 
   padding: 16px;
   border-radius: 8px;
@@ -222,7 +223,7 @@ export const CardContainer = styled(Box)`
 export const Option = styled.div`
   display: flex;
   align-items: center;
-  justify-content:center;
+  justify-content: center;
   background: ${({ selected }) =>
     selected
       ? 'linear-gradient(to right, rgba(86, 58, 189, 0.8), rgba(70, 143, 240, 0.88))'
@@ -240,19 +241,17 @@ export const Option = styled.div`
   &:hover {
     transform: translateY(-5px);
     background: ${({ selected }) =>
-    selected
-      ? 'linear-gradient(to right, #6a11cb, #2575fc)'
-      : 'linear-gradient(to right, #2575fc, #6a11cb)'};
+      selected
+        ? 'linear-gradient(to right, #6a11cb, #2575fc)'
+        : 'linear-gradient(to right, #2575fc, #6a11cb)'};
     box-shadow: 0 6px 8px rgba(29, 43, 105, 0.8);
     color: rgb(245, 212, 181);
   }
 
   &:active {
     transform: scale(0.95);
-    
   }
 `;
-
 
 export const ssGrid = styled.div`
   display: grid;
@@ -269,7 +268,7 @@ export const GlowingCheckbox = styled.input.attrs({ type: 'checkbox' })`
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  
+
   /* Basic sizing and shape */
   width: 1.25rem;
   height: 1.25rem;
@@ -277,17 +276,18 @@ export const GlowingCheckbox = styled.input.attrs({ type: 'checkbox' })`
   border: 2px solid #007bff;
   border-radius: 50%;
   cursor: pointer;
-  
+
   /* Smooth transitions for hover and active states */
-  transition: background-color 0.3s ease, 
-              border-color 0.3s ease, 
-              box-shadow 0.3s ease;
-  
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+
   /* Glow on hover */
   &:hover {
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
   }
-  
+
   /* Appearance when the checkbox is checked */
   &:checked {
     background-color: #007bff;
@@ -299,13 +299,14 @@ export const GlowingCheckbox = styled.input.attrs({ type: 'checkbox' })`
   &:focus {
     outline: none;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.7);
-  }`
+  }
+`;
 export const CheckboxInput = styled.input.attrs({ type: 'checkbox' })`
   /* Remove default checkbox appearance */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  
+
   /* Basic sizing */
   width: 1.25rem;
   height: 1.25rem;
@@ -318,7 +319,9 @@ export const CheckboxInput = styled.input.attrs({ type: 'checkbox' })`
   outline: none;
 
   /* Use transitions for smoother interactions */
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 
   /* Style for when the checkbox is checked */
   &:checked {
@@ -329,27 +332,28 @@ export const CheckboxInput = styled.input.attrs({ type: 'checkbox' })`
   /* Optional hover effect */
   &:hover {
     border-color: #0056b3;
-  }`
+  }
+`;
 
 export const Input = styled.input`
   /* Basic size and spacing */
   width: 100%;
-  margin-bottom:5px;
+  margin-bottom: 5px;
   padding: 0.75rem 2.5rem 0.75rem 0.75rem;
   border-radius: 30px;
   font-size: 1rem;
-  transition: 
+  transition:
     border-color 0.3s ease,
     box-shadow 0.3s ease,
     background-color 0.3s ease;
-  
+
   /* Subtle gradient background */
   background: linear-gradient(120deg, #f3f3f3 0%, #ffffff 100%);
   border: 1px solid #ccc;
 
   /* Soft inner shadow for a "pressed" look */
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.08);
-  
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+
   /* Placeholder styling, if needed */
   &::placeholder {
     color: #aaa;
@@ -359,7 +363,7 @@ export const Input = styled.input`
   /* Hover effect: slightly darker border, more pronounced inner shadow */
   &:hover {
     border-color: #999;
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.15);
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.15);
   }
 
   /* Focus state: highlight the border and show a glow ring */
@@ -367,8 +371,8 @@ export const Input = styled.input`
     outline: none;
     border-color: #007bff;
     box-shadow:
-      0 0 0 4px rgba(0,123,255,0.25),
-      inset 0 1px 4px rgba(0,0,0,0.08);
+      0 0 0 4px rgba(0, 123, 255, 0.25),
+      inset 0 1px 4px rgba(0, 0, 0, 0.08);
   }
 
   /* Disabled state */
@@ -386,7 +390,7 @@ export const CloseSuggestions = styled.button`
   right: 8px;
   border: none;
   cursor: pointer;
-  font-size: 0.8rem;  /* reduce size if desired */
+  font-size: 0.8rem; /* reduce size if desired */
   color: #aaa;
   background: transparent;
   &:hover {
@@ -469,8 +473,8 @@ export const RadioLabel = styled.label`
   border: 2px solid #007bff;
   border-radius: 25px;
   transition: all 0.3s ease;
-  background-color: ${props => (props.checked ? '#007bff' : 'rgba(124, 186, 253, 0.57)')};
-  color: ${props => (props.checked ? 'white' : '#007bff')};
+  background-color: ${(props) => (props.checked ? '#007bff' : 'rgba(124, 186, 253, 0.57)')};
+  color: ${(props) => (props.checked ? 'white' : '#007bff')};
 
   &:hover {
     background-color: #007bff;

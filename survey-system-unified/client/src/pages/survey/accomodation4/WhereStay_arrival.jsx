@@ -53,7 +53,7 @@ const Select = styled.select`
   transition: border-color 0.3s ease;
 
   &:focus {
-    border-color: #4CAF50;
+    border-color: #4caf50;
     outline: none;
   }
 `;
@@ -67,13 +67,13 @@ const Input = styled.input`
   transition: border-color 0.3s ease;
 
   &:focus {
-    border-color: #4CAF50;
+    border-color: #4caf50;
     outline: none;
   }
 `;
 
 const NextButton = styled(motion.button)`
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   padding: 12px 24px;
   border: none;
@@ -151,7 +151,7 @@ const WhereStayed = () => {
       [translations.whereStayArrivalOptionHome]: 'Home of Friends or Relatives',
       [translations.whereStayArrivalOptionCampsite]: 'Campsite',
       [translations.whereStayArrivalOptionCruise]: 'Cruise Ship',
-      [translations.whereStayArrivalOptionOwnHome]: 'Own Home'
+      [translations.whereStayArrivalOptionOwnHome]: 'Own Home',
     };
 
     const englishSelectedOption = optionMapping[selectedOption] || selectedOption;
@@ -160,23 +160,23 @@ const WhereStayed = () => {
     const surveyResponses = [
       {
         surveyquestion_ref: 'WS001',
-        response_value: englishSelectedOption
+        response_value: englishSelectedOption,
       },
       {
         surveyquestion_ref: 'WS002',
-        response_value: duration
+        response_value: duration,
       },
       {
         surveyquestion_ref: 'WS003',
-        response_value: durationUnit
-      }
+        response_value: durationUnit,
+      },
     ];
 
     // Save the input data to local storage before submission
     const toStore = {
       selectedOption,
       duration,
-      durationUnit
+      durationUnit,
     };
     saveToLocalStorage('whereStayedData', toStore);
 
@@ -192,7 +192,12 @@ const WhereStayed = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.1} blendMode="multiply" handleNextClick={handleNextClick}>
+      <GradientBackground
+        overlayImage={imgoverlay}
+        opacity={0.1}
+        blendMode="multiply"
+        handleNextClick={handleNextClick}
+      >
         <Container
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -210,10 +215,18 @@ const WhereStayed = () => {
               }}
             >
               <option value="">{translations.whereStayArrivalDefaultOption}</option>
-              <option value={translations.whereStayArrivalOptionHome}>{translations.whereStayArrivalOptionHome}</option>
-              <option value={translations.whereStayArrivalOptionCampsite}>{translations.whereStayArrivalOptionCampsite}</option>
-              <option value={translations.whereStayArrivalOptionCruise}>{translations.whereStayArrivalOptionCruise}</option>
-              <option value={translations.whereStayArrivalOptionOwnHome}>{translations.whereStayArrivalOptionOwnHome}</option>
+              <option value={translations.whereStayArrivalOptionHome}>
+                {translations.whereStayArrivalOptionHome}
+              </option>
+              <option value={translations.whereStayArrivalOptionCampsite}>
+                {translations.whereStayArrivalOptionCampsite}
+              </option>
+              <option value={translations.whereStayArrivalOptionCruise}>
+                {translations.whereStayArrivalOptionCruise}
+              </option>
+              <option value={translations.whereStayArrivalOptionOwnHome}>
+                {translations.whereStayArrivalOptionOwnHome}
+              </option>
             </Select>
 
             <Label htmlFor="duration">{translations.whereStayArrivalDurationLabel}</Label>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import styled, { keyframes } from 'styled-components';
 import bg from './page1bg.jpg';
 import logo from './logo.svg';
-import bisulogo from "../../../components/img/BISU-LOGO.png"; 
+import bisulogo from '../../../components/img/BISU-LOGO.png';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import { useNavigate } from 'react-router-dom';
 import { NextButtonU } from '../../../components/utils/styles1';
@@ -53,7 +53,6 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-
 const Wave = styled.div`
   position: absolute;
   top: 0;
@@ -63,7 +62,9 @@ const Wave = styled.div`
   background-image: url(${bg});
   background-size: cover;
   background-position: center;
-  animation: ${zoomIn} 2s ease-in-out, ${fadeIn} 1.5s ease-in-out;
+  animation:
+    ${zoomIn} 2s ease-in-out,
+    ${fadeIn} 1.5s ease-in-out;
 `;
 
 const Content = styled.div`
@@ -151,7 +152,7 @@ const Page1 = () => {
     fr: 'ENQUÊTE SUR LE MARCHÉ DES PRODUITS TOURISTIQUES',
     ru: 'ОПРОС РЫНКА ТУРИСТИЧЕСКИХ ПРОДУКТОВ',
     hi: 'पर्यटन उत्पाद बाजार सर्वेक्षण',
-    fl: 'TOURISM PRODUCT MARKET SURVEY'
+    fl: 'TOURISM PRODUCT MARKET SURVEY',
   };
 
   // Inline localizations for collaboration text
@@ -161,10 +162,10 @@ const Page1 = () => {
     zh: '与薄荷岛州立大学-BISU主校区合作',
     ja: 'ボホール島州立大学（BISUメイン）との協力',
     es: 'EN COLABORACIÓN CON LA UNIVERSIDAD ESTATAL DE LA ISLA DE BOHOL - BISU MAIN',
-    fr: 'EN COLLABORATION AVEC L\'UNIVERSITÉ D\'ÉTAT DE L\'ÎLE DE BOHOL - BISU MAIN',
+    fr: "EN COLLABORATION AVEC L'UNIVERSITÉ D'ÉTAT DE L'ÎLE DE BOHOL - BISU MAIN",
     ru: 'В СОТРУДНИЧЕСТВЕ С ГОСУДАРСТВЕННЫМ УНИВЕРСИТЕТОМ ОСТРОВА БОХОЛЬ - BISU MAIN',
     hi: 'बोहोल आइलैंड स्टेट यूनिवर्सिटी - बीआईएसयू मेन के सहयोग से',
-    fl: 'Sa pakikipagtulungan ng Bohol Island State University - BISU Main'
+    fl: 'Sa pakikipagtulungan ng Bohol Island State University - BISU Main',
   };
 
   const navigate = useNavigate();
@@ -176,11 +177,10 @@ const Page1 = () => {
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        console.log("GET SURVEYPROGRESS");
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_HOST}/api/survey/progress`,
-          { withCredentials: true }
-        );
+        console.log('GET SURVEYPROGRESS');
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
+          withCredentials: true,
+        });
         setCurrentStep(response.data.currentStep);
       } catch (err) {
         console.error(err);
@@ -190,30 +190,26 @@ const Page1 = () => {
   }, [navigate]);
 
   const handleNextClick = () => {
-    console.log("Current Step Index:", currentStepIndex);
+    console.log('Current Step Index:', currentStepIndex);
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
   };
 
   return (
     <>
       <BodyPartial />
-        <Wave />
-        <Content>
-          <Logo src={logo} alt="Department of Tourism Philippines logo" />
-          <Title>{titleLocalizations[language]}</Title>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-            <BackButtonU onClick={() => navigate(-1)}>
-              ←
-            </BackButtonU>
-            <NextButtonU onClick={handleNextClick}>
-              {translations.next}
-            </NextButtonU>
-          </div>
-        </Content>
-        <CollaborationSection>
-          <CollaborationText>{collaborationLocalizations[language]}</CollaborationText>
-          <BisuLogo src={bisulogo} alt="BISU Logo" />
-        </CollaborationSection>
+      <Wave />
+      <Content>
+        <Logo src={logo} alt="Department of Tourism Philippines logo" />
+        <Title>{titleLocalizations[language]}</Title>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+          <BackButtonU onClick={() => navigate(-1)}>←</BackButtonU>
+          <NextButtonU onClick={handleNextClick}>{translations.next}</NextButtonU>
+        </div>
+      </Content>
+      <CollaborationSection>
+        <CollaborationText>{collaborationLocalizations[language]}</CollaborationText>
+        <BisuLogo src={bisulogo} alt="BISU Logo" />
+      </CollaborationSection>
     </>
   );
 };
