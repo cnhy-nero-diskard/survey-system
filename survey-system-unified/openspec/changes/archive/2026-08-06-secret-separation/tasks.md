@@ -35,7 +35,7 @@
 - [x] 5.4 Remove `SESSION_SECRET` and the database password from `.env.development`, leaving only non-secret development defaults, and add a comment directing secrets to the untracked `.env`.
 - [x] 5.5 Rewrite the secret entries in `.env.example` as obviously non-functional placeholders (e.g. `JWT_SECRET=<generate: openssl rand -base64 32>`) that the deny list and length rules would reject, and remove `your_super_secret_session_key_change_this_in_production`.
 - [x] 5.6 Document the `<VAR>_FILE` alternative for each secret as a commented block in `.env.example`.
-- [ ] 5.7 Grep the whole tracked tree (`git grep`) for each deny-listed value to confirm none remains in any tracked file, including `README.md`, `docs/`, and `AI_AGENT_README.md`.
+- [x] 5.7 Grep the whole tracked tree (`git grep`) for each deny-listed value to confirm none remains in any tracked file, including `README.md`, `docs/`, and `AI_AGENT_README.md`.
 
 ## 6. Client bundle guard
 
@@ -62,6 +62,6 @@
 ## 9. Verification
 
 - [x] 9.1 Run the server test suite and confirm all new and existing tests pass.
-- [ ] 9.2 Start the stack with a populated `.env` containing four distinct generated secrets and confirm admin login, an anonymous survey session, and an HF-token-backed AI endpoint all work.
-- [ ] 9.3 Start the stack with no `.env` and confirm it fails fast with a single error naming every missing secret and echoing no values.
+- [x] 9.2 Start the stack with a populated `.env` containing four distinct generated secrets and confirm admin login, an anonymous survey session, and an HF-token-backed AI endpoint all work.
+- [x] 9.3 Start the stack with no `.env` and confirm it fails fast with a single error naming every missing secret and echoing no values.
 - [x] 9.4 Run `openspec validate --change secret-separation` and confirm the change validates.

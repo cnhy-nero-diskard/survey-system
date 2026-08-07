@@ -17,5 +17,5 @@
 ## 4. Verification
 
 - [x] 4.1 Confirm no removed package is imported anywhere in `client/src/` or `server/` (re-run the import scan)
-- [ ] 4.2 Run the client build (`npm run client:build`) to confirm no import resolution errors
+- [x] 4.2 Run the client build (`npm run client:build`) to confirm no import resolution errors
 - [x] 4.3 Run the server test suite (`npm test` in `server/`) to confirm nothing is broken

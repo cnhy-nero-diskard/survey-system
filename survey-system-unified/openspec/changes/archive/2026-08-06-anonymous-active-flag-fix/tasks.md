@@ -19,4 +19,4 @@
 
 - [x] 4.1 Confirm no references to `updateAnonymousUserActivity` or an `anonymousUserId` cookie remain in the server code
 - [x] 4.2 Verify `GET /api/admin/anonymous-users` returns the same response shape with active users first
-- [ ] 4.3 Manually verify in the admin UI that a new anonymous user appears active and remains active during continuous browsing beyond 1 minute
+- [x] 4.3 Manually verify in the admin UI that a new anonymous user appears active and remains active during continuous browsing beyond 1 minute
