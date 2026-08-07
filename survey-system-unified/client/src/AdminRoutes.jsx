@@ -12,7 +12,7 @@ import Dashboard from './components/admin/maindashboard/Dashboard';
 import HeatmapChart from './components/admin/nlp/sentimentgraphs/sentiment_heatmap';
 import SurveyMetrics from './components/admin/surveryperfmetrics/SurveyMetrics';
 import AIToolsDashboard from './components/admin/aitoolsdashboard/AiToolsDashboard';
-import Metrics from './components/temp/metricsprom';
+import Metrics from './components/metricsprom/metricsprom';
 import UsersDashboard from './components/admin/usersdashboard/UsersDashboard';
 import { useAuth } from './components/context/AuthContext';
 import WarningMessage from './components/partials/WarningMessage';
