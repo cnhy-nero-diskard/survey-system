@@ -15,10 +15,7 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 import 'react-datepicker/dist/react-datepicker.css';
 
 // Import your storage utility functions
-import {
-  saveToLocalStorage,
-  loadFromLocalStorage,
-} from '../../../components/utils/storageUtils';
+import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 const FormContainer = styled(animated.div)`
   display: flex;
@@ -118,9 +115,7 @@ const PProfile2 = () => {
 
   // Update the date in the state array whenever the user picks a date
   const handleInputChange = (index, date) => {
-    setResponses((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, value: date } : item))
-    );
+    setResponses((prev) => prev.map((item, i) => (i === index ? { ...item, value: date } : item)));
   };
 
   // On Next click, we submit the date values, then navigate
@@ -163,14 +158,14 @@ const PProfile2 = () => {
       >
         <FormContainer style={formAnimation}>
           <FormTitle>{translations.pprofile2FormTitle}</FormTitle>
-          
+
           {responses.map((item, index) => (
             <FormField key={item.ref}>
               <Label>{translations[item.label]}</Label>
               <DatePicker
                 selected={item.value}
                 onChange={(date) => handleInputChange(index, date)}
-                disabled={item.ref === 'ACCMP'} 
+                disabled={item.ref === 'ACCMP'}
                 dateFormat="MM/dd/yyyy"
                 placeholderText="mm/dd/yyyy"
                 popperPlacement="bottom"

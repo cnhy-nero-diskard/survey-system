@@ -79,12 +79,11 @@ const ProponentLgu = () => {
   const currentStepIndex = useCurrentStepIndex(routes);
   const { activeBlocks, appendActiveBlocks, removeActiveBlocks } = useContext(UnifiedContext);
 
-  useEffect( () => {
+  useEffect(() => {
     goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
-
   }, []);
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [inputs, setInputs] = useState([
     { key: 'PRCITY', value: 'PANGLAO' },
     { key: 'PRPROV', value: 'BOHOL' },
@@ -97,13 +96,13 @@ const ProponentLgu = () => {
   };
 
   const handleNextClick = async () => {
-    const surveyResponses = inputs.map(input => ({
+    const surveyResponses = inputs.map((input) => ({
       surveyquestion_ref: input.key,
       response_value: input.value,
     }));
 
     try {
-      await submitSurveyResponses(surveyResponses); 
+      await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
       console.error('Error submitting survey responses:', error);
@@ -113,7 +112,12 @@ const ProponentLgu = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} opacity={0.2} blendMode="darken" handleNextClick={handleNextClick}>
+      <GradientBackground
+        overlayImage={imgoverlay}
+        opacity={0.2}
+        blendMode="darken"
+        handleNextClick={handleNextClick}
+      >
         <Container
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

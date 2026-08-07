@@ -3,11 +3,11 @@ import { getApiUrl } from '../../config/apiConfig.js';
 
 /**
  * Fetch entity metrics from the server
- * 
+ *
  * @param {number|null} year - The year to filter by (optional)
  * @param {number|null} quarter - The quarter to filter by (optional, 1-4)
  * @returns {Promise<Array>} A promise that resolves to an array of entity metrics
- * 
+ *
  * Example response structure:
  * [
  *   {
@@ -42,13 +42,13 @@ export const fetchEntityMetrics = async (year = null, quarter = null) => {
     const params = new URLSearchParams();
     if (year) params.append('year', year);
     if (quarter) params.append('quarter', quarter);
-    
-    const url = params.toString() 
+
+    const url = params.toString()
       ? `${getApiUrl('/api/admin/getEntityMetrics')}?${params.toString()}`
       : getApiUrl('/api/admin/getEntityMetrics');
-    
+
     const response = await axios.get(url, {
-      withCredentials: true
+      withCredentials: true,
     });
     return response.data;
   } catch (error) {

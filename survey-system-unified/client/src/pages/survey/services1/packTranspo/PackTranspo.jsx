@@ -73,99 +73,99 @@ const ConversionResult = styled.div`
 `;
 
 const PackagePaid = () => {
-    const [price, setPrice] = useState('');
-    const [currency, setCurrency] = useState('USD');
-    const buttonAnimation = useSpring({
-        transform: 'scale(1)',
-        from: { transform: 'scale(0.9)' },
-        config: { tension: 200, friction: 10 },
-    });
+  const [price, setPrice] = useState('');
+  const [currency, setCurrency] = useState('USD');
+  const buttonAnimation = useSpring({
+    transform: 'scale(1)',
+    from: { transform: 'scale(0.9)' },
+    config: { tension: 200, friction: 10 },
+  });
 
-    const handleInputChange = (e) => {
-        setPrice(e.target.value);
-    };
+  const handleInputChange = (e) => {
+    setPrice(e.target.value);
+  };
 
-    const handleCurrencyChange = (e) => {
-        setCurrency(e.target.value);
-    };
+  const handleCurrencyChange = (e) => {
+    setCurrency(e.target.value);
+  };
 
-    const handleNextClick = () => {
-        const conversionRates = {
-            USD: 56, // Example rate to PHP
-            EUR: 60, // Example rate to PHP
-            JPY: 0.4, // Example rate to PHP
-            PHP: 1, // PHP itself
-            CNY: 8, // Chinese Yuan to PHP
-            INR: 0.7, // Indian Rupee to PHP
-            RUB: 0.75, // Russian Ruble to PHP
-            KRW: 0.04, // Korean Won to PHP
-            FRF: 60, // French Franc (assuming Euro rate)
-            ESP: 60, // Spanish Peseta (assuming Euro rate)
-        };
-
-        const convertedPrice = (parseFloat(price) * conversionRates[currency]).toFixed(2);
-        alert(`You paid ${price} ${currency}, which is approximately ${convertedPrice} PHP.`);
-    };
-
-    // Dynamic conversion logic
+  const handleNextClick = () => {
     const conversionRates = {
-        USD: 56, // Example rate to PHP
-        EUR: 60, // Example rate to PHP
-        JPY: 0.4, // Example rate to PHP
-        PHP: 1, // PHP itself
-        CNY: 8, // Chinese Yuan to PHP
-        INR: 0.7, // Indian Rupee to PHP
-        RUB: 0.75, // Russian Ruble to PHP
-        KRW: 0.04, // Korean Won to PHP
-        FRF: 60, // French Franc (assuming Euro rate)
-        ESP: 60, // Spanish Peseta (assuming Euro rate)
+      USD: 56, // Example rate to PHP
+      EUR: 60, // Example rate to PHP
+      JPY: 0.4, // Example rate to PHP
+      PHP: 1, // PHP itself
+      CNY: 8, // Chinese Yuan to PHP
+      INR: 0.7, // Indian Rupee to PHP
+      RUB: 0.75, // Russian Ruble to PHP
+      KRW: 0.04, // Korean Won to PHP
+      FRF: 60, // French Franc (assuming Euro rate)
+      ESP: 60, // Spanish Peseta (assuming Euro rate)
     };
 
     const convertedPrice = (parseFloat(price) * conversionRates[currency]).toFixed(2);
+    alert(`You paid ${price} ${currency}, which is approximately ${convertedPrice} PHP.`);
+  };
 
-    return (
-        <>
-            <BodyPartial />
-            <GradientBackground>
-                <Container>
-                    <Question>How much did you pay for your package tour?</Question>
-                    <InputContainer>
-                        <InputLabel>Enter Amount and Select Currency</InputLabel>
-                        <CurrencyInput
-                            type="number"
-                            placeholder="Tour Package Price"
-                            value={price}
-                            onChange={handleInputChange}
-                        />
-                        <CurrencySelect value={currency} onChange={handleCurrencyChange}>
-                            <option value="USD">USD - US Dollar</option>
-                            <option value="EUR">EUR - Euro</option>
-                            <option value="JPY">JPY - Japanese Yen</option>
-                            <option value="PHP">PHP - Philippine Peso</option>
-                            <option value="CNY">CNY - Chinese Yuan</option>
-                            <option value="INR">INR - Indian Rupee</option>
-                            <option value="RUB">RUB - Russian Ruble</option>
-                            <option value="KRW">KRW - Korean Won</option>
-                            <option value="FRF">FRF - French Franc</option>
-                            <option value="ESP">ESP - Spanish Peseta</option>
-                        </CurrencySelect>
-                    </InputContainer>
-                    <ConversionResult>
-                        {price && currency ? (
-                            <span>
-                                {price} {currency} is approximately {convertedPrice} PHP.
-                            </span>
-                        ) : (
-                            <span></span>
-                        )}
-                    </ConversionResult>
-                    <NextButton style={buttonAnimation} onClick={handleNextClick}>
-                        Next
-                    </NextButton>
-                </Container>
-            </GradientBackground>
-        </>
-    );
+  // Dynamic conversion logic
+  const conversionRates = {
+    USD: 56, // Example rate to PHP
+    EUR: 60, // Example rate to PHP
+    JPY: 0.4, // Example rate to PHP
+    PHP: 1, // PHP itself
+    CNY: 8, // Chinese Yuan to PHP
+    INR: 0.7, // Indian Rupee to PHP
+    RUB: 0.75, // Russian Ruble to PHP
+    KRW: 0.04, // Korean Won to PHP
+    FRF: 60, // French Franc (assuming Euro rate)
+    ESP: 60, // Spanish Peseta (assuming Euro rate)
+  };
+
+  const convertedPrice = (parseFloat(price) * conversionRates[currency]).toFixed(2);
+
+  return (
+    <>
+      <BodyPartial />
+      <GradientBackground>
+        <Container>
+          <Question>How much did you pay for your package tour?</Question>
+          <InputContainer>
+            <InputLabel>Enter Amount and Select Currency</InputLabel>
+            <CurrencyInput
+              type="number"
+              placeholder="Tour Package Price"
+              value={price}
+              onChange={handleInputChange}
+            />
+            <CurrencySelect value={currency} onChange={handleCurrencyChange}>
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="JPY">JPY - Japanese Yen</option>
+              <option value="PHP">PHP - Philippine Peso</option>
+              <option value="CNY">CNY - Chinese Yuan</option>
+              <option value="INR">INR - Indian Rupee</option>
+              <option value="RUB">RUB - Russian Ruble</option>
+              <option value="KRW">KRW - Korean Won</option>
+              <option value="FRF">FRF - French Franc</option>
+              <option value="ESP">ESP - Spanish Peseta</option>
+            </CurrencySelect>
+          </InputContainer>
+          <ConversionResult>
+            {price && currency ? (
+              <span>
+                {price} {currency} is approximately {convertedPrice} PHP.
+              </span>
+            ) : (
+              <span></span>
+            )}
+          </ConversionResult>
+          <NextButton style={buttonAnimation} onClick={handleNextClick}>
+            Next
+          </NextButton>
+        </Container>
+      </GradientBackground>
+    </>
+  );
 };
 
 export default PackagePaid;

@@ -70,7 +70,7 @@ const HeaderContainer = styled(Box)`
   color: white;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -90,7 +90,7 @@ const HeaderContent = styled(Box)`
   align-items: center;
   position: relative;
   z-index: 1;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 16px;
@@ -106,7 +106,7 @@ const HeaderTitle = styled(Typography)`
   display: flex;
   align-items: center;
   gap: 12px;
-  
+
   @media (max-width: 768px) {
     font-size: 24px;
   }
@@ -118,13 +118,13 @@ const StyledCard = styled(Card)`
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  
+
   &:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     background: rgba(255, 255, 255, 1);
   }
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -141,7 +141,7 @@ const CardIconContainer = styled(Box)`
   display: flex;
   justify-content: center;
   margin-bottom: 16px;
-  
+
   .icon {
     width: 48px;
     height: 48px;
@@ -151,7 +151,7 @@ const CardIconContainer = styled(Box)`
     padding: 8px;
     transition: all 0.3s ease;
   }
-  
+
   ${StyledCard}:hover & .icon {
     color: white;
     background: linear-gradient(135deg, #667eea, #764ba2);
@@ -179,7 +179,7 @@ const StyledModalContent = styled(Box)`
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   animation: ${scaleIn} 0.3s ease-out;
-  
+
   @media (max-width: 768px) {
     width: 98%;
     max-height: 95vh;
@@ -199,20 +199,20 @@ const ModalBody = styled(Box)`
   padding: 0;
   max-height: calc(90vh - 80px);
   overflow-y: auto;
-  
+
   &::-webkit-scrollbar {
     width: 8px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 4px;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, #5a6fd8, #6a4c93);
   }
@@ -238,43 +238,43 @@ const DataManager = () => {
       title: 'Localization',
       description: 'Manage translations and localization data',
       icon: <LocalizationIcon className="icon" />,
-      component: <LocalizationUI />
+      component: <LocalizationUI />,
     },
     {
       id: 'establishments',
       title: 'Establishments',
       description: 'Handle business establishment data',
       icon: <EstablishmentIcon className="icon" />,
-      component: <EstablishmentsUI />
+      component: <EstablishmentsUI />,
     },
     {
       id: 'tourismAttractions',
       title: 'Tourism Attractions',
       description: 'Manage tourism attraction information',
       icon: <AttractionIcon className="icon" />,
-      component: <TourismAttractionUI />
+      component: <TourismAttractionUI />,
     },
     {
       id: 'surveyresponses',
       title: 'Survey Responses',
       description: 'CRUD operations on survey response data',
       icon: <SurveyIcon className="icon" />,
-      component: <SurveyResponsesUI />
+      component: <SurveyResponsesUI />,
     },
     {
       id: 'anonhandler',
       title: 'Anonymous Users',
       description: 'Handle anonymous user data',
       icon: <AnonymousIcon className="icon" />,
-      component: <AnonymousUsersHandler />
+      component: <AnonymousUsersHandler />,
     },
     {
       id: 'feedbackhandler',
       title: 'Open Feedbacks',
       description: 'Manage survey feedback data',
       icon: <FeedbackIcon className="icon" />,
-      component: <SurveyFeedbackManager />
-    }
+      component: <SurveyFeedbackManager />,
+    },
   ];
 
   const getCurrentDate = () => {
@@ -299,15 +299,15 @@ const DataManager = () => {
                 fontFamily: fontFamily,
                 opacity: 0.9,
                 fontWeight: 400,
-                marginTop: '4px'
+                marginTop: '4px',
               }}
             >
               {getCurrentDate()} • Comprehensive data operations and CRUD management
             </Typography>
           </Box>
-          
+
           <Box display="flex" flexDirection="column" alignItems="flex-end" gap={2}>
-            <Chip 
+            <Chip
               label={`${dataCategories.length} data categories available`}
               sx={{
                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -328,28 +328,26 @@ const DataManager = () => {
             <Fade in timeout={600}>
               <StyledCard onClick={() => openModal(category.id)}>
                 <CardContent sx={{ textAlign: 'center', padding: '24px' }}>
-                  <CardIconContainer>
-                    {category.icon}
-                  </CardIconContainer>
-                  
+                  <CardIconContainer>{category.icon}</CardIconContainer>
+
                   <Typography
                     variant="h6"
                     sx={{
                       fontFamily: fontFamily,
                       fontWeight: 600,
                       color: '#2d3748',
-                      marginBottom: '8px'
+                      marginBottom: '8px',
                     }}
                   >
                     {category.title}
                   </Typography>
-                  
+
                   <Typography
                     variant="body2"
                     sx={{
                       fontFamily: fontFamily,
                       color: '#718096',
-                      lineHeight: 1.5
+                      lineHeight: 1.5,
                     }}
                   >
                     {category.description}
@@ -381,28 +379,29 @@ const DataManager = () => {
                   fontWeight: 600,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 2
+                  gap: 2,
                 }}
               >
-                {activeGroup && dataCategories.find(cat => cat.id === activeGroup)?.icon}
-                {activeGroup && dataCategories.find(cat => cat.id === activeGroup)?.title} Management
+                {activeGroup && dataCategories.find((cat) => cat.id === activeGroup)?.icon}
+                {activeGroup && dataCategories.find((cat) => cat.id === activeGroup)?.title}{' '}
+                Management
               </Typography>
-              
+
               <IconButton
                 onClick={closeModal}
                 sx={{
                   color: 'white',
                   '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  }
+                  },
                 }}
               >
                 <CloseIcon />
               </IconButton>
             </ModalHeader>
-            
+
             <ModalBody>
-              {activeGroup && dataCategories.find(cat => cat.id === activeGroup)?.component}
+              {activeGroup && dataCategories.find((cat) => cat.id === activeGroup)?.component}
             </ModalBody>
           </StyledModalContent>
         </Fade>

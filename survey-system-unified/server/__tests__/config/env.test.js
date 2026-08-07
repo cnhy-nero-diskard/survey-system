@@ -49,7 +49,9 @@ describe('environment secret validation', () => {
       JWT_SECRET_FILE: 'missing/jwt.secret',
     });
 
-    expect(result.errors.join('\n')).toContain('JWT_SECRET_FILE could not be read at configured path');
+    expect(result.errors.join('\n')).toContain(
+      'JWT_SECRET_FILE could not be read at configured path'
+    );
     expect(result.errors.join('\n')).not.toContain(validSecrets.JWT_SECRET);
   });
 
@@ -61,7 +63,7 @@ describe('environment secret validation', () => {
     });
 
     expect(result.errors).toContain(
-      'PG_PASSWORD uses a publicly known secret value and must be replaced',
+      'PG_PASSWORD uses a publicly known secret value and must be replaced'
     );
   });
 
@@ -84,7 +86,7 @@ describe('environment secret validation', () => {
 
     expect(result.errors).toEqual([]);
     expect(result.warnings).toContain(
-      'Warning: SESSION_SECRET must be at least 32 characters long',
+      'Warning: SESSION_SECRET must be at least 32 characters long'
     );
   });
 
@@ -96,7 +98,7 @@ describe('environment secret validation', () => {
     });
 
     expect(result.errors).toContain(
-      'Cryptographic secrets must be distinct: JWT_SECRET, HMAC_SECRET',
+      'Cryptographic secrets must be distinct: JWT_SECRET, HMAC_SECRET'
     );
   });
 

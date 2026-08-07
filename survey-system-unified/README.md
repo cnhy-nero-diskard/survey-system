@@ -20,6 +20,7 @@ survey-system-unified/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+ and npm 8+
 - PostgreSQL database
 - Docker (optional, for containerized deployment)
@@ -27,21 +28,24 @@ survey-system-unified/
 ### Development Setup
 
 1. **Clone and Navigate**
+
    ```bash
    cd survey-system-unified
    ```
 
 2. **Setup Environment**
+
    ```bash
    # Windows
    scripts\setup-dev.bat
-   
+
    # Linux/macOS
    chmod +x scripts/setup-dev.sh
    ./scripts/setup-dev.sh
    ```
 
 3. **Configure Environment Variables**
+
    ```bash
    cp .env.example .env
    # Edit .env with your database and other settings
@@ -51,7 +55,7 @@ survey-system-unified/
    ```bash
    # Start both frontend and backend concurrently
    npm run dev
-   
+
    # Or start individually:
    npm run dev:client  # React dev server on :3000
    npm run dev:server  # Node.js server on :5000
@@ -60,6 +64,7 @@ survey-system-unified/
 ### Production Build
 
 1. **Build the Application**
+
    ```bash
    npm run build
    ```
@@ -73,6 +78,7 @@ survey-system-unified/
 ## 🐳 Docker Deployment
 
 ### Build and Run
+
 ```bash
 # Build the Docker image
 npm run docker:build
@@ -82,6 +88,7 @@ npm run docker:run
 ```
 
 ### Manual Docker Commands
+
 ```bash
 # Build
 docker build -t survey-system-unified .
@@ -123,24 +130,24 @@ undecryptable.
 Any value ever used from a committed configuration must be treated as
 disclosed and rotated. `docker-compose up` now requires a populated `.env`.
 
-| Secret | Protects | Rotation effect | Data migration |
-|---|---|---|---|
-| `SESSION_SECRET` | Anonymous session cookies | Live sessions expire | No |
-| `JWT_SECRET` | Admin JWTs | Issued admin tokens expire | No |
-| `CRYPTO_SECRET` | AES-encrypted `HF_TOKENS.apitoken` values | Stored tokens must be re-encrypted or re-entered | Yes |
-| `HMAC_SECRET` | Admin-provisioning request signatures | External callers must be re-keyed | No |
+| Secret           | Protects                                  | Rotation effect                                  | Data migration |
+| ---------------- | ----------------------------------------- | ------------------------------------------------ | -------------- |
+| `SESSION_SECRET` | Anonymous session cookies                 | Live sessions expire                             | No             |
+| `JWT_SECRET`     | Admin JWTs                                | Issued admin tokens expire                       | No             |
+| `CRYPTO_SECRET`  | AES-encrypted `HF_TOKENS.apitoken` values | Stored tokens must be re-encrypted or re-entered | Yes            |
+| `HMAC_SECRET`    | Admin-provisioning request signatures     | External callers must be re-keyed                | No             |
 
-| Variable | Description | Required | Default |
-|----------|-------------|----------|---------|
-| `NODE_ENV` | Environment (development/production) | No | production |
-| `PORT` | Server port | No | 5000 |
-| `PG_HOST` | Database host | Yes | - |
-| `PG_PORT` | Database port | No | 5432 |
-| `PG_DATABASE` | Database name | Yes | - |
-| `PG_USER` | Database user | Yes | - |
-| `PG_PASSWORD` | Database password | Yes | - |
-| `SESSION_SECRET` | Session encryption key | Yes | - |
-| `FRONTEND_URL` | External frontend URL (optional) | No | - |
+| Variable         | Description                          | Required | Default    |
+| ---------------- | ------------------------------------ | -------- | ---------- |
+| `NODE_ENV`       | Environment (development/production) | No       | production |
+| `PORT`           | Server port                          | No       | 5000       |
+| `PG_HOST`        | Database host                        | Yes      | -          |
+| `PG_PORT`        | Database port                        | No       | 5432       |
+| `PG_DATABASE`    | Database name                        | Yes      | -          |
+| `PG_USER`        | Database user                        | Yes      | -          |
+| `PG_PASSWORD`    | Database password                    | Yes      | -          |
+| `SESSION_SECRET` | Session encryption key               | Yes      | -          |
+| `FRONTEND_URL`   | External frontend URL (optional)     | No       | -          |
 
 See `.env.example` for the full, authoritative list.
 
@@ -184,21 +191,23 @@ survey-system-unified/
 ### Manual Testing Steps
 
 1. **Development Mode Testing**
+
    ```bash
    # Start development servers
    npm run dev
-   
+
    # Check frontend: http://localhost:3000
    # Check backend API: http://localhost:5000/api/health
    # Test API calls from frontend to backend
    ```
 
 2. **Production Mode Testing**
+
    ```bash
    # Build and start production
    npm run build
    npm start
-   
+
    # Check unified app: http://localhost:5000
    # Test all frontend routes (React Router)
    # Test API endpoints: http://localhost:5000/api/*
@@ -210,7 +219,7 @@ survey-system-unified/
    # Build and test container
    npm run docker:build
    npm run docker:run
-   
+
    # Check health: http://localhost:5000/api/health
    # Test application functionality
    ```
@@ -271,6 +280,7 @@ curl http://localhost:5000/api/health
 ## 🌐 Deployment Options
 
 ### Cloud Run (Google Cloud)
+
 ```bash
 # Build and push to registry
 docker build -t gcr.io/YOUR_PROJECT/survey-system .
@@ -285,12 +295,14 @@ gcloud run deploy survey-system \
 ```
 
 ### Railway
+
 ```bash
 # Connect your repository and configure environment variables
 # Railway will automatically detect the Dockerfile
 ```
 
 ### Heroku
+
 ```bash
 # Add Heroku remote and deploy
 heroku create your-app-name
@@ -309,11 +321,13 @@ git push heroku main
 ## 📊 Monitoring
 
 ### Health Checks
+
 - `GET /api/health` - Application health status
 - Docker health check included in Dockerfile
 - Monitor memory and CPU usage
 
 ### Logging
+
 - Application logs via Winston
 - Console logs in development
 - Container logs available via Docker

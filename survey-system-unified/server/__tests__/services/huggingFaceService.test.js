@@ -56,9 +56,9 @@ describe('queryHuggingFace', () => {
       json: async () => ({ error: '400 Bad Request' }),
     });
 
-    await expect(
-      queryHuggingFace('text', 'token', 'https://example.test/model')
-    ).resolves.toEqual({ error: '400 Bad Request' });
+    await expect(queryHuggingFace('text', 'token', 'https://example.test/model')).resolves.toEqual({
+      error: '400 Bad Request',
+    });
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
@@ -66,9 +66,9 @@ describe('queryHuggingFace', () => {
     const networkError = new Error('network unavailable');
     global.fetch.mockRejectedValue(networkError);
 
-    await expect(
-      queryHuggingFace('text', 'token', 'https://example.test/model')
-    ).rejects.toThrow('network unavailable');
+    await expect(queryHuggingFace('text', 'token', 'https://example.test/model')).rejects.toThrow(
+      'network unavailable'
+    );
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 });

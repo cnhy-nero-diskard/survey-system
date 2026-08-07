@@ -29,17 +29,17 @@ export const useAsync = (asyncFunction, dependencies = []) => {
   const [state, setState] = useState({
     data: null,
     loading: true,
-    error: null
+    error: null,
   });
 
   useEffect(() => {
     let cancelled = false;
 
     const execute = async () => {
-      setState(prevState => ({
+      setState((prevState) => ({
         ...prevState,
         loading: true,
-        error: null
+        error: null,
       }));
 
       try {
@@ -48,7 +48,7 @@ export const useAsync = (asyncFunction, dependencies = []) => {
           setState({
             data: result,
             loading: false,
-            error: null
+            error: null,
           });
         }
       } catch (error) {
@@ -56,7 +56,7 @@ export const useAsync = (asyncFunction, dependencies = []) => {
           setState({
             data: null,
             loading: false,
-            error: error.message || 'An error occurred'
+            error: error.message || 'An error occurred',
           });
         }
       }
@@ -70,10 +70,10 @@ export const useAsync = (asyncFunction, dependencies = []) => {
   }, dependencies);
 
   const retry = () => {
-    setState(prevState => ({
+    setState((prevState) => ({
       ...prevState,
       loading: true,
-      error: null
+      error: null,
     }));
   };
 

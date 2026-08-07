@@ -20,18 +20,18 @@ export const getTextsFromDB = async (language, component) => {
 };
 
 export const getTourismAttractionLocalizations = async (languageCode) => {
-    // 1. Get the language_id from the languages table using the languageCode
-    const languageQuery = 'SELECT id FROM languages WHERE code = $1';
-    const languageResult = await pool.query(languageQuery, [languageCode]);
+  // 1. Get the language_id from the languages table using the languageCode
+  const languageQuery = 'SELECT id FROM languages WHERE code = $1';
+  const languageResult = await pool.query(languageQuery, [languageCode]);
 
-    if (languageResult.rows.length === 0) {
-      throw new Error(`Language code '${languageCode}' not found`);
-    }
+  if (languageResult.rows.length === 0) {
+    throw new Error(`Language code '${languageCode}' not found`);
+  }
 
-    const languageId = languageResult.rows[0].id;
+  const languageId = languageResult.rows[0].id;
 
-    // 2. Query the tourismattraction_localizations and tourismattractions tables using language_id
-    const localizationQuery = `
+  // 2. Query the tourismattraction_localizations and tourismattractions tables using language_id
+  const localizationQuery = `
       SELECT 
         ta_l.tourism_attraction_id, -- Include tourism_attraction_id in the query
         ta_l.translated_name, 
@@ -45,33 +45,33 @@ export const getTourismAttractionLocalizations = async (languageCode) => {
         ON ta_l.tourism_attraction_id = ta.id
       WHERE ta_l.language_id = $1
     `;
-    const localizationResult = await pool.query(localizationQuery, [languageId]);
+  const localizationResult = await pool.query(localizationQuery, [languageId]);
 
-    // 2a. Query the tourismattraction_localizations table for English names (language_id = 1)
-    const englishLocalizationQuery = `
+  // 2a. Query the tourismattraction_localizations table for English names (language_id = 1)
+  const englishLocalizationQuery = `
       SELECT 
         ta_l.tourism_attraction_id,
         ta_l.translated_name AS en_name
       FROM tourismattraction_localizations ta_l
       WHERE ta_l.language_id = 1
     `;
-    const englishLocalizationResult = await pool.query(englishLocalizationQuery);
+  const englishLocalizationResult = await pool.query(englishLocalizationQuery);
 
-    // 2b. Create a map of tourism_attraction_id to English name
-    const englishNameMap = englishLocalizationResult.rows.reduce((acc, row) => {
-      acc[row.tourism_attraction_id] = row.en_name;
-      return acc;
-    }, {});
+  // 2b. Create a map of tourism_attraction_id to English name
+  const englishNameMap = englishLocalizationResult.rows.reduce((acc, row) => {
+    acc[row.tourism_attraction_id] = row.en_name;
+    return acc;
+  }, {});
 
-    // 2c. Format the tourism attractions into key-value pairs, including the English name
-    const resultatt = localizationResult.rows.map(row => ({
-      [row.translated_name]: `${row.brgy}, ${row.city_mun}, ${row.prov_huc}, ${row.region}`,
-      category: row.ntdp_category,
-      en_name: englishNameMap[row.tourism_attraction_id] || 'N/A' // Use tourism_attraction_id to map English names
-    }));
+  // 2c. Format the tourism attractions into key-value pairs, including the English name
+  const resultatt = localizationResult.rows.map((row) => ({
+    [row.translated_name]: `${row.brgy}, ${row.city_mun}, ${row.prov_huc}, ${row.region}`,
+    category: row.ntdp_category,
+    en_name: englishNameMap[row.tourism_attraction_id] || 'N/A', // Use tourism_attraction_id to map English names
+  }));
 
-    // 3. Query the tourismactivities table for localized activities
-    const localizationQueryAct = `
+  // 3. Query the tourismactivities table for localized activities
+  const localizationQueryAct = `
       SELECT
         ta_name,
         CASE
@@ -87,23 +87,26 @@ export const getTourismAttractionLocalizations = async (languageCode) => {
         END AS localized_ta_name
       FROM tourismactivities
     `;
-    const localizationQueryActResult = await pool.query(localizationQueryAct, [languageCode]);
+  const localizationQueryActResult = await pool.query(localizationQueryAct, [languageCode]);
 
-    // 3a. Format the tourism activities into key-value pairs
-    const resultact = localizationQueryActResult.rows.map(row => ({
-      [row.localized_ta_name]: row.ta_name
-    }));
+  // 3a. Format the tourism activities into key-value pairs
+  const resultact = localizationQueryActResult.rows.map((row) => ({
+    [row.localized_ta_name]: row.ta_name,
+  }));
 
-    // 4. Return array of two objects: [ { act }, { att } ]
-    return [
-      { act: resultact },
-      { att: resultatt }
-    ];
+  // 4. Return array of two objects: [ { act }, { att } ]
+  return [{ act: resultact }, { att: resultatt }];
 };
 
-
 // pseudo-spam protection code to prevent duplicate entries to be inserted into survey_feedback table
-export const submitSurveyFeedback = async ({ entity, rating, review, touchpoint, anonid, language }) => {
+export const submitSurveyFeedback = async ({
+  entity,
+  rating,
+  review,
+  touchpoint,
+  anonid,
+  language,
+}) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -126,13 +129,13 @@ export const submitSurveyFeedback = async ({ entity, rating, review, touchpoint,
     `;
 
     const surveyResult = await client.query(surveyQuery, [
-      entity, 
-      rating, 
-      review, 
-      touchpoint, 
-      anonid, 
-      'TPENT', 
-      language
+      entity,
+      rating,
+      review,
+      touchpoint,
+      anonid,
+      'TPENT',
+      language,
     ]);
 
     // If it was an update (conflict occurred)

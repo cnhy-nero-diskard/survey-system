@@ -6,22 +6,21 @@ const FeedbackContext = createContext();
 
 // Provider component
 export const FeedbackProvider = ({ children }) => {
-    const [feedback, setFeedback] = useState({
-        entity: null,
-        rating: null,
-        review: null,
-        touchpoint: null, 
-        is_analyzed:false,
-        submitted_at: null,
-        language: null
+  const [feedback, setFeedback] = useState({
+    entity: null,
+    rating: null,
+    review: null,
+    touchpoint: null,
+    is_analyzed: false,
+    submitted_at: null,
+    language: null,
+  });
 
-    });
-
-    return (
-        <FeedbackContext.Provider value={{ feedback, setFeedback }}>
-            {children}
-        </FeedbackContext.Provider>
-    );
+  return (
+    <FeedbackContext.Provider value={{ feedback, setFeedback }}>
+      {children}
+    </FeedbackContext.Provider>
+  );
 };
 
 // Custom hook to use the context

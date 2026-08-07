@@ -3,14 +3,16 @@ import React from 'react';
 
 const withBackground = (WrappedComponent) => {
   return ({ overlayImage, ...props }) => (
-    <div style={{
-      textAlign: 'center',
-      padding: '20px',
-      background: 'linear-gradient(135deg, #95b1ed, #3abde9)',
-      borderRadius: '10px',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-      position: 'relative', // Needed for overlay positioning
-    }}>
+    <div
+      style={{
+        textAlign: 'center',
+        padding: '20px',
+        background: 'linear-gradient(135deg, #95b1ed, #3abde9)',
+        borderRadius: '10px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        position: 'relative', // Needed for overlay positioning
+      }}
+    >
       {/* Optional Image Overlay */}
       {overlayImage && (
         <div

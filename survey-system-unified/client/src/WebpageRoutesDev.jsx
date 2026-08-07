@@ -138,7 +138,6 @@ const ButtonGrid = () => {
     { label: 'Personal Profile 2', path: 'pprofile2' },
     { label: 'Personal Profile 1', path: 'pprofile1' },
     { label: 'Proponent LGU', path: 'proponentlgu' },
-
   ];
 
   // Load state from localStorage on mount

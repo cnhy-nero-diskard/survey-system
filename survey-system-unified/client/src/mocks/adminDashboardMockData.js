@@ -18,19 +18,11 @@ export const sentimentTableMock = {
     'The place was clean and well organized.',
     'Loved the local food recommendations.',
   ],
-  neutral: [
-    'It was an okay experience overall.',
-    'Nothing special, but nothing bad either.',
-  ],
-  negative: [
-    'Long wait times at the front desk.',
-    'Signage could be clearer.',
-  ],
+  neutral: ['It was an okay experience overall.', 'Nothing special, but nothing bad either.'],
+  negative: ['Long wait times at the front desk.', 'Signage could be clearer.'],
 };
 
-export const analyzeTopicsMock = [
-  { customLabel: 'Service Quality' },
-];
+export const analyzeTopicsMock = [{ customLabel: 'Service Quality' }];
 
 // Shared by OverallBarangay / BarangayDashboard / MunicipalityDashboard
 // (touchpoint === 'barangay' | 'island' | 'points' | 'transportation'),
@@ -289,8 +281,8 @@ export const surveyTallyMock = [
 ];
 
 export const surveyTopicsMock = {
-  'Accommodation': { dissatisfied: 4, neutral: 12, satisfied: 48, very_satisfied: 30 },
-  'Transportation': { dissatisfied: 8, neutral: 20, satisfied: 35, very_satisfied: 15 },
-  'Attractions': { dissatisfied: 2, neutral: 10, satisfied: 50, very_satisfied: 40 },
+  Accommodation: { dissatisfied: 4, neutral: 12, satisfied: 48, very_satisfied: 30 },
+  Transportation: { dissatisfied: 8, neutral: 20, satisfied: 35, very_satisfied: 15 },
+  Attractions: { dissatisfied: 2, neutral: 10, satisfied: 50, very_satisfied: 40 },
   'Food & Dining': { dissatisfied: 5, neutral: 15, satisfied: 40, very_satisfied: 25 },
 };

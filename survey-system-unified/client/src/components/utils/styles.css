@@ -5,11 +5,11 @@
    where it vertically centered the whole page inside 100vh and clipped
    content taller than the viewport off the top). */
 body.survey-mode {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}

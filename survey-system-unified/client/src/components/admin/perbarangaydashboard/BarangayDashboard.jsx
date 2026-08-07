@@ -44,9 +44,6 @@ const ErrorMessage = styled(Typography)`
   max-width: 400px;
 `;
 
-
-
-
 const AreaDashboard = () => {
   const [metrics, setMetrics] = useState([]);
   const [error, setError] = useState(null);
@@ -69,21 +66,29 @@ const AreaDashboard = () => {
         const data = await fetchEntityMetrics(year, quarter);
         // Filter data to include only objects with touchpoint="attractions"
         const filteredData = Array.isArray(data)
-          ? data.filter(item => (item.touchpoint === "barangay" || item.touchpoint === "island" || item.touchpoint === "points" || item.touchpoint === "transportation"))
-          : [];        
+          ? data.filter(
+              (item) =>
+                item.touchpoint === 'barangay' ||
+                item.touchpoint === 'island' ||
+                item.touchpoint === 'points' ||
+                item.touchpoint === 'transportation'
+            )
+          : [];
         if (filteredData.length === 0) {
-          setMetrics([{
-            entity: "No Data Available",
-            total_responses: "0",
-            rating: {
-              Dissatisfied: "0",
-              Neutral: "0",
-              Satisfied: "0",
-              VerySatisfied: "0",
+          setMetrics([
+            {
+              entity: 'No Data Available',
+              total_responses: '0',
+              rating: {
+                Dissatisfied: '0',
+                Neutral: '0',
+                Satisfied: '0',
+                VerySatisfied: '0',
+              },
+              mentionedTerms: {},
+              language: {},
             },
-            mentionedTerms: {},
-            language: {},
-          }]);
+          ]);
         } else {
           setMetrics(filteredData);
         }
@@ -130,11 +135,10 @@ const AreaDashboard = () => {
   if (error) {
     return (
       <ErrorContainer>
-        <ErrorTitle>
-          ⚠️ Error Loading Area Data
-        </ErrorTitle>
+        <ErrorTitle>⚠️ Error Loading Area Data</ErrorTitle>
         <ErrorMessage>
-          We encountered an issue while loading the area dashboard data. Please try refreshing the page or contact support if the problem persists.
+          We encountered an issue while loading the area dashboard data. Please try refreshing the
+          page or contact support if the problem persists.
         </ErrorMessage>
         <Box sx={{ mt: 2, p: 2, bgcolor: '#fed7d7', borderRadius: 2, maxWidth: 500 }}>
           <Typography variant="caption" sx={{ fontFamily: fontFamily, color: '#c53030' }}>

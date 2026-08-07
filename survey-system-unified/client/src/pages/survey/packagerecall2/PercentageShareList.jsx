@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import useTranslations from '../../../components/utils/useTranslations'; 
-import Slider from 'rc-slider'; 
+import useTranslations from '../../../components/utils/useTranslations';
+import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; 
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { NextButtonU } from '../../../components/utils/styles1';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
@@ -75,9 +75,9 @@ const NextButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  
+
   &:hover {
-     background-color: #0056b3;
+    background-color: #0056b3;
   }
 `;
 
@@ -159,7 +159,7 @@ const PercentageShareList = () => {
       await submitSurveyResponses(surveyResponses);
       goToNextStep(currentStepIndex, navigate, routes, activeBlocks);
     } catch (error) {
-      console.error("Error submitting survey responses:", error);
+      console.error('Error submitting survey responses:', error);
     }
   };
 

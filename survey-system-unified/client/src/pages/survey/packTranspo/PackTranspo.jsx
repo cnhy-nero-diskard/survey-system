@@ -4,8 +4,8 @@ import { useSpring, animated } from 'react-spring';
 import Select from 'react-select';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import { useNavigate } from "react-router-dom";
-import imgOverlay from "../../../components/img/money.png";
+import { useNavigate } from 'react-router-dom';
+import imgOverlay from '../../../components/img/money.png';
 import useTranslations from '../../../components/utils/useTranslations';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
@@ -142,7 +142,7 @@ const PackTranspo = () => {
       {
         surveyquestion_ref: 'NPCONVR',
         response_value: convertedPrice,
-      }
+      },
     ];
 
     try {
@@ -227,7 +227,7 @@ const PackTranspo = () => {
               }),
             }}
             isSearchable
-            placeholder='...'
+            placeholder="..."
             menuPortalTarget={document.body}
             menuPosition="fixed"
           />
@@ -246,4 +246,3 @@ const PackTranspo = () => {
 };
 
 export default PackTranspo;
-

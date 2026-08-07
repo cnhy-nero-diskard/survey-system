@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import './BranchingSelect.css';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgoverlay from "../../../components/img/emailbg.png";
+import imgoverlay from '../../../components/img/emailbg.png';
 import { Container, NextButtonU, QuestionText } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
@@ -65,7 +65,8 @@ const BranchingSelect = () => {
   const [language, setLanguage] = useState(localStorage.getItem('selectedLanguage'));
   const translations = useTranslations('BranchingSelect', language);
 
-  const { routes, appendActiveBlocks, removeActiveBlocks, activeBlocks } = useContext(UnifiedContext);
+  const { routes, appendActiveBlocks, removeActiveBlocks, activeBlocks } =
+    useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
 
   // Maps user-selected options to blocks
@@ -81,14 +82,12 @@ const BranchingSelect = () => {
 
   // 1) Load from localStorage **once** on mount
   useEffect(() => {
-
-
     removeActiveBlocks('yesaccom');
     removeActiveBlocks('noaccom');
     const savedOptions = loadFromLocalStorage('branchingSelectOptions');
     if (savedOptions) {
       setSelectedOptions(savedOptions);
-      
+
       savedOptions.forEach((option) => {
         if (optionToBlockMap[option]) {
           appendActiveBlocks([optionToBlockMap[option]]);

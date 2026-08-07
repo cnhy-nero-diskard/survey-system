@@ -3,7 +3,7 @@ import { useSpring, animated } from 'react-spring';
 import styled from 'styled-components';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgoverlay from "../../../components/img/commentsbg.png";
+import imgoverlay from '../../../components/img/commentsbg.png';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import useTranslations from '../../../components/utils/useTranslations';
 import { GREETINGS } from '../../../components/utils/componentConstants';
@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
-
 
 const Title = styled.h1`
   font-size: 2rem;
@@ -93,16 +92,20 @@ const Greetings = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgoverlay} handleNextClick={handleStartSurvey} nextmsg={translations.greetingsStartSurvey}>
-<Container style={{maxWidth: '600px'}}>
+      <GradientBackground
+        overlayImage={imgoverlay}
+        handleNextClick={handleStartSurvey}
+        nextmsg={translations.greetingsStartSurvey}
+      >
+        <Container style={{ maxWidth: '600px' }}>
           {/* Animatmax-width=''edContainer uses the containerAnimation styles */}
-            <Title>{translations.greetingsTitle}</Title>
-            <Subtitle>{translations.greetingsInvitation}</Subtitle>
-            <Subtitle>{translations.greetingsDOTSurvey}</Subtitle>
-            <Paragraph>{translations.greetingsSurveyPurpose}</Paragraph>
-            <Paragraph>{translations.greetingsDataPrivacy}</Paragraph>
-  
-</Container>      </GradientBackground>
+          <Title>{translations.greetingsTitle}</Title>
+          <Subtitle>{translations.greetingsInvitation}</Subtitle>
+          <Subtitle>{translations.greetingsDOTSurvey}</Subtitle>
+          <Paragraph>{translations.greetingsSurveyPurpose}</Paragraph>
+          <Paragraph>{translations.greetingsDataPrivacy}</Paragraph>
+        </Container>{' '}
+      </GradientBackground>
     </>
   );
 };

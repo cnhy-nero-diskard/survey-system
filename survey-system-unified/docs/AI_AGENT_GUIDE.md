@@ -7,12 +7,14 @@ This document provides essential context for AI agents working on this survey sy
 ## 📋 Project Overview
 
 ### System Type
+
 - **Tourism Survey Platform** - Collects visitor feedback and analytics
 - **Unified Full-Stack Application** - React frontend + Node.js backend in single deployment
 - **PostgreSQL Database** - Complex relational schema with localization support
 - **Pre-deployment** - Not yet deployed to production; no live users or live data (confirmed 2026-08-05). Schema changes are cheap; no migration constraint.
 
 ### Architecture
+
 ```
 survey-system-unified/
 ├── client/          # React frontend (CRA-based)
@@ -24,14 +26,18 @@ survey-system-unified/
 ## 🚨 Critical Safety Guidelines
 
 ### 1. Database Operations
+
 **⚠️ NEVER ALTER DATABASE SCHEMA WITHOUT EXPLICIT APPROVAL**
+
 - The system uses complex PostgreSQL schemas with foreign key relationships
 - No production data exists yet (pre-deployment); schema changes are cheap but should still be tested
 - Migrations must be carefully planned and tested
 - Always backup before schema modifications
 
 ### 2. Breaking Changes Prevention
+
 **Before making ANY change, verify:**
+
 - [ ] Frontend-backend API contracts remain intact
 - [ ] Database queries still work with existing schema
 - [ ] Environment variable dependencies are maintained
@@ -39,6 +45,7 @@ survey-system-unified/
 - [ ] Existing user sessions won't be invalidated
 
 ### 3. MVP Technical Debt Areas (Handle with Care)
+
 - **Mixed authentication patterns** - Session-based + JWT tokens coexist
 - **Inconsistent error handling** - Some routes lack proper error boundaries
 - **Hardcoded values** - Config scattered across files instead of centralized
@@ -49,6 +56,7 @@ survey-system-unified/
 ## 🏗️ System Architecture Details
 
 ### Frontend (React)
+
 - **Framework**: Create React App (CRA) - avoid ejecting
 - **UI Libraries**: Material-UI, Chakra UI (mixed usage - be consistent)
 - **State Management**: Mixed patterns (useState, context, props drilling)
@@ -56,12 +64,14 @@ survey-system-unified/
 - **API Communication**: Axios with custom config
 
 **Key Frontend Files:**
+
 - `client/src/config/apiConfig.js` - API endpoint configuration
 - `client/src/ThemeContext.js` - Global theme management
 - `client/src/components/` - Reusable UI components
 - `client/src/pages/` - Page-level components
 
 ### Backend (Node.js/Express)
+
 - **Runtime**: Node.js 18+ with ES modules
 - **Framework**: Express.js with middleware stack
 - **Database**: PostgreSQL with pg driver
@@ -69,6 +79,7 @@ survey-system-unified/
 - **Logging**: Winston for structured logging
 
 **Key Backend Files:**
+
 - `server/server.js` - Main application entry point
 - `server/config/db.js` - Database connection configuration
 - `server/routes/` - API route definitions
@@ -76,7 +87,9 @@ survey-system-unified/
 - `server/middleware/` - Express middleware (auth, CORS, etc.)
 
 ### Database Schema
+
 **Main Tables:**
+
 - `survey_responses` - User survey data
 - `anonymous_users` - Session management
 - `localization00` - Multi-language content
@@ -87,6 +100,7 @@ survey-system-unified/
 ## 🔧 Development Patterns
 
 ### Environment Configuration
+
 ```bash
 # Development
 NODE_ENV=development
@@ -98,6 +112,7 @@ NODE_ENV=production
 ```
 
 ### API Endpoint Patterns
+
 ```javascript
 // Client-side API calls
 import { getApiUrl } from '../config/apiConfig';
@@ -107,6 +122,7 @@ const response = await axios.get(getApiUrl('/api/admin/data'));
 ```
 
 ### Database Query Patterns
+
 ```javascript
 // Service layer pattern
 export const fetchDataService = async (filters = {}) => {
@@ -124,21 +140,25 @@ export const fetchDataService = async (filters = {}) => {
 ## ⚠️ Known Issues & Workarounds
 
 ### 1. Mixed UI Libraries
+
 - **Problem**: Both Material-UI and Chakra UI are used
 - **Workaround**: Prefer Material-UI for new components
 - **Don't**: Add more UI libraries
 
 ### 2. Authentication Complexity
+
 - **Problem**: Session + JWT hybrid system
 - **Workaround**: Follow existing patterns in `authController.js`
 - **Don't**: Refactor auth system without migration plan
 
 ### 3. Localization Implementation
+
 - **Problem**: Hardcoded language keys scattered across components
 - **Workaround**: Use existing `localization00` table patterns
 - **Don't**: Create new localization systems
 
 ### 4. Error Handling Gaps
+
 - **Problem**: Inconsistent error responses
 - **Workaround**: Follow `errorHandler.js` middleware patterns
 - **Don't**: Remove existing error handling without replacement
@@ -146,19 +166,23 @@ export const fetchDataService = async (filters = {}) => {
 ## 🚀 Safe Development Practices
 
 ### Making Frontend Changes
+
 1. **Test API compatibility** - Ensure backend endpoints still work
 2. **Check responsive design** - Mobile users are primary audience
 3. **Verify language switching** - Multi-language support is critical
 4. **Test offline behavior** - Handle network failures gracefully
 
 ### Making Backend Changes
+
 1. **Database queries** - Always use parameterized queries (prevent SQL injection)
 2. **API versioning** - Don't break existing endpoints
 3. **Authentication** - Maintain session security
 4. **Logging** - Use winston logger for consistency
 
 ### Environment Variables
+
 **Required for functionality:**
+
 ```env
 # Database (Critical)
 DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
@@ -173,6 +197,7 @@ SENDGRID_API_KEY, HF_TOKEN_1, HF_TOKEN_2
 ## 🧪 Testing Strategy
 
 ### Before Deploying Changes
+
 1. **Unit Tests**: Run `npm test` in server directory
 2. **Integration Tests**: Test full user survey flow
 3. **Database Tests**: Verify all CRUD operations work
@@ -180,6 +205,7 @@ SENDGRID_API_KEY, HF_TOKEN_1, HF_TOKEN_2
 5. **Mobile Tests**: Verify responsive design
 
 ### Manual Testing Checklist
+
 - [ ] User can complete a survey end-to-end
 - [ ] Admin dashboard loads without errors
 - [ ] Language switching works correctly
@@ -189,12 +215,14 @@ SENDGRID_API_KEY, HF_TOKEN_1, HF_TOKEN_2
 ## 📊 Performance Considerations
 
 ### Known Bottlenecks
+
 - Large dataset queries in admin dashboard
 - Unoptimized chart rendering
 - Missing database indexes on frequently queried columns
 - Synchronous file processing operations
 
 ### Optimization Guidelines
+
 - Use pagination for large datasets
 - Implement database query optimization
 - Add proper indexes before performance fixes
@@ -203,6 +231,7 @@ SENDGRID_API_KEY, HF_TOKEN_1, HF_TOKEN_2
 ## 🔐 Security Considerations
 
 ### Current Security Measures
+
 - CORS configuration for cross-origin requests
 - Session management with secure cookies
 - SQL injection prevention via parameterized queries
@@ -210,6 +239,7 @@ SENDGRID_API_KEY, HF_TOKEN_1, HF_TOKEN_2
 - HTTPS enforcement in production
 
 ### Security Gaps to Address Carefully
+
 - Input validation missing on some endpoints
 - No API key rotation mechanism
 - Limited audit logging for admin actions
@@ -218,6 +248,7 @@ SENDGRID_API_KEY, HF_TOKEN_1, HF_TOKEN_2
 ## 🚫 What NOT to Do
 
 ### Absolute Don'ts
+
 1. **Never** modify database schema without backup and rollback plan
 2. **Never** remove authentication middleware from protected routes
 3. **Never** hardcode credentials or sensitive data
@@ -226,6 +257,7 @@ SENDGRID_API_KEY, HF_TOKEN_1, HF_TOKEN_2
 6. **Never** disable security middleware
 
 ### Risky Changes (Require Extra Caution)
+
 - Modifying session management
 - Changing database connection configuration
 - Updating authentication flows
@@ -235,12 +267,14 @@ SENDGRID_API_KEY, HF_TOKEN_1, HF_TOKEN_2
 ## 📞 Emergency Procedures
 
 ### If Something Breaks
+
 1. **Check logs**: `docker logs <container_id>` or application logs
 2. **Database connectivity**: Verify connection string and credentials
 3. **Rollback strategy**: Revert to last known working state
 4. **Health checks**: Use `/api/health` endpoint for status
 
 ### Quick Fixes
+
 ```bash
 # Restart application
 docker-compose restart survey-app
@@ -255,6 +289,7 @@ node -e "import('./server/config/db.js').then(pool => pool.query('SELECT NOW()')
 ## 🎯 Improvement Priorities
 
 ### Technical Debt to Address (In Order)
+
 1. **Standardize error handling** across all routes
 2. **Consolidate UI library usage** (prefer Material-UI)
 3. **Add comprehensive input validation**
@@ -263,6 +298,7 @@ node -e "import('./server/config/db.js').then(pool => pool.query('SELECT NOW()')
 6. **Security audit** and vulnerability fixes
 
 ### Safe Refactoring Areas
+
 - Component extraction and reusability
 - Utility function creation
 - Code documentation improvements

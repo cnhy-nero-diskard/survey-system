@@ -50,7 +50,7 @@ const EstablishmentsDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());
   const [quarter, setQuarter] = useState(Math.floor((new Date().getMonth() + 3) / 3));
-  
+
   const handleYearChange = (event) => {
     setYear(event.target.value);
   };
@@ -62,25 +62,27 @@ const EstablishmentsDashboard = () => {
   useEffect(() => {
     const getMetrics = async () => {
       setIsLoading(true);
-      
+
       try {
         const data = await fetchEntityMetrics(year, quarter);
         const filteredData = Array.isArray(data)
-          ? data.filter(item => item.touchpoint === "establishments")
-          : [];        
+          ? data.filter((item) => item.touchpoint === 'establishments')
+          : [];
         if (filteredData.length === 0) {
-          setMetrics([{
-            entity: "No Data Available",
-            total_responses: "0",
-            rating: {
-              Dissatisfied: "0",
-              Neutral: "0",
-              Satisfied: "0",
-              VerySatisfied: "0",
+          setMetrics([
+            {
+              entity: 'No Data Available',
+              total_responses: '0',
+              rating: {
+                Dissatisfied: '0',
+                Neutral: '0',
+                Satisfied: '0',
+                VerySatisfied: '0',
+              },
+              mentionedTerms: {},
+              language: {},
             },
-            mentionedTerms: {},
-            language: {},
-          }]);
+          ]);
         } else {
           setMetrics(filteredData);
         }
@@ -121,18 +123,16 @@ const EstablishmentsDashboard = () => {
       key: metric.entity.toLowerCase().replace(/\s+/g, ''), // Create a unique key for each entity
       name: metric.entity,
       short_id: metric.short_id,
-
     }));
   };
 
   if (error) {
     return (
       <ErrorContainer>
-        <ErrorTitle>
-          ⚠️ Error Loading Establishment Data
-        </ErrorTitle>
+        <ErrorTitle>⚠️ Error Loading Establishment Data</ErrorTitle>
         <ErrorMessage>
-          We encountered an issue while loading the establishment dashboard data. Please try refreshing the page or contact support if the problem persists.
+          We encountered an issue while loading the establishment dashboard data. Please try
+          refreshing the page or contact support if the problem persists.
         </ErrorMessage>
         <Box sx={{ mt: 2, p: 2, bgcolor: '#fed7d7', borderRadius: 2, maxWidth: 500 }}>
           <Typography variant="caption" sx={{ fontFamily: fontFamily, color: '#c53030' }}>
@@ -184,6 +184,5 @@ const EstablishmentsDashboard = () => {
     </Fade>
   );
 };
-
 
 export default EstablishmentsDashboard;

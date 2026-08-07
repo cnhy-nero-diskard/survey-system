@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import { useNavigate } from 'react-router-dom';
-import { submitSurveyResponses } from '../../../components/utils/sendInputUtils'; 
+import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import axios from 'axios';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
@@ -17,7 +17,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   max-width: 800px;
-  
+
   background: linear-gradient(135deg, #95b1ed, #3abde9);
   font-family: Arial, sans-serif;
   border-radius: 40px;
@@ -46,7 +46,7 @@ const Text = styled.p`
   text-align: justify;
   margin-bottom: 20px;
   padding: 0 2px 0 2px;
-  color:rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
   width: 100%;
 
   @media (max-width: 600px) {
@@ -64,20 +64,23 @@ const Text = styled.p`
 
 const SurveyConsent = () => {
   const [translations, setTranslations] = useState({});
-  const [language, ] = useState(localStorage.getItem('selectedLanguage') || 'en');
+  const [language] = useState(localStorage.getItem('selectedLanguage') || 'en');
 
-  const {routes} = useContext(UnifiedContext);
+  const { routes } = useContext(UnifiedContext);
   const currentStepIndex = useCurrentStepIndex(routes);
-  const {activeBlocks} = useContext(UnifiedContext);
+  const { activeBlocks } = useContext(UnifiedContext);
 
-  const notify = () => toast(translations.SurveyConsentAgreeToast || 'Thank you for agreeing to participate!');
+  const notify = () =>
+    toast(translations.SurveyConsentAgreeToast || 'Thank you for agreeing to participate!');
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, { withCredentials: true });
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/progress`, {
+          withCredentials: true,
+        });
         // setCurrentStep(response.data.currentStep);
       } catch (err) {
         console.error(err);
@@ -87,9 +90,7 @@ const SurveyConsent = () => {
   }, [navigate]);
 
   const handleNextClick = async () => {
-    const responses = [
-      { surveyquestion_ref: 'CONS1', response_value: 'Agreed' },
-    ];
+    const responses = [{ surveyquestion_ref: 'CONS1', response_value: 'Agreed' }];
 
     try {
       await submitSurveyResponses(responses);
@@ -103,7 +104,8 @@ const SurveyConsent = () => {
   useEffect(() => {
     const fetchTranslations = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/texts?language=${language}&component=SurveyConsent`,
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/api/texts?language=${language}&component=SurveyConsent`,
           { withCredentials: true }
         );
         setTranslations(response.data);
@@ -122,7 +124,8 @@ const SurveyConsent = () => {
         <Container>
           <Title>{translations.SurveyConsentTitle}</Title>
           <Text>
-            {translations.SurveyConsentDescription || 'Thank you for taking part in our survey for the Department of Tourism. This survey aims to improve tourism services, and your participation is voluntary. You can stop at any time without any consequences. Your responses will be kept anonymous and used only for the purpose of this survey.'}
+            {translations.SurveyConsentDescription ||
+              'Thank you for taking part in our survey for the Department of Tourism. This survey aims to improve tourism services, and your participation is voluntary. You can stop at any time without any consequences. Your responses will be kept anonymous and used only for the purpose of this survey.'}
           </Text>
         </Container>
       </GradientBackground>

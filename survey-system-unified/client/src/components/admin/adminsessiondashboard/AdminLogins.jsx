@@ -79,97 +79,149 @@ const StatusIndicator = styled(FaCircle).withConfig({
   // Without this, `status` is spread onto the <svg> and React warns.
   shouldForwardProp: (prop) => prop !== 'loggedIn',
 })`
-  color: ${props => (props.loggedIn ? '#10b981' : '#ef4444')};
+  color: ${(props) => (props.loggedIn ? '#10b981' : '#ef4444')};
   margin-right: 8px;
   vertical-align: middle;
 `;
 
 const AdminSessionDashboard = () => {
-    const [sessionData, setSessionData] = useState([]);
-    const [isUnauthorized, setIsUnauthorized] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+  const [sessionData, setSessionData] = useState([]);
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchSessionData = async () => {
-            try {
-                const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/admin/session-data`, {
-                    method: 'GET',
-                    credentials: 'include', 
-                    headers: {
-                        'Content-type': 'application/json',
-                    },
-                });
+  useEffect(() => {
+    const fetchSessionData = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/admin/session-data`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-type': 'application/json',
+          },
+        });
 
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        setIsUnauthorized(true);
-                    }
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+        if (!response.ok) {
+          if (response.status === 401) {
+            setIsUnauthorized(true);
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-                const data = await response.json();
-                // Guard: a non-array payload would blow up .map() below.
-                setSessionData(Array.isArray(data) ? data : []);
-                setIsUnauthorized(false); // Reset unauthorized state if request succeeds
-            } catch (error) {
-                console.error('Error fetching session data:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+        const data = await response.json();
+        // Guard: a non-array payload would blow up .map() below.
+        setSessionData(Array.isArray(data) ? data : []);
+        setIsUnauthorized(false); // Reset unauthorized state if request succeeds
+      } catch (error) {
+        console.error('Error fetching session data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-        fetchSessionData();
-        const interval = setInterval(fetchSessionData, 5000); // Poll every 5 seconds
+    fetchSessionData();
+    const interval = setInterval(fetchSessionData, 5000); // Poll every 5 seconds
 
-        return () => clearInterval(interval);
-    }, []);
+    return () => clearInterval(interval);
+  }, []);
 
-    return (
-        <Container>
-            {isUnauthorized ? (
-                <WarningMessage message="YOU ARE NOT ALLOWED TO VIEW THIS PAGE" />
-            ) : isLoading ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, minHeight: 180 }} role="status" aria-live="polite">
-                    <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} />
-                    <Typography sx={{ color: '#4a5568', fontWeight: 500 }}>Loading admin sessions…</Typography>
-                </Box>
-            ) : (
-                <Table>
-                    <TableHeader>
-                        <tr>
-                            <TableHeaderCell><IconWrapper><FaUser /></IconWrapper>Username</TableHeaderCell>
-                            <TableHeaderCell><IconWrapper><FaSignInAlt /></IconWrapper>Last Login</TableHeaderCell>
-                            <TableHeaderCell><IconWrapper><FaSignOutAlt /></IconWrapper>Last Logout</TableHeaderCell>
-                            <TableHeaderCell><IconWrapper><FaClock /></IconWrapper>Session Duration</TableHeaderCell>
-                            <TableHeaderCell>Status</TableHeaderCell>
-                        </tr>
-                    </TableHeader>
-                    <tbody>
-                        {sessionData.length === 0 ? (
-                            <tr>
-                                {/* Previously an empty response rendered a header with nothing
+  return (
+    <Container>
+      {isUnauthorized ? (
+        <WarningMessage message="YOU ARE NOT ALLOWED TO VIEW THIS PAGE" />
+      ) : isLoading ? (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1.5,
+            minHeight: 180,
+          }}
+          role="status"
+          aria-live="polite"
+        >
+          <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} />
+          <Typography sx={{ color: '#4a5568', fontWeight: 500 }}>
+            Loading admin sessions…
+          </Typography>
+        </Box>
+      ) : (
+        <Table>
+          <TableHeader>
+            <tr>
+              <TableHeaderCell>
+                <IconWrapper>
+                  <FaUser />
+                </IconWrapper>
+                Username
+              </TableHeaderCell>
+              <TableHeaderCell>
+                <IconWrapper>
+                  <FaSignInAlt />
+                </IconWrapper>
+                Last Login
+              </TableHeaderCell>
+              <TableHeaderCell>
+                <IconWrapper>
+                  <FaSignOutAlt />
+                </IconWrapper>
+                Last Logout
+              </TableHeaderCell>
+              <TableHeaderCell>
+                <IconWrapper>
+                  <FaClock />
+                </IconWrapper>
+                Session Duration
+              </TableHeaderCell>
+              <TableHeaderCell>Status</TableHeaderCell>
+            </tr>
+          </TableHeader>
+          <tbody>
+            {sessionData.length === 0 ? (
+              <tr>
+                {/* Previously an empty response rendered a header with nothing
                                     under it, which reads as a broken table. */}
-                                <EmptyRow colSpan={5}>No admin sessions recorded yet.</EmptyRow>
-                            </tr>
-                        ) : (
-                            sessionData.map((admin, index) => (
-                                <TableRow key={admin.username || index}>
-                                    <TableCell><IconWrapper><FaUser /></IconWrapper>{admin.username}</TableCell>
-                                    <TableCell><IconWrapper><FaSignInAlt /></IconWrapper>{admin.last_login ? new Date(admin.last_login).toLocaleString() : 'N/A'}</TableCell>
-                                    <TableCell><IconWrapper><FaSignOutAlt /></IconWrapper>{admin.last_logout ? new Date(admin.last_logout).toLocaleString() : 'N/A'}</TableCell>
-                                    <TableCell><IconWrapper><FaClock /></IconWrapper>{admin.session_duration ? `${admin.session_duration} seconds` : 'N/A'}</TableCell>
-                                    <TableCell>
-                                        <StatusIndicator loggedIn={!!admin.is_logged_in} />
-                                        {admin.is_logged_in ? 'Logged In' : 'Logged Out'}
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </tbody>
-                </Table>
+                <EmptyRow colSpan={5}>No admin sessions recorded yet.</EmptyRow>
+              </tr>
+            ) : (
+              sessionData.map((admin, index) => (
+                <TableRow key={admin.username || index}>
+                  <TableCell>
+                    <IconWrapper>
+                      <FaUser />
+                    </IconWrapper>
+                    {admin.username}
+                  </TableCell>
+                  <TableCell>
+                    <IconWrapper>
+                      <FaSignInAlt />
+                    </IconWrapper>
+                    {admin.last_login ? new Date(admin.last_login).toLocaleString() : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <IconWrapper>
+                      <FaSignOutAlt />
+                    </IconWrapper>
+                    {admin.last_logout ? new Date(admin.last_logout).toLocaleString() : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <IconWrapper>
+                      <FaClock />
+                    </IconWrapper>
+                    {admin.session_duration ? `${admin.session_duration} seconds` : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <StatusIndicator loggedIn={!!admin.is_logged_in} />
+                    {admin.is_logged_in ? 'Logged In' : 'Logged Out'}
+                  </TableCell>
+                </TableRow>
+              ))
             )}
-        </Container>
-    );
+          </tbody>
+        </Table>
+      )}
+    </Container>
+  );
 };
 
 export default AdminSessionDashboard;

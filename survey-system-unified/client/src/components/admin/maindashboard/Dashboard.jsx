@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Grid, 
-  Typography, 
-  MenuItem, 
-  Select, 
+import {
+  Box,
+  Grid,
+  Typography,
+  MenuItem,
+  Select,
   FormControl,
   Chip,
   Skeleton,
   CircularProgress,
   Fade,
-  Paper
+  Paper,
 } from '@mui/material';
 import styled, { keyframes } from 'styled-components';
 import OverallMun from './nestedcomponents/OverallMun';
@@ -21,12 +21,12 @@ import { fontFamily } from '../../../config/fontConfig';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { 
+import {
   TrendingUp as TrendingUpIcon,
   LocationCity as LocationIcon,
   Business as BusinessIcon,
   Topic as TopicIcon,
-  CalendarToday as CalendarIcon
+  CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
 // Animations
 const fadeIn = keyframes`
@@ -68,7 +68,7 @@ const HeaderContainer = styled(Box)`
   color: white;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -88,7 +88,7 @@ const HeaderContent = styled(Box)`
   align-items: center;
   position: relative;
   z-index: 1;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 16px;
@@ -104,7 +104,7 @@ const HeaderTitle = styled(Typography)`
   display: flex;
   align-items: center;
   gap: 12px;
-  
+
   @media (max-width: 768px) {
     font-size: 24px;
   }
@@ -114,7 +114,7 @@ const FilterContainer = styled(Box)`
   display: flex;
   gap: 16px;
   align-items: flex-start;
-  
+
   @media (max-width: 768px) {
     width: 100%;
     justify-content: flex-start;
@@ -138,20 +138,20 @@ const FilterLabel = styled(Typography)`
 
 const StyledFormControl = styled(FormControl)`
   min-width: 120px;
-  
+
   & .MuiOutlinedInput-root {
     background-color: rgba(255, 255, 255, 0.95);
     border-radius: 8px;
-    
+
     &:hover {
       background-color: rgba(255, 255, 255, 1);
     }
-    
+
     &.Mui-focused {
       background-color: rgba(255, 255, 255, 1);
     }
   }
-  
+
   & .MuiSelect-select {
     font-family: ${fontFamily};
     font-weight: 500;
@@ -171,12 +171,12 @@ const CardContainer = styled(Paper)`
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
   }
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -213,7 +213,7 @@ const CardIcon = styled(Box)`
   align-items: center;
   justify-content: center;
   color: white;
-  
+
   & svg {
     font-size: 20px;
   }
@@ -291,47 +291,50 @@ const Dashboard = () => {
     const loadTimer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
-    
+
     // Make API request for relevance classification
     const classifyResponses = async () => {
       setClassificationStatus('loading');
-      const toastId = toast.loading("🔍 Analyzing and classifying responses...", {
+      const toastId = toast.loading('🔍 Analyzing and classifying responses...', {
         style: {
           fontFamily: fontFamily,
-        }
+        },
       });
-      
+
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/admin/automateclassification`, {
-          withCredentials: true
-        });
-        
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/api/admin/automateclassification`,
+          {
+            withCredentials: true,
+          }
+        );
+
         const { message, results } = response.data;
-        const relevantCount = results.filter(item => item.relevance === "RELEVANT").length;
-        const irrelevantCount = results.filter(item => item.relevance === "IRRELEVANT").length;
-        
+        const relevantCount = results.filter((item) => item.relevance === 'RELEVANT').length;
+        const irrelevantCount = results.filter((item) => item.relevance === 'IRRELEVANT').length;
+
         toast.update(toastId, {
           render: `✅ ${message} | Relevant: ${relevantCount} | Irrelevant: ${irrelevantCount}`,
-          type: "success",
+          type: 'success',
           isLoading: false,
           autoClose: 6000,
           style: {
             fontFamily: fontFamily,
-          }
+          },
         });
-        
+
         setClassificationStatus('success');
       } catch (error) {
         toast.update(toastId, {
-          render: `ℹ️ ${error.response?.data?.message || "No new feedback responses to classify at the moment"}`,
-          type: "info",
+          render: `ℹ️ ${error.response?.data?.message || 'No new feedback responses to classify at the moment'}`,
+          type: 'info',
           isLoading: false,
           autoClose: 5000,
           style: {
             fontFamily: fontFamily,
-          }
+          },
         });
-        
+
         setClassificationStatus('idle');
       }
     };
@@ -368,38 +371,41 @@ const Dashboard = () => {
 
   const getStatusText = () => {
     switch (classificationStatus) {
-      case 'loading': return 'Analyzing...';
-      case 'success': return 'Classification Complete';
-      default: return 'Ready';
+      case 'loading':
+        return 'Analyzing...';
+      case 'success':
+        return 'Classification Complete';
+      default:
+        return 'Ready';
     }
   };
 
   // Card configurations with icons
   const cardConfigs = [
     {
-      title: "Municipality Overview",
+      title: 'Municipality Overview',
       icon: <LocationIcon />,
       component: <OverallMun year={year} quarter={quarter} />,
-      description: "Municipal-level survey data and insights"
+      description: 'Municipal-level survey data and insights',
     },
     {
-      title: "Barangay Analysis", 
+      title: 'Barangay Analysis',
       icon: <BusinessIcon />,
       component: <OverallBarangay year={year} quarter={quarter} />,
-      description: "Area-specific response patterns"
+      description: 'Area-specific response patterns',
     },
     {
-      title: "Topic Distribution",
+      title: 'Topic Distribution',
       icon: <TopicIcon />,
       component: <OverallSurveyTopic year={year} quarter={quarter} />,
-      description: "Survey topic categorization and trends"
+      description: 'Survey topic categorization and trends',
     },
     {
-      title: "Establishment Data",
+      title: 'Establishment Data',
       icon: <TrendingUpIcon />,
       component: <OverallEstablishment year={year} quarter={quarter} />,
-      description: "Business establishment survey metrics"
-    }
+      description: 'Business establishment survey metrics',
+    },
   ];
 
   return (
@@ -421,7 +427,7 @@ const Dashboard = () => {
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         }}
       />
-      
+
       <MainContent>
         <Fade in={true} timeout={600}>
           <HeaderContainer>
@@ -437,44 +443,34 @@ const Dashboard = () => {
                     fontFamily: fontFamily,
                     opacity: 0.9,
                     fontWeight: 400,
-                    marginTop: '4px'
+                    marginTop: '4px',
                   }}
                 >
                   {getCurrentDate()} • Real-time survey analytics
                 </Typography>
               </Box>
-              
+
               <Box display="flex" alignItems="center" gap={2}>
-                <StatusChip
-                  label={getStatusText()}
-                  tone={classificationStatus}
-                  size="small"
-                />
-                
+                <StatusChip label={getStatusText()} tone={classificationStatus} size="small" />
+
                 <FilterContainer>
                   <FilterGroup>
                     <FilterLabel>Year</FilterLabel>
                     <StyledFormControl size="small" variant="outlined">
-                      <Select
-                        value={year}
-                        onChange={handleYearChange}
-                        displayEmpty
-                      >
+                      <Select value={year} onChange={handleYearChange} displayEmpty>
                         {generateYears().map((yr) => (
-                          <MenuItem key={yr} value={yr}>{yr}</MenuItem>
+                          <MenuItem key={yr} value={yr}>
+                            {yr}
+                          </MenuItem>
                         ))}
                       </Select>
                     </StyledFormControl>
                   </FilterGroup>
-                  
+
                   <FilterGroup>
                     <FilterLabel>Quarter</FilterLabel>
                     <StyledFormControl size="small" variant="outlined">
-                      <Select
-                        value={quarter}
-                        onChange={handleQuarterChange}
-                        displayEmpty
-                      >
+                      <Select value={quarter} onChange={handleQuarterChange} displayEmpty>
                         <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
                         <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
                         <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>
@@ -498,7 +494,7 @@ const Dashboard = () => {
         <Grid container spacing={3}>
           {cardConfigs.map((config, index) => (
             <Grid item xs={12} sm={12} md={6} lg={6} xl={6} key={index}>
-              <Fade in={!isLoading} timeout={800 + (index * 200)}>
+              <Fade in={!isLoading} timeout={800 + index * 200}>
                 <div>
                   {isLoading ? (
                     <LoadingCard elevation={0}>
@@ -516,29 +512,23 @@ const Dashboard = () => {
                   ) : (
                     <CardContainer elevation={0}>
                       <CardHeader>
-                        <CardIcon>
-                          {config.icon}
-                        </CardIcon>
+                        <CardIcon>{config.icon}</CardIcon>
                         <Box>
-                          <CardTitle>
-                            {config.title}
-                          </CardTitle>
+                          <CardTitle>{config.title}</CardTitle>
                           <Typography
                             variant="caption"
                             sx={{
                               color: '#718096',
                               fontFamily: fontFamily,
                               display: 'block',
-                              marginTop: '2px'
+                              marginTop: '2px',
                             }}
                           >
                             {config.description}
                           </Typography>
                         </Box>
                       </CardHeader>
-                      <ContentBox>
-                        {config.component}
-                      </ContentBox>
+                      <ContentBox>{config.component}</ContentBox>
                     </CardContainer>
                   )}
                 </div>

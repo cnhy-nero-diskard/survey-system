@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgOverlay from "../../../components/img/umb.png";
+import imgOverlay from '../../../components/img/umb.png';
 import { Button } from '../../../components/utils/styles1';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
@@ -180,7 +180,7 @@ const SuggestionItem = styled.li`
   cursor: pointer;
 
   &:hover {
-    background-color:rgb(75, 75, 75);
+    background-color: rgb(75, 75, 75);
   }
 `;
 
@@ -235,10 +235,13 @@ const AttractionForm = () => {
   useEffect(() => {
     const fetchAttractionLocalizations = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/survey/attraction`, {
-          params: { languageCode: language },
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_HOST}/api/survey/attraction`,
+          {
+            params: { languageCode: language },
+            withCredentials: true,
+          }
+        );
 
         if (response.status !== 200) {
           throw new Error('Failed to fetch attraction localizations');
@@ -325,9 +328,7 @@ const AttractionForm = () => {
   };
 
   const handleRatingChange = (id, newRating) => {
-    const updatedRows = rows.map((row) =>
-      row.id === id ? { ...row, rating: newRating } : row
-    );
+    const updatedRows = rows.map((row) => (row.id === id ? { ...row, rating: newRating } : row));
     setRows(updatedRows);
     saveToLocalStorage('attractionFormData', updatedRows);
   };
@@ -528,9 +529,7 @@ const AttractionForm = () => {
                     </TableCell>
                     <TableCell>{row.activity}</TableCell>
                     <TableCell>
-                      <TrashButton onClick={() => handleDeleteRow(row.id)}>
-                        🗑️
-                      </TrashButton>
+                      <TrashButton onClick={() => handleDeleteRow(row.id)}>🗑️</TrashButton>
                     </TableCell>
                   </tr>
                 ))}
@@ -596,11 +595,7 @@ const AttractionForm = () => {
 
                 {/* New: Dropdown for Activity (Japanese text with hidden English text) */}
                 <MobileRowHeader>{translations.attactivity}</MobileRowHeader>
-                <Select
-                  name="activity"
-                  value={currentInput.activity}
-                  onChange={handleChange}
-                >
+                <Select name="activity" value={currentInput.activity} onChange={handleChange}>
                   <option value="">-- {translations.attselectacti} --</option>
                   {activities.map((item, index) => {
                     const jpKey = Object.keys(item)[0]; // e.g. "スキューバダイビング"

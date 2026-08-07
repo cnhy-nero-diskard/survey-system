@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import { Box, useMediaQuery } from "@mui/material";
-import Sidebar from "./Sidebar";
-import { gradients } from "../shared/designTokens";
+import React, { useEffect, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { Box, useMediaQuery } from '@mui/material';
+import Sidebar from './Sidebar';
+import { gradients } from '../shared/designTokens';
 
 export const drawerWidth = 300;
 export const collapsedWidth = 80;
@@ -27,7 +27,7 @@ const MainContent = styled(Box)`
 `;
 
 const DashboardOutlet = () => {
-  const isMobile = useMediaQuery("(max-width:600px)");
+  const isMobile = useMediaQuery('(max-width:600px)');
   const navigate = useNavigate();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -40,9 +40,9 @@ const DashboardOutlet = () => {
       // Both branches of the old window.confirm() navigated to "/", so the
       // prompt was a dead choice. Just tell the user and redirect.
       window.alert(
-        "This dashboard is designed for desktop. Please open it on a larger screen for the intended experience."
+        'This dashboard is designed for desktop. Please open it on a larger screen for the intended experience.'
       );
-      navigate("/");
+      navigate('/');
     }
   }, [isMobile, navigate]);
 

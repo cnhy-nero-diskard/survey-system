@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -15,13 +15,13 @@ import {
   Button,
   Modal,
   CircularProgress,
-} from "@mui/material";
+} from '@mui/material';
 
-import { Circle, VerifiedUserOutlined as UserIcon } from "@mui/icons-material";
-import styled from "styled-components";
-import AdminSessionDashboard from "../adminsessiondashboard/AdminLogins";
-import { fontFamily } from "../../../config/fontConfig";
-import { gradients } from "../shared/designTokens";
+import { Circle, VerifiedUserOutlined as UserIcon } from '@mui/icons-material';
+import styled from 'styled-components';
+import AdminSessionDashboard from '../adminsessiondashboard/AdminLogins';
+import { fontFamily } from '../../../config/fontConfig';
+import { gradients } from '../shared/designTokens';
 
 // Removed the chart.js registration plus the `dummyData` geographic/language
 // datasets: both chart objects were built on every render and never rendered.
@@ -73,15 +73,15 @@ const UsersDashboard = () => {
         const response = await fetch(
           `${process.env.REACT_APP_API_HOST}/api/admin/anonymous-users`,
           {
-            credentials: "include",
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
+            credentials: 'include',
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
           }
         );
         const data = await response.json();
         setAnonymousUsers(data);
       } catch (error) {
-        console.error("Error fetching anonymous users:", error);
+        console.error('Error fetching anonymous users:', error);
       } finally {
         setIsLoading(false);
       }
@@ -114,7 +114,11 @@ const UsersDashboard = () => {
         <Grid item xs={12} md={6}>
           <GlassCard elevation={0}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontFamily, fontWeight: 600, color: '#2d3748' }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontFamily, fontWeight: 600, color: '#2d3748' }}
+              >
                 Active Admins
               </Typography>
               <AdminSessionDashboard />
@@ -126,25 +130,42 @@ const UsersDashboard = () => {
         <Grid item xs={12} md={6}>
           <GlassCard elevation={0}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontFamily, fontWeight: 600, color: '#2d3748' }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontFamily, fontWeight: 600, color: '#2d3748' }}
+              >
                 Active Users
               </Typography>
               {isLoading ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minHeight: 112 }} role="status" aria-live="polite">
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minHeight: 112 }}
+                  role="status"
+                  aria-live="polite"
+                >
                   <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} />
-                  <Typography sx={{ fontFamily, color: '#4a5568', fontWeight: 500 }}>Loading active users…</Typography>
+                  <Typography sx={{ fontFamily, color: '#4a5568', fontWeight: 500 }}>
+                    Loading active users…
+                  </Typography>
                 </Box>
               ) : (
                 <>
-              <Typography variant="h3" sx={{ fontFamily, fontWeight: 700, color: '#667eea', my: 1 }}>
-                {activeUsers}
-              </Typography>
-              <Typography variant="body2" sx={{ fontFamily, color: '#718096', mb: 2 }}>
-                currently taking surveys · {anonymousUsers.length} total recorded
-              </Typography>
-              <Button variant="contained" onClick={() => setOpenModal(true)} sx={{ textTransform: 'none' }}>
-                View All Users
-              </Button>
+                  <Typography
+                    variant="h3"
+                    sx={{ fontFamily, fontWeight: 700, color: '#667eea', my: 1 }}
+                  >
+                    {activeUsers}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontFamily, color: '#718096', mb: 2 }}>
+                    currently taking surveys · {anonymousUsers.length} total recorded
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => setOpenModal(true)}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    View All Users
+                  </Button>
                 </>
               )}
             </CardContent>
@@ -156,20 +177,20 @@ const UsersDashboard = () => {
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Box
           sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             // A hard 800px overflowed narrower viewports with no way to scroll
             // horizontally out of it.
-            width: "90%",
+            width: '90%',
             maxWidth: 800,
-            bgcolor: "background.paper",
+            bgcolor: 'background.paper',
             borderRadius: 3,
             boxShadow: 24,
             p: 4,
-            maxHeight: "80vh",
-            overflowY: "auto",
+            maxHeight: '80vh',
+            overflowY: 'auto',
           }}
         >
           <Typography variant="h6" gutterBottom>
@@ -178,8 +199,8 @@ const UsersDashboard = () => {
           <TableContainer
             component={Paper}
             sx={{
-              maxHeight: "60vh", // Restrict the height of the table container
-              overflowY: "auto", // Enable vertical scrolling for the table
+              maxHeight: '60vh', // Restrict the height of the table container
+              overflowY: 'auto', // Enable vertical scrolling for the table
             }}
           >
             <Table stickyHeader size="small">
@@ -194,7 +215,11 @@ const UsersDashboard = () => {
               <TableBody>
                 {anonymousUsers.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} align="center" sx={{ py: 4, color: '#718096', fontStyle: 'italic' }}>
+                    <TableCell
+                      colSpan={4}
+                      align="center"
+                      sx={{ py: 4, color: '#718096', fontStyle: 'italic' }}
+                    >
                       No anonymous users recorded yet.
                     </TableCell>
                   </TableRow>
@@ -203,11 +228,15 @@ const UsersDashboard = () => {
                   <TableRow key={user.anonymous_user_id} hover>
                     <TableCell>{user.anonymous_user_id}</TableCell>
                     <TableCell>{user.nickname}</TableCell>
-                    <TableCell>{user.created_at ? new Date(user.created_at).toLocaleString() : '—'}</TableCell>
+                    <TableCell>
+                      {user.created_at ? new Date(user.created_at).toLocaleString() : '—'}
+                    </TableCell>
                     <TableCell>
                       {/* The bare dot conveyed status by colour alone. */}
                       <Box display="flex" alignItems="center" gap={0.75}>
-                        <Circle sx={{ color: user.is_active ? '#10b981' : '#ef4444', fontSize: 12 }} />
+                        <Circle
+                          sx={{ color: user.is_active ? '#10b981' : '#ef4444', fontSize: 12 }}
+                        />
                         <Typography variant="caption" sx={{ color: '#4a5568' }}>
                           {user.is_active ? 'Active' : 'Inactive'}
                         </Typography>

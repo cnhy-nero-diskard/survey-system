@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Typography, Box, Skeleton, CircularProgress, Fade } from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Typography, Box, Skeleton, CircularProgress, Fade } from '@mui/material';
 import styled from 'styled-components';
 import { ChartContainer, MainContent } from '../../shared/styledComponents';
-import { fontFamily } from "../../../../config/fontConfig";
-import axios from "axios";
+import { fontFamily } from '../../../../config/fontConfig';
+import axios from 'axios';
 
 // Enhanced styled components for better presentation
 const StyledChartContainer = styled(ChartContainer)`
   position: relative;
   min-height: 300px;
-  
+
   .recharts-legend-wrapper {
     font-family: ${fontFamily} !important;
   }
@@ -69,18 +69,18 @@ const CustomTooltip = ({ active, payload, total = 0 }) => {
 // Custom label function for the pie chart
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
   if (percent < 0.05) return null; // Don't show labels for slices less than 5%
-  
+
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text 
-      x={x} 
-      y={y} 
-      fill="white" 
-      textAnchor={x > cx ? 'start' : 'end'} 
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > cx ? 'start' : 'end'}
       dominantBaseline="central"
       fontSize="12"
       fontWeight="600"
@@ -101,13 +101,14 @@ const OverallMun = ({ year, quarter }) => {
         // Create cache key that includes year and quarter
         const cacheKey = `sentimentData_${year}_${quarter}`;
         const timestampKey = `sentimentDataTimestamp_${year}_${quarter}`;
-        
+
         // Check if cached data exists in localStorage
         const cachedData = localStorage.getItem(cacheKey);
         const cachedTimestamp = localStorage.getItem(timestampKey);
 
         // If cached data exists and is less than 5 minutes old, use it
-        if (cachedData && cachedTimestamp && Date.now() - cachedTimestamp < 30000) { // 30000ms = 30 seconds
+        if (cachedData && cachedTimestamp && Date.now() - cachedTimestamp < 30000) {
+          // 30000ms = 30 seconds
           const { counts, positive, neutral, negative } = JSON.parse(cachedData);
           processData(counts, positive, neutral, negative);
           setLoading(false);
@@ -118,7 +119,7 @@ const OverallMun = ({ year, quarter }) => {
         const params = new URLSearchParams();
         if (year) params.append('year', year);
         if (quarter) params.append('quarter', quarter);
-        
+
         const sentimentResponse = await axios.get(
           `${process.env.REACT_APP_API_HOST}/api/admin/getsentimenttable?${params.toString()}`
         );
@@ -132,7 +133,7 @@ const OverallMun = ({ year, quarter }) => {
         processData(counts, positive, neutral, negative);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         setLoading(false);
       }
     };
@@ -143,8 +144,8 @@ const OverallMun = ({ year, quarter }) => {
       // previously that failure removed every otherwise-valid pie slice.
       const modernColors = {
         positive: '#10B981', // Emerald green
-        neutral: '#F59E0B',  // Amber
-        negative: '#EF4444'  // Red
+        neutral: '#F59E0B', // Amber
+        negative: '#EF4444', // Red
       };
 
       const data = [];
@@ -153,21 +154,21 @@ const OverallMun = ({ year, quarter }) => {
       const negativeCount = Number(counts.negative) || 0;
 
       if (positiveCount > 0) {
-        data.push({ 
+        data.push({
           name: 'Positive',
           value: positiveCount,
           color: modernColors.positive,
         });
       }
       if (neutralCount > 0) {
-        data.push({ 
+        data.push({
           name: 'Neutral',
           value: neutralCount,
           color: modernColors.neutral,
         });
       }
       if (negativeCount > 0) {
-        data.push({ 
+        data.push({
           name: 'Negative',
           value: negativeCount,
           color: modernColors.negative,
@@ -185,7 +186,12 @@ const OverallMun = ({ year, quarter }) => {
       <MainContent>
         <LoadingContainer>
           <Skeleton variant="text" width="60%" height={32} />
-          <CircularProgress size={28} thickness={4} sx={{ color: '#667eea' }} aria-label="Loading municipality analytics" />
+          <CircularProgress
+            size={28}
+            thickness={4}
+            sx={{ color: '#667eea' }}
+            aria-label="Loading municipality analytics"
+          />
           <Skeleton variant="circular" width={200} height={200} />
           <Box display="flex" gap={2} mt={2}>
             <Skeleton variant="rectangular" width={80} height={20} />
@@ -204,8 +210,13 @@ const OverallMun = ({ year, quarter }) => {
       <MainContent>
         <Box
           sx={{
-            height: '100%', minHeight: 200, display: 'flex', alignItems: 'center',
-            justifyContent: 'center', textAlign: 'center', px: 2,
+            height: '100%',
+            minHeight: 200,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            px: 2,
           }}
         >
           {/* Without this, a failed or empty fetch left a blank white card with
@@ -222,9 +233,7 @@ const OverallMun = ({ year, quarter }) => {
     <MainContent>
       <Fade in={!loading} timeout={600}>
         <Box>
-          <ChartTitle>
-            Overall Sentiment Analysis
-          </ChartTitle>
+          <ChartTitle>Overall Sentiment Analysis</ChartTitle>
           <StyledChartContainer>
             <ResponsiveContainer width="100%" height={320}>
               <PieChart>
@@ -241,14 +250,14 @@ const OverallMun = ({ year, quarter }) => {
                   label={renderCustomLabel}
                 >
                   {pieData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
+                    <Cell
+                      key={`cell-${index}`}
                       fill={entry.color}
                       stroke="#ffffff"
                       strokeWidth={3}
                       style={{
                         filter: 'drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.1))',
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.3s ease',
                       }}
                     />
                   ))}
@@ -258,7 +267,7 @@ const OverallMun = ({ year, quarter }) => {
                   wrapperStyle={{
                     fontSize: '13px',
                     fontFamily: fontFamily,
-                    paddingTop: '20px'
+                    paddingTop: '20px',
                   }}
                   iconType="circle"
                 />

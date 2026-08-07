@@ -1,7 +1,7 @@
 // useCurrentStepIndex.js
-import { useContext, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { UnifiedContext } from "../../routes/UnifiedContext";
+import { useContext, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { UnifiedContext } from '../../routes/UnifiedContext';
 /**
  * Custom hook to get the index of the current step in the survey based on the current URL path.
  *
@@ -22,11 +22,10 @@ export const useCurrentStepIndex = (__surveyRoutes = []) => {
   // console.log(`USECURRENTINDEX - we are in current path ${currentPath}`);
 
   const getParentPath = (path) => {
-    const segments = path.split("/");
-    return segments.slice(0, -1).join("/");
+    const segments = path.split('/');
+    return segments.slice(0, -1).join('/');
   };
   // console.log(`!!!!!!!!!!! Acknowledge backend api ${process.env.REACT_APP_API_HOST}`);
-
 
   // console.log(`USECURRENTINDEX ACTIVE BLOCKS --> ${JSON.stringify(activeBlocks)}`);
 

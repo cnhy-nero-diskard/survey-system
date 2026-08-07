@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgoverlay from "../../../components/img/items.png";
+import imgoverlay from '../../../components/img/items.png';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
@@ -51,8 +51,7 @@ const ChecklistItem = styled(motion.label)`
   cursor: pointer;
   font-size: 1rem;
   color: white;
-  background-color: ${(props) =>
-    props.isSelected ? 'rgb(46, 145, 231)' : 'rgb(16, 136, 241)'};
+  background-color: ${(props) => (props.isSelected ? 'rgb(46, 145, 231)' : 'rgb(16, 136, 241)')};
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
 
@@ -101,8 +100,12 @@ const LoadingSpinner = styled.div`
   margin: 0 auto;
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 

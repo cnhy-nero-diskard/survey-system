@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Drawer,
   Box,
@@ -15,9 +15,9 @@ import {
   Tooltip,
   Avatar,
   Chip,
-} from "@mui/material";
-import styled, { keyframes } from "styled-components";
-import { Link, useLocation } from "react-router-dom";
+} from '@mui/material';
+import styled, { keyframes } from 'styled-components';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Dashboard as DashboardIcon,
   LocationCity as MunicipalityIcon,
@@ -41,12 +41,12 @@ import {
   Settings as SettingsIcon,
   TrendingUp as TrendingUpIcon,
   SupervisorAccount as AdminIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 
-import "@fontsource/poppins/300.css"; // Light
-import "@fontsource/poppins/400.css"; // Regular
-import "@fontsource/poppins/500.css"; // Medium
-import "@fontsource/poppins/700.css"; // Bold
+import '@fontsource/poppins/300.css'; // Light
+import '@fontsource/poppins/400.css'; // Regular
+import '@fontsource/poppins/500.css'; // Medium
+import '@fontsource/poppins/700.css'; // Bold
 
 // Animations
 const slideIn = keyframes`
@@ -64,16 +64,16 @@ const slideIn = keyframes`
 const SidebarDrawer = styled(Drawer).withConfig({
   shouldForwardProp: (prop) => !['drawerWidth', 'collapsed'].includes(prop),
 })`
-  width: ${({ drawerWidth, collapsed }) => collapsed ? '80px' : `${drawerWidth}px`};
+  width: ${({ drawerWidth, collapsed }) => (collapsed ? '80px' : `${drawerWidth}px`)};
   flex-shrink: 0;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   & .MuiDrawer-paper {
-    width: ${({ drawerWidth, collapsed }) => collapsed ? '80px' : `${drawerWidth}px`};
+    width: ${({ drawerWidth, collapsed }) => (collapsed ? '80px' : `${drawerWidth}px`)};
     box-sizing: border-box;
     background: linear-gradient(145deg, #ffffff 0%, #f8fafc 50%, #e2e8f0 100%);
     border-right: 1px solid #e2e8f0;
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', sans-serif;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
@@ -86,13 +86,13 @@ const SidebarHeader = styled(Box).withConfig({
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: ${({ collapsed }) => collapsed ? '12px 8px 16px 8px' : '24px 16px'};
+  padding: ${({ collapsed }) => (collapsed ? '12px 8px 16px 8px' : '24px 16px')};
   background: #4f46e5;
   color: white;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: ${({ collapsed }) => collapsed ? '80px' : 'auto'};
+  min-height: ${({ collapsed }) => (collapsed ? '80px' : 'auto')};
 `;
 
 const UserProfile = styled(Box).withConfig({
@@ -101,7 +101,7 @@ const UserProfile = styled(Box).withConfig({
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: ${({ collapsed }) => collapsed ? '8px' : '16px'};
+  padding: ${({ collapsed }) => (collapsed ? '8px' : '16px')};
   margin: 16px;
   background: rgba(79, 70, 229, 0.08);
   border-radius: 16px;
@@ -124,12 +124,12 @@ const SearchField = styled(TextField)`
   & .MuiOutlinedInput-root {
     border-radius: 12px;
     transition: all 0.3s ease;
-    
+
     &:hover {
       background-color: white;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
-    
+
     &.Mui-focused {
       background-color: white;
       box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
@@ -137,7 +137,7 @@ const SearchField = styled(TextField)`
   }
 
   & .MuiInputBase-input {
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-weight: 400;
   }
 `;
@@ -147,7 +147,7 @@ const MenuSection = styled(Box)`
 `;
 
 const SectionTitle = styled(Typography)`
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 600;
   font-size: 12px;
   color: #64748b;
@@ -162,16 +162,18 @@ const StyledListItem = styled(ListItem).withConfig({
   // <li>, which React rejects as an unknown attribute.
   shouldForwardProp: (prop) => prop !== 'collapsed',
 })`
-  margin: ${({ collapsed }) => collapsed ? '6px 0' : '2px 8px'};
+  margin: ${({ collapsed }) => (collapsed ? '6px 0' : '2px 8px')};
   border-radius: 12px;
   border-left: 3px solid transparent;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 
   &.active {
     background: rgba(79, 70, 229, 0.08);
     color: #4f46e5;
     font-weight: 600;
-    border-left-color: ${({ collapsed }) => collapsed ? 'transparent' : '#4f46e5'};
+    border-left-color: ${({ collapsed }) => (collapsed ? 'transparent' : '#4f46e5')};
 
     & .MuiListItemIcon-root {
       color: #4f46e5;
@@ -194,13 +196,15 @@ const StyledListItem = styled(ListItem).withConfig({
 
 const CollapseFooterButton = styled(Button)`
   border-radius: 12px;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 600;
   text-transform: none;
   color: #64748b;
   justify-content: flex-start;
   padding-left: 24px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
     background: rgba(79, 70, 229, 0.08);
@@ -218,7 +222,7 @@ const LogoutButton = styled(Button)`
   border-radius: 12px;
   background: #ef4444;
   color: white;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 600;
   padding: 12px 24px;
   transition: background-color 0.2s ease;
@@ -229,61 +233,111 @@ const LogoutButton = styled(Button)`
 `;
 
 const CustomTypography = styled(Typography)`
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
 `;
 
 const menuSections = [
   {
-    title: "Overview",
+    title: 'Overview',
     items: [
-      { text: "Dashboard", icon: <DashboardIcon />, to: "dashboard", description: "Main overview" },
-    ]
+      { text: 'Dashboard', icon: <DashboardIcon />, to: 'dashboard', description: 'Main overview' },
+    ],
   },
   {
-    title: "Data Analytics",
+    title: 'Data Analytics',
     items: [
-      { text: "Municipality Data", icon: <MunicipalityIcon />, to: "overallmun", description: "Municipal analytics" },
-      { text: "Per Area Data", icon: <BarangayIcon />, to: "barangaydashboard", description: "Area-specific insights" },
-      { text: "Per Attraction Data", icon: <AttIcon />, to: "attractiondashboard", description: "Tourism attractions" },
-      { text: "Per Establishment Data", icon: <EstablishmentIcon />, to: "establishmentdashboard", description: "Business establishments" },
-    ]
+      {
+        text: 'Municipality Data',
+        icon: <MunicipalityIcon />,
+        to: 'overallmun',
+        description: 'Municipal analytics',
+      },
+      {
+        text: 'Per Area Data',
+        icon: <BarangayIcon />,
+        to: 'barangaydashboard',
+        description: 'Area-specific insights',
+      },
+      {
+        text: 'Per Attraction Data',
+        icon: <AttIcon />,
+        to: 'attractiondashboard',
+        description: 'Tourism attractions',
+      },
+      {
+        text: 'Per Establishment Data',
+        icon: <EstablishmentIcon />,
+        to: 'establishmentdashboard',
+        description: 'Business establishments',
+      },
+    ],
   },
   {
-    title: "Survey Management",
+    title: 'Survey Management',
     items: [
-      { text: "Survey Metrics", icon: <SurveyIcon />, to: "surveymetrics", description: "Performance metrics" },
-      { text: "Survey Statistics", icon: <GraphIcon />, to: "stally", description: "Statistical analysis" },
-      { text: "Survey Touchpoints", icon: <SurveyTouchpointsIcon />, to: "surveytouchpoints", description: "Interaction points" },
-    ]
+      {
+        text: 'Survey Metrics',
+        icon: <SurveyIcon />,
+        to: 'surveymetrics',
+        description: 'Performance metrics',
+      },
+      {
+        text: 'Survey Statistics',
+        icon: <GraphIcon />,
+        to: 'stally',
+        description: 'Statistical analysis',
+      },
+      {
+        text: 'Survey Touchpoints',
+        icon: <SurveyTouchpointsIcon />,
+        to: 'surveytouchpoints',
+        description: 'Interaction points',
+      },
+    ],
   },
   {
-    title: "AI & Analytics",
+    title: 'AI & Analytics',
     items: [
-      { text: "AI Tools", icon: <AiToolsIcon />, to: "aitoolsdashboard", description: "ML & AI features" },
-    ]
+      {
+        text: 'AI Tools',
+        icon: <AiToolsIcon />,
+        to: 'aitoolsdashboard',
+        description: 'ML & AI features',
+      },
+    ],
   },
   {
-    title: "System Management",
+    title: 'System Management',
     items: [
       // { text: "Users Dashboard", icon: <UserIcon />, to: "usersdashboard", description: "User management" },
-      { text: "Data Manager", icon: <DBIcon />, to: "datamanager", description: "Data operations" },
-      { text: "System Performance", icon: <CompIcon />, to: "systemperf", description: "System monitoring" },
-      { text: "Log Stream", icon: <SurveyTouchpointsIcon />, to: "logstream", description: "System logs" },
-    ]
-  }
+      { text: 'Data Manager', icon: <DBIcon />, to: 'datamanager', description: 'Data operations' },
+      {
+        text: 'System Performance',
+        icon: <CompIcon />,
+        to: 'systemperf',
+        description: 'System monitoring',
+      },
+      {
+        text: 'Log Stream',
+        icon: <SurveyTouchpointsIcon />,
+        to: 'logstream',
+        description: 'System logs',
+      },
+    ],
+  },
 ];
 
 const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
   const location = useLocation();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  
+
   // Initialize collapsed state from localStorage or prop
   const [collapsed, setCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebar-collapsed');
-    return saved !== null ? JSON.parse(saved) : (propCollapsed || false);
+    return saved !== null ? JSON.parse(saved) : propCollapsed || false;
   });
-  
+
   const [expandedSections, setExpandedSections] = useState(() => {
     // Default every section open, keyed off menuSections itself. The old
     // literal listed "Administration", which is not a real section title, so
@@ -332,10 +386,10 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
   };
 
   const handleSectionToggle = (sectionTitle) => {
-    setExpandedSections(prev => {
+    setExpandedSections((prev) => {
       const newState = {
         ...prev,
-        [sectionTitle]: !prev[sectionTitle]
+        [sectionTitle]: !prev[sectionTitle],
       };
       localStorage.setItem('sidebar-expanded-sections', JSON.stringify(newState));
       return newState;
@@ -348,14 +402,17 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
       if (!searchTerm.trim()) {
         return menuSections;
       }
-      
-      return menuSections.map(section => ({
-        ...section,
-        items: section.items.filter(item =>
-          item.text.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-          item.description.toLowerCase().includes(searchTerm.toLowerCase().trim())
-        )
-      })).filter(section => section.items.length > 0);
+
+      return menuSections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter(
+            (item) =>
+              item.text.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+              item.description.toLowerCase().includes(searchTerm.toLowerCase().trim())
+          ),
+        }))
+        .filter((section) => section.items.length > 0);
     } catch (error) {
       console.error('Error filtering sidebar sections:', error);
       return menuSections;
@@ -368,33 +425,30 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
 
   const handleLogout = async () => {
     if (isLoggingOut) return; // Prevent double-clicks
-    
+
     setIsLoggingOut(true);
     try {
-      console.log("Logging out...");
-      const response = await fetch(
-        `${process.env.REACT_APP_API_HOST}/api/auth/logout`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-type": "application/json",
-          },
-        }
-      );
+      console.log('Logging out...');
+      const response = await fetch(`${process.env.REACT_APP_API_HOST}/api/auth/logout`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-type': 'application/json',
+        },
+      });
       console.log(response.status);
       if (response.status === 200) {
         // Clear localStorage on logout
         localStorage.removeItem('sidebar-collapsed');
         localStorage.removeItem('sidebar-expanded-sections');
-        window.location.href = "/login";
+        window.location.href = '/login';
       } else {
         throw new Error(`Logout failed with status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Logout failed:', error);
       // Still redirect on error to be safe
-      window.location.href = "/login";
+      window.location.href = '/login';
     } finally {
       setIsLoggingOut(false);
     }
@@ -413,10 +467,19 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
           </Tooltip>
         ) : (
           <>
-            <CustomTypography variant="h6" align="center" fontWeight="bold" sx={{ fontSize: '14px', mb: 1 }}>
+            <CustomTypography
+              variant="h6"
+              align="center"
+              fontWeight="bold"
+              sx={{ fontSize: '14px', mb: 1 }}
+            >
               MULTILINGUAL SURVEY SYSTEM
             </CustomTypography>
-            <CustomTypography variant="subtitle2" align="center" sx={{ fontSize: '12px', opacity: 0.9 }}>
+            <CustomTypography
+              variant="subtitle2"
+              align="center"
+              sx={{ fontSize: '12px', opacity: 0.9 }}
+            >
               PANGLAO TOURISM OFFICE
             </CustomTypography>
           </>
@@ -432,12 +495,16 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
             <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#334155' }}>
               Admin User
             </Typography>
-            <Chip label="Online" size="small" sx={{ 
-              bgcolor: '#10b981', 
-              color: 'white', 
-              fontSize: '10px',
-              height: '18px'
-            }} />
+            <Chip
+              label="Online"
+              size="small"
+              sx={{
+                bgcolor: '#10b981',
+                color: 'white',
+                fontSize: '10px',
+                height: '18px',
+              }}
+            />
           </Box>
         </UserProfile>
       )}
@@ -460,28 +527,29 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
         </>
       )}
 
-      <Box sx={{ overflow: "auto", flex: 1 }}>
+      <Box sx={{ overflow: 'auto', flex: 1 }}>
         {filteredSections.map((section, sectionIndex) => (
           <MenuSection key={section.title}>
-            {collapsed && sectionIndex > 0 && (
-              <Divider sx={{ mx: 2, my: 1 }} />
-            )}
+            {collapsed && sectionIndex > 0 && <Divider sx={{ mx: 2, my: 1 }} />}
             {!collapsed && (
               <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1 }}>
                 <SectionTitle variant="overline" sx={{ flex: 1 }}>
                   {section.title}
                 </SectionTitle>
-                <IconButton 
-                  size="small" 
+                <IconButton
+                  size="small"
                   onClick={() => handleSectionToggle(section.title)}
-                  sx={{ 
-                    opacity: 0.9, 
-                    width: 36, 
-                    height: 36, 
+                  sx={{
+                    opacity: 0.9,
+                    width: 36,
+                    height: 36,
                     ml: 1,
                     borderRadius: 1,
                     '&:hover': { bgcolor: 'rgba(99,102,241,0.06)' },
-                    '&:focus-visible': { outline: '2px solid rgba(99,102,241,0.18)', outlineOffset: 2 }
+                    '&:focus-visible': {
+                      outline: '2px solid rgba(99,102,241,0.18)',
+                      outlineOffset: 2,
+                    },
                   }}
                   aria-expanded={!!expandedSections[section.title]}
                   aria-controls={`section-${sectionIndex}`}
@@ -490,16 +558,19 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
                 </IconButton>
               </Box>
             )}
-            
+
             {/* An active search must reveal its matches even inside a section
                 the user had collapsed, otherwise search appears to return
                 nothing. */}
-            <Collapse in={collapsed || !!searchTerm.trim() || expandedSections[section.title]} timeout={300}>
+            <Collapse
+              in={collapsed || !!searchTerm.trim() || expandedSections[section.title]}
+              timeout={300}
+            >
               <List dense>
                 {section.items.map((item, index) => (
-                  <Tooltip 
+                  <Tooltip
                     key={`${sectionIndex}-${index}`}
-                    title={collapsed ? `${item.text} - ${item.description}` : ""} 
+                    title={collapsed ? `${item.text} - ${item.description}` : ''}
                     placement="right"
                     arrow
                     disableHoverListener={!collapsed}
@@ -510,7 +581,7 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
                         to={item.to}
                         collapsed={collapsed}
                         className={isActiveRoute(item.to) ? 'active' : ''}
-                        sx={{ 
+                        sx={{
                           minHeight: 48,
                           justifyContent: collapsed ? 'center' : 'flex-start',
                           px: collapsed ? 0 : 3,
@@ -526,18 +597,18 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
                         >
                           {item.icon}
                         </ListItemIcon>
-                        
+
                         {!collapsed && (
                           <ListItemText
                             primary={item.text}
                             secondary={item.description}
                             primaryTypographyProps={{
-                              fontFamily: "Poppins, sans-serif",
+                              fontFamily: 'Poppins, sans-serif',
                               fontWeight: isActiveRoute(item.to) ? 600 : 400,
                               fontSize: '14px',
                             }}
                             secondaryTypographyProps={{
-                              fontFamily: "Poppins, sans-serif",
+                              fontFamily: 'Poppins, sans-serif',
                               fontSize: '11px',
                               color: '#94a3b8',
                             }}
@@ -556,14 +627,16 @@ const Sidebar = ({ drawerWidth, onToggle, collapsed: propCollapsed }) => {
       <Box sx={{ mt: 'auto' }}>
         <Divider sx={{ mx: 2, my: 1 }} />
         {collapsed ? (
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            py: 1,
-            gap: 1,
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              width: '100%',
+              py: 1,
+              gap: 1,
+            }}
+          >
             <Tooltip title="Log Out" placement="right">
               <IconButton
                 onClick={handleLogout}

@@ -1,7 +1,7 @@
 // BodyPartial.js
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import defaultimg from "../img/page1bg.png";
+import defaultimg from '../img/page1bg.png';
 
 const BodyPartial = ({ backgroundColor, gradient, fonts, backgroundImage }) => {
   // Use the first font in the provided `fonts` array or default to 'Montserrat'
@@ -17,16 +17,12 @@ const BodyPartial = ({ backgroundColor, gradient, fonts, backgroundImage }) => {
 
   return (
     <Helmet>
-
       {/* Preconnect to the Google Fonts server for optimization */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
 
       {/* Load multiple Google Fonts */}
-      {fonts &&
-        fonts.map((font) => (
-          <link key={font.url} rel="stylesheet" href={font.url} />
-        ))}
+      {fonts && fonts.map((font) => <link key={font.url} rel="stylesheet" href={font.url} />)}
 
       {/* Apply styles to the body */}
       <style>{`

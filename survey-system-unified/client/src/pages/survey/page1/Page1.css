@@ -9,13 +9,13 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #4A90E2;
+  background-color: #4a90e2;
 }
 
 .containerr {
   width: 100%;
   height: 100%;
-  background-color: #4A90E2;
+  background-color: #4a90e2;
   overflow: hidden;
 }
 
@@ -39,7 +39,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  color: #D1E751;
+  color: #d1e751;
 }
 
 .contentImg {
@@ -53,26 +53,24 @@ body {
 }
 .rounded-button {
   /* Change the background color */
-  
+
   /* Change the text color */
-  
+
   /* Add padding to the button */
-  
+
   /* Remove the default border */
   border: none;
   box-shadow: none;
-  
+
   /* Add rounded corners */
   border-radius: 20px; /* Adjust the value to control the roundness */
-  
+
   /* Add some hover effect */
   cursor: pointer;
   transition: background-color 0.3s ease;
-  
 }
 
-
-.arr{
+.arr {
   width: 75px;
   color: aliceblue;
 }

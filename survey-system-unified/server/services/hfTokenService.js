@@ -22,11 +22,11 @@ export const getHFTokens = async () => {
 };
 
 export const getHFTokenByLabel = async (label) => {
-    const query = 'SELECT apitoken FROM HF_TOKENS WHERE label = $1';
-    const result = await pool.query(query, [label]);
-  
-    if (result.rows.length > 0) {
-      return decrypt(result.rows[0].apitoken); // Decrypt the token before returning it
-    }
-    return null;
-  };
+  const query = 'SELECT apitoken FROM HF_TOKENS WHERE label = $1';
+  const result = await pool.query(query, [label]);
+
+  if (result.rows.length > 0) {
+    return decrypt(result.rows[0].apitoken); // Decrypt the token before returning it
+  }
+  return null;
+};

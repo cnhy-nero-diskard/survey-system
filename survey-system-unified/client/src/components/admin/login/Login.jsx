@@ -179,7 +179,6 @@ const Login = () => {
                 {formik.isSubmitting ? 'Logging in...' : 'Login'}
               </StyledButton>
             </StyledForm>
-
           </StyledPaper>
         </Grid>
 

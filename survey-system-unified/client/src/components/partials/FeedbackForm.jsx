@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import BodyPartial from './BodyPartial';
 import GradientBackground from './GradientBackground';
-import imgOverlay from "../img/review.png";
+import imgOverlay from '../img/review.png';
 import useTranslations from '../utils/useTranslations';
 import { submitSurveyResponses } from '../utils/sendInputUtils';
 import { Paragraph, QuestionText } from '../utils/styles1';
@@ -122,7 +122,7 @@ const OpenFormat1 = ({
     Satisfied: 3,
     VerySatisfied: 4,
   },
-  initialValue = {} // Ensure initialValue is passed correctly
+  initialValue = {}, // Ensure initialValue is passed correctly
 }) => {
   // Set initial state directly from initialValue
   const [feedback, setFeedback] = useState(initialValue.feedback || '');
@@ -131,27 +131,24 @@ const OpenFormat1 = ({
   const [language] = useState(localStorage.getItem('selectedLanguage'));
   const [isFormValid, setIsFormValid] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
-  
+
   const translations = useTranslations('FeedbackForm', language);
   const translationsborrow = useTranslations('OpenEnded1', language);
   useEffect(() => {
     setFeedback(initialValue.feedback || '');
     setSelectedOption(initialValue.selectedOptionValue || null);
     console.log(`Initial value: ${JSON.stringify(initialValue)}`);
-
-
-
   }, [initialValue]);
- useEffect(() => {
-  if (initialValue.selectedOptionValue) {
-    const numericValue = initialValue.selectedOptionValue;
-    // Find which key in the satisfactionOptions has that numericValue
-    const matchedKey = Object.keys(satisfactionOptions).find(
-      (key) => satisfactionOptions[key] === numericValue
-    );
-    setSelectedOption(matchedKey || null);
-  }
-}, [initialValue]); 
+  useEffect(() => {
+    if (initialValue.selectedOptionValue) {
+      const numericValue = initialValue.selectedOptionValue;
+      // Find which key in the satisfactionOptions has that numericValue
+      const matchedKey = Object.keys(satisfactionOptions).find(
+        (key) => satisfactionOptions[key] === numericValue
+      );
+      setSelectedOption(matchedKey || null);
+    }
+  }, [initialValue]);
   // Dynamically change placeholder text
   useEffect(() => {
     switch (selectedOption) {
@@ -174,9 +171,7 @@ const OpenFormat1 = ({
 
   // Validate the form
   useEffect(() => {
-    setIsFormValid(
-      selectedOption !== null && feedback.trim().length >= minFeedbackLength
-    );
+    setIsFormValid(selectedOption !== null && feedback.trim().length >= minFeedbackLength);
   }, [selectedOption, feedback, minFeedbackLength]);
 
   // Handle option click
@@ -221,22 +216,18 @@ const OpenFormat1 = ({
       <GradientBackground
         overlayImage={imgOverlay}
         opacity={0.15}
-        blendMode='screen'
+        blendMode="screen"
         buttonAppear={isFormValid}
         handleNextClick={handleNextClick}
       >
         <FeedbackFormContainer>
-          <QuestionText>
-            {title || translations.feedbackFormTitle}
-          </QuestionText>
+          <QuestionText>{title || translations.feedbackFormTitle}</QuestionText>
 
           <OptionsContainer>
             {Object.keys(satisfactionOptions).map((option) => (
               <OptionButton
                 key={option}
-                className={
-                  selectedOption === option ? `selected ${option}` : ''
-                }
+                className={selectedOption === option ? `selected ${option}` : ''}
                 onClick={() => handleOptionClick(option)}
                 aria-pressed={selectedOption === option}
               >
@@ -256,11 +247,7 @@ const OpenFormat1 = ({
             aria-label="Feedback textarea"
           />
 
-          {showWarning && (
-            <WarningMessage>
-              {translations.feedbackFormWarning}
-            </WarningMessage>
-          )}
+          {showWarning && <WarningMessage>{translations.feedbackFormWarning}</WarningMessage>}
         </FeedbackFormContainer>
       </GradientBackground>
     </>

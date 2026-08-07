@@ -73,7 +73,9 @@ const SectionCard = styled(Paper)`
   &::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 4px;
     background: ${gradients.brandBar};
   }
@@ -101,7 +103,9 @@ const IconTile = styled(Box)`
   color: #fff;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
-  & svg { font-size: 22px; }
+  & svg {
+    font-size: 22px;
+  }
 `;
 
 const SectionTitle = styled(Typography)`
@@ -169,7 +173,9 @@ const StepBadge = styled(Box)`
   color: ${({ $active }) => ($active ? '#fff' : text.muted)};
   border: ${({ $active }) => ($active ? 'none' : `2px solid ${surface.divider}`)};
   box-shadow: ${({ $active }) => ($active ? '0 4px 12px rgba(102, 126, 234, 0.4)' : '0 1px 3px rgba(0,0,0,0.06)')};
-  & svg { font-size: 18px; }
+  & svg {
+    font-size: 18px;
+  }
 `;
 
 const StepConnector = styled(Box)`
@@ -199,8 +205,13 @@ const SentimentResultCard = styled(Paper).withConfig({
   padding: 14px 16px;
   background: #fff !important;
   box-shadow: ${shadow.soft} !important;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
-  &:hover { box-shadow: ${shadow.card} !important; transform: translateY(-1px); }
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+  &:hover {
+    box-shadow: ${shadow.card} !important;
+    transform: translateY(-1px);
+  }
 `;
 
 const TopicResultCard = styled(Paper)`
@@ -210,12 +221,19 @@ const TopicResultCard = styled(Paper)`
   box-shadow: ${shadow.soft} !important;
   position: relative;
   overflow: hidden;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
-  &:hover { box-shadow: ${shadow.card} !important; transform: translateY(-1px); }
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+  &:hover {
+    box-shadow: ${shadow.card} !important;
+    transform: translateY(-1px);
+  }
   &::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 4px;
     background: ${gradients.brandBar};
   }
@@ -256,7 +274,7 @@ const HeaderTitle = styled(Typography)`
 const AIToolsDashboard = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [topicText, setTopicText] = useState("");
+  const [topicText, setTopicText] = useState('');
   const [isTopicModeling, setIsTopicModeling] = useState(false);
   const [topicModelingResult, setTopicModelingResult] = useState(null);
   const [topicModelingError, setTopicModelingError] = useState(null);
@@ -265,25 +283,24 @@ const AIToolsDashboard = () => {
 
   // State for API Configuration
   const [hfTokens, setHfTokens] = useState([]);
-  const [selectedHFToken, setSelectedHFToken] = useState("");
+  const [selectedHFToken, setSelectedHFToken] = useState('');
 
   // State for Sentiment Analysis
-  const [sentimentText, setSentimentText] = useState("");
+  const [sentimentText, setSentimentText] = useState('');
   const [isSentimentAnalyzing, setIsSentimentAnalyzing] = useState(false);
   const [sentimentResults, setSentimentResults] = useState(null);
   const [sentimentError, setSentimentError] = useState(null);
 
   // State for Snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
 
   // Entity selection states
   const [selectedEntities, setSelectedEntities] = useState([]);
   const uniqueEntities = Array.from(
     new Map(
-      openEndedResponses
-        .map((response) => [response.entity, response]) // Use entity as the key
+      openEndedResponses.map((response) => [response.entity, response]) // Use entity as the key
     ).values() // Get unique response objects
   ).map((response) => ({
     entity: response.entity,
@@ -295,10 +312,9 @@ const AIToolsDashboard = () => {
   useEffect(() => {
     const fetchHFTokens = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_HOST}/api/hf-tokens`,
-          { withCredentials: true }
-        );
+        const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/hf-tokens`, {
+          withCredentials: true,
+        });
         setHfTokens(response.data);
       } catch (error) {
         console.error('Error fetching HF tokens:', error);
@@ -327,20 +343,16 @@ const AIToolsDashboard = () => {
       console.log('Open-ended responses:', response.data);
 
       // Filter responses where is_analyzed is false
-      const unanalyzedResponses = response.data.filter(
-        (r) => !r.is_analyzed
-      );
+      const unanalyzedResponses = response.data.filter((r) => !r.is_analyzed);
 
       if (unanalyzedResponses.length > 0) {
         // Concatenate all to one string
-        const combinedText = unanalyzedResponses
-          .map((r) => r.response_value)
-          .join("\n\n");
+        const combinedText = unanalyzedResponses.map((r) => r.response_value).join('\n\n');
 
         setSentimentText(combinedText);
         setTopicText(combinedText);
       } else {
-        console.log("All responses have been analyzed.");
+        console.log('All responses have been analyzed.');
       }
     } catch (error) {
       console.error('Error fetching open-ended responses:', error);
@@ -351,15 +363,13 @@ const AIToolsDashboard = () => {
     setIsSentimentAnalyzing(true);
     setSentimentError(null);
     setSnackbarMessage(
-      "Just a heads-up, the first response might take a little longer (20-30 seconds) if the AI endpoint was dormant."
+      'Just a heads-up, the first response might take a little longer (20-30 seconds) if the AI endpoint was dormant.'
     );
-    setSnackbarSeverity("info");
+    setSnackbarSeverity('info');
     setSnackbarOpen(true);
 
     try {
-      const selectedToken = hfTokens.find(
-        (token) => token.id === selectedHFToken
-      );
+      const selectedToken = hfTokens.find((token) => token.id === selectedHFToken);
       if (!selectedToken) {
         throw new Error('No token selected');
       }
@@ -378,8 +388,8 @@ const AIToolsDashboard = () => {
       } else {
         console.error('Unexpected response format:', response.data);
         if (response.data?.error) {
-          setSnackbarMessage("THE AI ENDPOINT IS CURRENTLY UNAVAILABLE. PLEASE TRY AGAIN LATER");
-          setSnackbarSeverity("error");
+          setSnackbarMessage('THE AI ENDPOINT IS CURRENTLY UNAVAILABLE. PLEASE TRY AGAIN LATER');
+          setSnackbarSeverity('error');
           setSnackbarOpen(true);
         }
         setSentimentResults(null);
@@ -407,15 +417,10 @@ const AIToolsDashboard = () => {
         const matchingResponse = openEnded.find((response) => {
           const normalizedRes = response.response_value.trim().toLowerCase();
           const normalizedSens = result.text.trim().toLowerCase();
-          return (
-            normalizedRes.includes(normalizedSens) ||
-            normalizedSens.includes(normalizedRes)
-          );
+          return normalizedRes.includes(normalizedSens) || normalizedSens.includes(normalizedRes);
         });
 
-        const userId = matchingResponse
-          ? matchingResponse.anonymous_user_id
-          : "default_user_id";
+        const userId = matchingResponse ? matchingResponse.anonymous_user_id : 'default_user_id';
 
         const responseId = matchingResponse ? matchingResponse.response_id : null;
         const now = new Date();
@@ -424,8 +429,8 @@ const AIToolsDashboard = () => {
           user_id: userId,
           response_id: responseId,
           review_date: new Date().toISOString() + timeString,
-          rating: "0",
-          sqref: "TPENT",
+          rating: '0',
+          sqref: 'TPENT',
           sentiment: result.sentiment,
           confidence: parseFloat(result.confidence).toFixed(3),
         };
@@ -438,21 +443,21 @@ const AIToolsDashboard = () => {
       );
 
       if (response.status === 201 || response.status === 204) {
-        setSnackbarMessage("Sentiment analysis results stored successfully!");
-        setSnackbarSeverity("success");
+        setSnackbarMessage('Sentiment analysis results stored successfully!');
+        setSnackbarSeverity('success');
         setSnackbarOpen(true);
       } else {
-        setSnackbarMessage("Failed to store sentiment analysis results.");
-        setSnackbarSeverity("error");
+        setSnackbarMessage('Failed to store sentiment analysis results.');
+        setSnackbarSeverity('error');
         setSnackbarOpen(true);
       }
 
       // Potentially do something with the anonymized user IDs
-      console.log("Placeholder for admin/anonymous-users endpoint if needed.");
+      console.log('Placeholder for admin/anonymous-users endpoint if needed.');
     } catch (error) {
       console.error('Error storing sentiment analysis results:', error);
-      setSnackbarMessage("Error storing sentiment analysis results.");
-      setSnackbarSeverity("error");
+      setSnackbarMessage('Error storing sentiment analysis results.');
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
@@ -484,15 +489,13 @@ const AIToolsDashboard = () => {
         return dateFilter && entityFilter;
       });
 
-      const combinedText = filteredResponses
-        .map((resp) => resp.response_value)
-        .join("\n\n");
+      const combinedText = filteredResponses.map((resp) => resp.response_value).join('\n\n');
 
       if (combinedText) {
         setTopicText(combinedText);
       } else {
-        setTopicText("");
-        console.log("No open-ended responses found for the selected filters.");
+        setTopicText('');
+        console.log('No open-ended responses found for the selected filters.');
       }
     } catch (error) {
       console.error('Error fetching open-ended responses:', error);
@@ -503,15 +506,13 @@ const AIToolsDashboard = () => {
     setIsTopicModeling(true);
     setTopicModelingError(null);
     setSnackbarMessage(
-      "Starting Topic Modeling. This may take a moment if the endpoint is initializing."
+      'Starting Topic Modeling. This may take a moment if the endpoint is initializing.'
     );
-    setSnackbarSeverity("info");
+    setSnackbarSeverity('info');
     setSnackbarOpen(true);
 
     try {
-      const selectedToken = hfTokens.find(
-        (token) => token.id === selectedHFToken
-      );
+      const selectedToken = hfTokens.find((token) => token.id === selectedHFToken);
       if (!selectedToken) {
         throw new Error('No token selected');
       }
@@ -526,9 +527,9 @@ const AIToolsDashboard = () => {
 
       setTopicModelingResult(response.data);
 
-      if (response.data.hasOwnProperty("error")) {
-        setSnackbarMessage("THE AI ENDPOINT IS CURRENTLY UNAVAILABLE. PLEASE TRY AGAIN LATER");
-        setSnackbarSeverity("error");
+      if (response.data.hasOwnProperty('error')) {
+        setSnackbarMessage('THE AI ENDPOINT IS CURRENTLY UNAVAILABLE. PLEASE TRY AGAIN LATER');
+        setSnackbarSeverity('error');
         setSnackbarOpen(true);
       }
     } catch (error) {
@@ -552,24 +553,24 @@ const AIToolsDashboard = () => {
         endDate: endDate ? dayjs(endDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
         customFilter: selectedEntities, // <--- Selected entities are included here
       };
-  
+
       const response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/api/storetopics`,
         { zeroidx },
         { withCredentials: true }
       );
-  
+
       if (response.status === 201 || response.status === 200) {
-        setSnackbarMessage("Topic modeling results stored successfully!");
-        setSnackbarSeverity("success");
+        setSnackbarMessage('Topic modeling results stored successfully!');
+        setSnackbarSeverity('success');
         setSnackbarOpen(true);
       } else {
         throw new Error('Failed to store topic modeling results');
       }
     } catch (error) {
       console.error('Error storing topic modeling results:', error);
-      setSnackbarMessage("Error storing topic modeling results.");
-      setSnackbarSeverity("error");
+      setSnackbarMessage('Error storing topic modeling results.');
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
@@ -598,7 +599,10 @@ const AIToolsDashboard = () => {
             <AiToolsIcon sx={{ fontSize: 32 }} />
             AI Tools Dashboard
           </HeaderTitle>
-          <Typography variant="subtitle1" sx={{ fontFamily, opacity: 0.9, fontWeight: 400, mt: 0.5 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontFamily, opacity: 0.9, fontWeight: 400, mt: 0.5 }}
+          >
             Sentiment analysis and topic modelling over open-ended survey responses
           </Typography>
         </HeaderContainer>
@@ -609,10 +613,15 @@ const AIToolsDashboard = () => {
         {stepList.map((step, i) => (
           <React.Fragment key={step.n}>
             <StepItem>
-              <StepBadge $active={step.done}>
-                {step.done ? <CheckIcon /> : step.n}
-              </StepBadge>
-              <Typography sx={{ fontFamily, fontWeight: 500, fontSize: 14, color: step.done ? text.heading : text.muted }}>
+              <StepBadge $active={step.done}>{step.done ? <CheckIcon /> : step.n}</StepBadge>
+              <Typography
+                sx={{
+                  fontFamily,
+                  fontWeight: 500,
+                  fontSize: 14,
+                  color: step.done ? text.heading : text.muted,
+                }}
+              >
                 {step.label}
               </Typography>
             </StepItem>
@@ -627,7 +636,9 @@ const AIToolsDashboard = () => {
           <Slide in direction="up" timeout={1000}>
             <SectionCard elevation={0}>
               <SectionHeader>
-                <IconTile><TokenIcon /></IconTile>
+                <IconTile>
+                  <TokenIcon />
+                </IconTile>
                 <Box>
                   <SectionTitle>API Configuration</SectionTitle>
                   <SectionSubtitle>Select a Hugging Face token to power the models</SectionSubtitle>
@@ -644,14 +655,19 @@ const AIToolsDashboard = () => {
                 sx={{ mb: 1 }}
                 aria-label="Select API Token"
                 renderValue={(value) =>
-                  hfTokens.find((t) => t.id === value)?.label || 'Select an API token to enable analysis'
+                  hfTokens.find((t) => t.id === value)?.label ||
+                  'Select an API token to enable analysis'
                 }
               >
                 {hfTokens.length === 0 && (
-                  <MenuItem disabled value="">No API tokens available</MenuItem>
+                  <MenuItem disabled value="">
+                    No API tokens available
+                  </MenuItem>
                 )}
                 {hfTokens.map((token) => (
-                  <MenuItem key={token.id} value={token.id}>{token.label}</MenuItem>
+                  <MenuItem key={token.id} value={token.id}>
+                    {token.label}
+                  </MenuItem>
                 ))}
               </Select>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 1 }}>
@@ -680,23 +696,55 @@ const AIToolsDashboard = () => {
           <Slide in direction="up" timeout={1100}>
             <SectionCard elevation={0}>
               <SectionHeader>
-                <IconTile><ScanIcon /></IconTile>
+                <IconTile>
+                  <ScanIcon />
+                </IconTile>
                 <Box>
                   <SectionTitle>Open-Ended Responses</SectionTitle>
                   <SectionSubtitle>Scan the database for responses to analyse</SectionSubtitle>
                 </Box>
               </SectionHeader>
               <Box sx={{ display: 'flex', gap: 2, mb: 2.5 }}>
-                <Box sx={{ flex: 1, background: surface.divider, borderRadius: radius.control, p: 1.5 }}>
-                  <Typography sx={{ fontFamily, fontWeight: 700, fontSize: 24, color: brand.primary, lineHeight: 1.1 }}>
+                <Box
+                  sx={{
+                    flex: 1,
+                    background: surface.divider,
+                    borderRadius: radius.control,
+                    p: 1.5,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontFamily,
+                      fontWeight: 700,
+                      fontSize: 24,
+                      color: brand.primary,
+                      lineHeight: 1.1,
+                    }}
+                  >
                     {openEndedResponses.length}
                   </Typography>
                   <Typography sx={{ fontFamily, fontSize: 12, color: text.muted }}>
                     responses scanned
                   </Typography>
                 </Box>
-                <Box sx={{ flex: 1, background: surface.divider, borderRadius: radius.control, p: 1.5 }}>
-                  <Typography sx={{ fontFamily, fontWeight: 700, fontSize: 24, color: brand.secondary, lineHeight: 1.1 }}>
+                <Box
+                  sx={{
+                    flex: 1,
+                    background: surface.divider,
+                    borderRadius: radius.control,
+                    p: 1.5,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontFamily,
+                      fontWeight: 700,
+                      fontSize: 24,
+                      color: brand.secondary,
+                      lineHeight: 1.1,
+                    }}
+                  >
                     {uniqueEntities.length}
                   </Typography>
                   <Typography sx={{ fontFamily, fontSize: 12, color: text.muted }}>
@@ -716,7 +764,9 @@ const AIToolsDashboard = () => {
           <Slide in direction="up" timeout={1200}>
             <SectionCard elevation={0}>
               <SectionHeader>
-                <IconTile><SentimentIcon /></IconTile>
+                <IconTile>
+                  <SentimentIcon />
+                </IconTile>
                 <Box>
                   <SectionTitle>Sentiment Analysis</SectionTitle>
                   <SectionSubtitle>Gauge the emotional tone of free-text responses</SectionSubtitle>
@@ -738,14 +788,22 @@ const AIToolsDashboard = () => {
               <PrimaryButton
                 onClick={handleSentimentAnalysis}
                 disabled={isSentimentAnalyzing || !sentimentText || !selectedHFToken}
-                startIcon={isSentimentAnalyzing ? <CircularProgress size={18} color="inherit" /> : <AutoGraphIcon />}
+                startIcon={
+                  isSentimentAnalyzing ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    <AutoGraphIcon />
+                  )
+                }
               >
                 {isSentimentAnalyzing ? 'Analyzing…' : 'Analyze Sentiment'}
               </PrimaryButton>
 
               {sentimentResults && sentimentResults.length > 0 && (
                 <Box sx={{ mt: 3, maxHeight: '420px', overflowY: 'auto', pr: 1 }}>
-                  <Typography sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading, mb: 1.5 }}>
+                  <Typography
+                    sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading, mb: 1.5 }}
+                  >
                     Results
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
@@ -754,8 +812,17 @@ const AIToolsDashboard = () => {
                       const accent = sentimentPalette[tone] || text.muted;
                       return (
                         <SentimentResultCard key={index} $accent={accent} elevation={0}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
-                            <Typography sx={{ fontFamily, color: text.body, fontSize: 14, lineHeight: 1.4 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                              gap: 1,
+                            }}
+                          >
+                            <Typography
+                              sx={{ fontFamily, color: text.body, fontSize: 14, lineHeight: 1.4 }}
+                            >
                               {result.text}
                             </Typography>
                             <Chip
@@ -772,9 +839,15 @@ const AIToolsDashboard = () => {
                             />
                           </Box>
                           <Box sx={{ mt: 1.25 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.25 }}>
-                              <Typography sx={{ fontFamily, fontSize: 12, color: text.muted }}>Confidence</Typography>
-                              <Typography sx={{ fontFamily, fontSize: 12, fontWeight: 600, color: text.body }}>
+                            <Box
+                              sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.25 }}
+                            >
+                              <Typography sx={{ fontFamily, fontSize: 12, color: text.muted }}>
+                                Confidence
+                              </Typography>
+                              <Typography
+                                sx={{ fontFamily, fontSize: 12, fontWeight: 600, color: text.body }}
+                              >
                                 {result.confidence.toFixed(2)}%
                               </Typography>
                             </Box>
@@ -785,7 +858,10 @@ const AIToolsDashboard = () => {
                                 height: 6,
                                 borderRadius: radius.pill,
                                 bgcolor: surface.divider,
-                                '& .MuiLinearProgress-bar': { background: accent, borderRadius: radius.pill },
+                                '& .MuiLinearProgress-bar': {
+                                  background: accent,
+                                  borderRadius: radius.pill,
+                                },
                               }}
                             />
                           </Box>
@@ -796,42 +872,104 @@ const AIToolsDashboard = () => {
 
                   {/* Summary */}
                   <Box sx={{ mt: 3 }}>
-                    <Typography sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading, mb: 1.5 }}>
+                    <Typography
+                      sx={{
+                        fontFamily,
+                        fontWeight: 600,
+                        fontSize: 15,
+                        color: text.heading,
+                        mb: 1.5,
+                      }}
+                    >
                       Summary
                     </Typography>
                     {(() => {
                       const sentimentCounts = sentimentResults.reduce(
-                        (acc, res) => { acc[res.sentiment] = (acc[res.sentiment] || 0) + 1; return acc; },
+                        (acc, res) => {
+                          acc[res.sentiment] = (acc[res.sentiment] || 0) + 1;
+                          return acc;
+                        },
                         { positive: 0, neutral: 0, negative: 0 }
                       );
                       const total = sentimentResults.length;
                       let averageSentiment = 'neutral';
-                      if (sentimentCounts.positive > sentimentCounts.negative && sentimentCounts.positive > sentimentCounts.neutral) {
+                      if (
+                        sentimentCounts.positive > sentimentCounts.negative &&
+                        sentimentCounts.positive > sentimentCounts.neutral
+                      ) {
                         averageSentiment = 'positive';
-                      } else if (sentimentCounts.negative > sentimentCounts.positive && sentimentCounts.negative > sentimentCounts.neutral) {
+                      } else if (
+                        sentimentCounts.negative > sentimentCounts.positive &&
+                        sentimentCounts.negative > sentimentCounts.neutral
+                      ) {
                         averageSentiment = 'negative';
                       }
-                      const totalConfidence = sentimentResults.reduce((sum, item) => sum + parseFloat(item.confidence), 0);
+                      const totalConfidence = sentimentResults.reduce(
+                        (sum, item) => sum + parseFloat(item.confidence),
+                        0
+                      );
                       const avgConfidence = totalConfidence / total;
                       const segments = [
-                        { key: 'positive', count: sentimentCounts.positive, color: sentimentPalette.positive },
-                        { key: 'neutral', count: sentimentCounts.neutral, color: sentimentPalette.neutral },
-                        { key: 'negative', count: sentimentCounts.negative, color: sentimentPalette.negative },
+                        {
+                          key: 'positive',
+                          count: sentimentCounts.positive,
+                          color: sentimentPalette.positive,
+                        },
+                        {
+                          key: 'neutral',
+                          count: sentimentCounts.neutral,
+                          color: sentimentPalette.neutral,
+                        },
+                        {
+                          key: 'negative',
+                          count: sentimentCounts.negative,
+                          color: sentimentPalette.negative,
+                        },
                       ];
                       return (
                         <>
                           <SentimentBar>
-                            {segments.map((s) => s.count > 0 && (
-                              <Tooltip key={s.key} title={`${s.key} — ${s.count} (${((s.count / total) * 100).toFixed(1)}%)`} arrow>
-                                <Box sx={{ width: `${(s.count / total) * 100}%`, background: s.color, height: '100%' }} />
-                              </Tooltip>
-                            ))}
+                            {segments.map(
+                              (s) =>
+                                s.count > 0 && (
+                                  <Tooltip
+                                    key={s.key}
+                                    title={`${s.key} — ${s.count} (${((s.count / total) * 100).toFixed(1)}%)`}
+                                    arrow
+                                  >
+                                    <Box
+                                      sx={{
+                                        width: `${(s.count / total) * 100}%`,
+                                        background: s.color,
+                                        height: '100%',
+                                      }}
+                                    />
+                                  </Tooltip>
+                                )
+                            )}
                           </SentimentBar>
                           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 1.5, mb: 1.5 }}>
                             {segments.map((s) => (
-                              <Box key={s.key} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                                <Box sx={{ width: 12, height: 12, borderRadius: '3px', background: s.color }} />
-                                <Typography sx={{ fontFamily, fontSize: 13, color: text.body, textTransform: 'capitalize' }}>
+                              <Box
+                                key={s.key}
+                                sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: 12,
+                                    height: 12,
+                                    borderRadius: '3px',
+                                    background: s.color,
+                                  }}
+                                />
+                                <Typography
+                                  sx={{
+                                    fontFamily,
+                                    fontSize: 13,
+                                    color: text.body,
+                                    textTransform: 'capitalize',
+                                  }}
+                                >
                                   {s.key} · {s.count}
                                 </Typography>
                               </Box>
@@ -840,13 +978,20 @@ const AIToolsDashboard = () => {
                           <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
                             <Typography sx={{ fontFamily, fontSize: 13, color: text.muted }}>
                               Average sentiment:{' '}
-                              <strong style={{ color: sentimentPalette[averageSentiment], textTransform: 'capitalize' }}>
+                              <strong
+                                style={{
+                                  color: sentimentPalette[averageSentiment],
+                                  textTransform: 'capitalize',
+                                }}
+                              >
                                 {averageSentiment}
                               </strong>
                             </Typography>
                             <Typography sx={{ fontFamily, fontSize: 13, color: text.muted }}>
                               Avg. confidence:{' '}
-                              <strong style={{ color: text.heading }}>{avgConfidence.toFixed(2)}%</strong>
+                              <strong style={{ color: text.heading }}>
+                                {avgConfidence.toFixed(2)}%
+                              </strong>
                             </Typography>
                           </Box>
                         </>
@@ -873,7 +1018,9 @@ const AIToolsDashboard = () => {
           <Slide in direction="up" timeout={1400}>
             <SectionCard elevation={0}>
               <SectionHeader>
-                <IconTile><TopicIcon /></IconTile>
+                <IconTile>
+                  <TopicIcon />
+                </IconTile>
                 <Box>
                   <SectionTitle>Topic Modeling</SectionTitle>
                   <SectionSubtitle>Discover recurring themes across responses</SectionSubtitle>
@@ -883,11 +1030,19 @@ const AIToolsDashboard = () => {
               {/* Filter panel */}
               <Paper
                 variant="outlined"
-                sx={{ p: 2, mb: 3, borderRadius: radius.control, borderColor: surface.divider, backgroundColor: '#fafbff' }}
+                sx={{
+                  p: 2,
+                  mb: 3,
+                  borderRadius: radius.control,
+                  borderColor: surface.divider,
+                  backgroundColor: '#fafbff',
+                }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                   <TuneIcon sx={{ color: brand.primary, fontSize: 20 }} />
-                  <Typography sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading }}>
+                  <Typography
+                    sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading }}
+                  >
                     Date Range &amp; Entity Filters
                   </Typography>
                 </Box>
@@ -932,7 +1087,9 @@ const AIToolsDashboard = () => {
                     }
                   >
                     {uniqueEntities.length === 0 && (
-                      <MenuItem disabled value="">Scan for open-ended responses first</MenuItem>
+                      <MenuItem disabled value="">
+                        Scan for open-ended responses first
+                      </MenuItem>
                     )}
                     {uniqueEntities.map((entityObj) => (
                       <MenuItem key={entityObj.entity} value={entityObj.entity}>
@@ -941,7 +1098,10 @@ const AIToolsDashboard = () => {
                     ))}
                   </Select>
                 </Box>
-                <PrimaryButton onClick={handleRetrieveOpenEndedResponsesForTopicModeling} startIcon={<DatasetIcon />}>
+                <PrimaryButton
+                  onClick={handleRetrieveOpenEndedResponsesForTopicModeling}
+                  startIcon={<DatasetIcon />}
+                >
                   Retrieve &amp; Filter Responses
                 </PrimaryButton>
               </Paper>
@@ -949,7 +1109,8 @@ const AIToolsDashboard = () => {
               {/* Topic text + analyze */}
               <Box>
                 <Typography sx={{ fontFamily, fontSize: 14, color: text.muted, mb: 1.5 }}>
-                  Below is the auto-populated text from filtered open-ended responses. Feel free to edit it before analysis.
+                  Below is the auto-populated text from filtered open-ended responses. Feel free to
+                  edit it before analysis.
                 </Typography>
                 <TextField
                   value={topicText}
@@ -964,7 +1125,9 @@ const AIToolsDashboard = () => {
                 <PrimaryButton
                   onClick={handleTopicModeling}
                   disabled={isTopicModeling || !topicText || !selectedHFToken}
-                  startIcon={isTopicModeling ? <CircularProgress size={18} color="inherit" /> : <TopicIcon />}
+                  startIcon={
+                    isTopicModeling ? <CircularProgress size={18} color="inherit" /> : <TopicIcon />
+                  }
                 >
                   {isTopicModeling ? 'Analyzing…' : 'Analyze Topics'}
                 </PrimaryButton>
@@ -972,7 +1135,9 @@ const AIToolsDashboard = () => {
 
               {topicModelingResult && (
                 <Box sx={{ mt: 3, maxHeight: '420px', overflowY: 'auto', pr: 1 }}>
-                  <Typography sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading, mb: 1.5 }}>
+                  <Typography
+                    sx={{ fontFamily, fontWeight: 600, fontSize: 15, color: text.heading, mb: 1.5 }}
+                  >
                     Topic Modeling Results
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -980,14 +1145,33 @@ const AIToolsDashboard = () => {
                       const prob = topic.probability * 100;
                       return (
                         <TopicResultCard key={index} elevation={0}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                            <Typography sx={{ fontFamily, fontWeight: 700, fontSize: 16, color: text.heading }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              mb: 1,
+                            }}
+                          >
+                            <Typography
+                              sx={{
+                                fontFamily,
+                                fontWeight: 700,
+                                fontSize: 16,
+                                color: text.heading,
+                              }}
+                            >
                               Topic {index + 1}: {topic.customLabel}
                             </Typography>
                             <Chip
                               label={`${prob.toFixed(2)}%`}
                               size="small"
-                              sx={{ bgcolor: gradients.brand, color: '#fff', fontWeight: 600, fontFamily }}
+                              sx={{
+                                bgcolor: gradients.brand,
+                                color: '#fff',
+                                fontWeight: 600,
+                                fontFamily,
+                              }}
                             />
                           </Box>
                           <Box sx={{ mb: 1.5 }}>
@@ -998,7 +1182,10 @@ const AIToolsDashboard = () => {
                                 height: 6,
                                 borderRadius: radius.pill,
                                 bgcolor: surface.divider,
-                                '& .MuiLinearProgress-bar': { background: gradients.brandBar, borderRadius: radius.pill },
+                                '& .MuiLinearProgress-bar': {
+                                  background: gradients.brandBar,
+                                  borderRadius: radius.pill,
+                                },
                               }}
                             />
                           </Box>
@@ -1011,22 +1198,38 @@ const AIToolsDashboard = () => {
                                 key={wordIndex}
                                 label={word}
                                 size="small"
-                                sx={{ fontFamily, bgcolor: 'rgba(102, 126, 234, 0.12)', color: brand.primaryDark, fontWeight: 500 }}
+                                sx={{
+                                  fontFamily,
+                                  bgcolor: 'rgba(102, 126, 234, 0.12)',
+                                  color: brand.primaryDark,
+                                  fontWeight: 500,
+                                }}
                               />
                             ))}
                           </Box>
                           {topic.contribution && topic.contribution.length > 0 && (
                             <Box>
-                              <Typography sx={{ fontFamily, fontSize: 13, color: text.muted, mb: 0.5 }}>
+                              <Typography
+                                sx={{ fontFamily, fontSize: 13, color: text.muted, mb: 0.5 }}
+                              >
                                 Contributions
                               </Typography>
                               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
                                 {topic.contribution.map((contrib, contribIndex) => (
-                                  <Box key={contribIndex} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Box
+                                    key={contribIndex}
+                                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                                  >
                                     <Chip
                                       label={`T${contrib[0]}`}
                                       size="small"
-                                      sx={{ height: 20, fontFamily, fontSize: 11, bgcolor: surface.divider, color: text.muted }}
+                                      sx={{
+                                        height: 20,
+                                        fontFamily,
+                                        fontSize: 11,
+                                        bgcolor: surface.divider,
+                                        color: text.muted,
+                                      }}
                                     />
                                     <Typography sx={{ fontFamily, fontSize: 13, color: text.body }}>
                                       {contrib[1]}:{' '}

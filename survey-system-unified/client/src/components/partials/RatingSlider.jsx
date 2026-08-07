@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import GradientBackground from '../../components/partials/GradientBackground';
 import BodyPartial from '../../components/partials/BodyPartial';
 import { Title } from '../utils/styles1';
-import imgOverlay from "../../components/img/sentiment.png";
+import imgOverlay from '../../components/img/sentiment.png';
 import { submitSurveyResponses } from '../utils/sendInputUtils';
 import { NextButtonU } from '../utils/styles1';
 import useTranslations from '../utils/useTranslations';
@@ -43,16 +43,18 @@ const StyledSelect = styled.select`
   font-size: 1rem;
 `;
 
-const RatingSlider = ({ 
-  title, 
-  categories, 
-  onRatingComplete, 
-  surveyquestion_refs, 
+const RatingSlider = ({
+  title,
+  categories,
+  onRatingComplete,
+  surveyquestion_refs,
   entranslations,
-  initialSliderValues 
+  initialSliderValues,
 }) => {
   // Initialize sliderValues with initialSliderValues when the component mounts
-  const [sliderValues, setSliderValues] = useState(initialSliderValues || Array(categories.length).fill(''));
+  const [sliderValues, setSliderValues] = useState(
+    initialSliderValues || Array(categories.length).fill('')
+  );
 
   // Update sliderValues whenever initialSliderValues changes
   useEffect(() => {
@@ -63,7 +65,10 @@ const RatingSlider = ({
 
   const [responses, setResponses] = useState([]);
 
-  const choosetoskip = useTranslations('RATINGSLIDER', localStorage.getItem('selectedLanguage')).chooseToSkipText;
+  const choosetoskip = useTranslations(
+    'RATINGSLIDER',
+    localStorage.getItem('selectedLanguage')
+  ).chooseToSkipText;
   const rtranslations = useTranslations('RATINGSLIDER', localStorage.getItem('selectedLanguage'));
 
   const emojis = ['☹️', '😐', '🙂', '😄'];
@@ -80,7 +85,7 @@ const RatingSlider = ({
       const questionStub = entranslations[index] || '';
       return {
         surveyquestion_ref: surveyquestion_refs + questionStub.substring(0, 5).toUpperCase(),
-        response_value: parsedValue ? parsedValue.toString() : ''
+        response_value: parsedValue ? parsedValue.toString() : '',
       };
     });
 
@@ -97,10 +102,16 @@ const RatingSlider = ({
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.2} blendMode="screen" buttonAppear={true} handleNextClick={handleSubmitAll}>
+      <GradientBackground
+        overlayImage={imgOverlay}
+        opacity={0.2}
+        blendMode="screen"
+        buttonAppear={true}
+        handleNextClick={handleSubmitAll}
+      >
         <Title>{title}</Title>
         <Title style={{ fontSize: '1rem' }}>{choosetoskip}</Title>
-        
+
         <StyledTable>
           <StyledThead>
             <StyledTr>
@@ -119,8 +130,8 @@ const RatingSlider = ({
                 <StyledTr key={index}>
                   <StyledTd>{category}</StyledTd>
                   <StyledTd>
-                    <StyledSelect 
-                      value={selectedValue} 
+                    <StyledSelect
+                      value={selectedValue}
                       onChange={(e) => handleSelectChange(e, index)}
                     >
                       <option value="">⛔</option>
@@ -130,9 +141,7 @@ const RatingSlider = ({
                       <option value="4">😄</option>
                     </StyledSelect>
                   </StyledTd>
-                  <StyledTd style={{ fontSize: '2rem' }}>
-                    {displayedEmoji}
-                  </StyledTd>
+                  <StyledTd style={{ fontSize: '2rem' }}>{displayedEmoji}</StyledTd>
                 </StyledTr>
               );
             })}

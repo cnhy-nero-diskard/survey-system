@@ -6,8 +6,8 @@ import { AnimatedContainer, NextButtonU } from '../utils/styles1';
 import useTranslations from '../utils/useTranslations';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { animated, useSpring } from 'react-spring';
-import bisulogo from "../img/BISU-LOGO.png";
-import dotlogo from "../img/DOT-LOGO.svg";
+import bisulogo from '../img/BISU-LOGO.png';
+import dotlogo from '../img/DOT-LOGO.svg';
 
 // --- Styled Spinner ---
 const Spinner = styled.div`
@@ -24,7 +24,7 @@ const OverlayContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  top: 0; 
+  top: 0;
   left: 0;
   width: 100%;
   height: 100%;
@@ -107,7 +107,7 @@ const OverlayImage = styled.img`
   pointer-events: none;
 `;
 
- const BarIter = styled.div`
+const BarIter = styled.div`
   position: absolute;
   top 50px;
   bottom 70px;
@@ -115,7 +115,7 @@ const OverlayImage = styled.img`
   transform: translateX(-50%);
   width: 100%;
   height: 25px;
- `
+ `;
 // Progress bar container now part of the header
 const ProgressBarContainer = styled.div`
   flex-grow: 1;
@@ -196,9 +196,9 @@ const GradientBackground = ({
   blendMode = 'overlay',
   handleNextClick,
   handleBackClick,
-  nextmsg = "",
+  nextmsg = '',
   buttonAppear = true,
-  isLoading = false
+  isLoading = false,
 }) => {
   const { routes } = useContext(UnifiedContext);
   const [setCurrentStep] = useState();
@@ -209,27 +209,33 @@ const GradientBackground = ({
   const translations = useTranslations('PackagePaid', language || 'en');
   const navigate = useNavigate();
 
-  const progress = (((currentStepIndex) / routes.length) * 100) + 6;
+  const progress = (currentStepIndex / routes.length) * 100 + 6;
   const getParentPath = (path) => {
-    const segments = path.split("/");
-    return segments.slice(0, -1).join("/");
+    const segments = path.split('/');
+    return segments.slice(0, -1).join('/');
   };
 
   useEffect(() => {
-    if (isBlockActive("feedback") && (getParentPath(location.pathname) === "/survey") || location.pathname === "/survey") {
-      console.log("GBACK feedback detected...removing surveytpms");
-      removeActiveBlocks("feedback");
-    } else if (isBlockActive("surveytpms") && (getParentPath(location.pathname) === "/feedback") || location.pathname === "/feedback") {
-      removeActiveBlocks("surveytpms");
+    if (
+      (isBlockActive('feedback') && getParentPath(location.pathname) === '/survey') ||
+      location.pathname === '/survey'
+    ) {
+      console.log('GBACK feedback detected...removing surveytpms');
+      removeActiveBlocks('feedback');
+    } else if (
+      (isBlockActive('surveytpms') && getParentPath(location.pathname) === '/feedback') ||
+      location.pathname === '/feedback'
+    ) {
+      removeActiveBlocks('surveytpms');
     }
     console.log(`GBACK -- ACTIVE BLOCKS -- ${JSON.stringify(activeBlocks)}`);
   }, []);
 
   const useNext = () => {
-    if (location.pathname === "/survey" && !activeBlocks.includes("surveytpms")) {
-      removeActiveBlocks(["feedback"]);
-    } else if (location.pathname === "/feedback" && !activeBlocks.includes("feedback")) {
-      removeActiveBlocks(["surveytpms"]);
+    if (location.pathname === '/survey' && !activeBlocks.includes('surveytpms')) {
+      removeActiveBlocks(['feedback']);
+    } else if (location.pathname === '/feedback' && !activeBlocks.includes('feedback')) {
+      removeActiveBlocks(['surveytpms']);
     }
     handleNextClick();
   };
@@ -250,23 +256,16 @@ const GradientBackground = ({
           {/* <LogoImage src="/path/to/logo2.png" alt="Partner Logo" /> */}
           {/* <LogoImage src="/path/to/logo3.png" alt="Sponsor Logo" /> */}
         </LogoContainer>
-        
+
         <ProgressBarContainer>
           <ProgressBar progress={progress} />
         </ProgressBarContainer>
       </HeaderContainer>
 
       <ProgressText />
-      
+
       <BackgroundWrapper>
-        {true && (
-          <OverlayImage
-            src={overlayImage}
-            alt=""
-            opacity={opacity}
-            blendMode={blendMode}
-          />
-        )}
+        {true && <OverlayImage src={overlayImage} alt="" opacity={opacity} blendMode={blendMode} />}
         {children}
 
         {isLoading && (
@@ -278,11 +277,8 @@ const GradientBackground = ({
 
       {buttonAppear && (
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-          <BackButtonU
-            onClick={() => navigate(-1)}
-            disabled={isLoading}
-          >
-              ←
+          <BackButtonU onClick={() => navigate(-1)} disabled={isLoading}>
+            ←
           </BackButtonU>
 
           <NextButtonU
@@ -290,7 +286,7 @@ const GradientBackground = ({
             style={{ display: buttonAppear ? 'block' : 'none' }}
             disabled={isLoading}
           >
-            {nextmsg === "" ? translations.packagePaidNextButton : nextmsg}
+            {nextmsg === '' ? translations.packagePaidNextButton : nextmsg}
           </NextButtonU>
         </div>
       )}

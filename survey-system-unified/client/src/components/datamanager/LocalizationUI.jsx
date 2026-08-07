@@ -61,11 +61,14 @@ const Snackbar = styled.div`
   font-weight: 500;
 `;
 
-
-
 const LocalizationUI = () => {
   const [localizations, setLocalizations] = useState([]);
-  const [formData, setFormData] = useState({ key: '', language_code: '', textcontent: '', component: '' });
+  const [formData, setFormData] = useState({
+    key: '',
+    language_code: '',
+    textcontent: '',
+    component: '',
+  });
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editMode, setEditMode] = useState(null);
@@ -83,13 +86,26 @@ const LocalizationUI = () => {
 
       if (editMode) {
         // Update localization
-        const updatedLocalization = await updateLocalization(editMode, key, language_code, textcontent, component);
-        setLocalizations(localizations.map((loc) => (loc.id === editMode ? updatedLocalization : loc)));
+        const updatedLocalization = await updateLocalization(
+          editMode,
+          key,
+          language_code,
+          textcontent,
+          component
+        );
+        setLocalizations(
+          localizations.map((loc) => (loc.id === editMode ? updatedLocalization : loc))
+        );
         setEditMode(null);
       } else {
         // Create new localization
         // const { key, language_code: language_code, textcontent, component } = formData;
-        const newLocalization = await createLocalization(key, language_code, textcontent, component);
+        const newLocalization = await createLocalization(
+          key,
+          language_code,
+          textcontent,
+          component
+        );
         setLocalizations([...localizations, newLocalization]);
       }
 
@@ -141,11 +157,11 @@ const LocalizationUI = () => {
           <p>Total Localizations</p>
         </StatsCard>
         <StatsCard>
-          <h4>{[...new Set(localizations.map(loc => loc.language_code))].length}</h4>
+          <h4>{[...new Set(localizations.map((loc) => loc.language_code))].length}</h4>
           <p>Languages Supported</p>
         </StatsCard>
         <StatsCard>
-          <h4>{[...new Set(localizations.map(loc => loc.component))].length}</h4>
+          <h4>{[...new Set(localizations.map((loc) => loc.component))].length}</h4>
           <p>Components</p>
         </StatsCard>
       </StatsGrid>
@@ -162,7 +178,7 @@ const LocalizationUI = () => {
             required
           />
         </InputGroup>
-        
+
         <InputGroup>
           <Label>Language Code</Label>
           <ModernInput
@@ -173,7 +189,7 @@ const LocalizationUI = () => {
             required
           />
         </InputGroup>
-        
+
         <InputGroup>
           <Label>Text Content</Label>
           <ModernInput
@@ -184,7 +200,7 @@ const LocalizationUI = () => {
             required
           />
         </InputGroup>
-        
+
         <InputGroup>
           <Label>Component</Label>
           <ModernInput
@@ -195,7 +211,7 @@ const LocalizationUI = () => {
             required
           />
         </InputGroup>
-        
+
         <ModernButton type="submit" variant="primary">
           <AddIcon />
           {editMode ? 'Update Localization' : 'Create Localization'}
@@ -217,16 +233,13 @@ const LocalizationUI = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ width: '250px' }}
             />
-            <ModernButton 
+            <ModernButton
               variant="secondary"
-              onClick={() => fetchLocalizations().then(data => setLocalizations(data))}
+              onClick={() => fetchLocalizations().then((data) => setLocalizations(data))}
             >
               🔄 Reload
             </ModernButton>
-            <ModernButton 
-              variant="secondary"
-              onClick={toggleCollapse}
-            >
+            <ModernButton variant="secondary" onClick={toggleCollapse}>
               {isCollapsed ? 'Show' : 'Hide'} Table
             </ModernButton>
           </div>
@@ -258,37 +271,32 @@ const LocalizationUI = () => {
                         <strong>{loc.key}</strong>
                       </ModernTableCell>
                       <ModernTableCell>
-                        <span style={{
-                          background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                          color: 'white',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontWeight: '500'
-                        }}>
+                        <span
+                          style={{
+                            background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                          }}
+                        >
                           {loc.language_code.toUpperCase()}
                         </span>
                       </ModernTableCell>
                       <ModernTableCell>
-                        {loc.textcontent.length > 50 
-                          ? `${loc.textcontent.substring(0, 50)}...` 
-                          : loc.textcontent
-                        }
+                        {loc.textcontent.length > 50
+                          ? `${loc.textcontent.substring(0, 50)}...`
+                          : loc.textcontent}
                       </ModernTableCell>
                       <ModernTableCell>{loc.component}</ModernTableCell>
                       <ModernTableCell>
                         <ActionButtonGroup>
-                          <ActionButton 
-                            variant="edit" 
-                            onClick={() => handleEdit(loc)}
-                          >
+                          <ActionButton variant="edit" onClick={() => handleEdit(loc)}>
                             <EditIcon style={{ fontSize: '16px' }} />
                             Edit
                           </ActionButton>
-                          <ActionButton 
-                            variant="delete" 
-                            onClick={() => handleDelete(loc.id)}
-                          >
+                          <ActionButton variant="delete" onClick={() => handleDelete(loc.id)}>
                             <DeleteIcon style={{ fontSize: '16px' }} />
                             Delete
                           </ActionButton>
@@ -302,7 +310,7 @@ const LocalizationUI = () => {
           </TableContainer>
         )}
       </TableSection>
-      
+
       <Snackbar show={showSnackbar}>
         Localization successfully {editMode ? 'updated' : 'created'}!
       </Snackbar>

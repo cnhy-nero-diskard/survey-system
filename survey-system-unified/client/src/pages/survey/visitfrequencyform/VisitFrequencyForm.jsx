@@ -26,7 +26,7 @@ const VisitFrequencyForm = () => {
   }, []);
 
   const handleChoice = (value) => {
-    const numericalValue = value === "0" ? 0 : value === "1x" ? 1 : value === "2x" ? 2 : 3;
+    const numericalValue = value === '0' ? 0 : value === '1x' ? 1 : value === '2x' ? 2 : 3;
     setVisitCount(numericalValue);
     // Save the selected value to localStorage
     saveToLocalStorage('visitCount', numericalValue);

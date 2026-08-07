@@ -198,7 +198,8 @@ const SurveyTouchpoints = () => {
       console.error('SVG element not found');
       return;
     }
-    domtoimage.toPng(svg)
+    domtoimage
+      .toPng(svg)
       .then((dataUrl) => {
         const link = document.createElement('a');
         link.download = `${selectedItem}_QRCode.png`;
@@ -211,7 +212,8 @@ const SurveyTouchpoints = () => {
   };
 
   const handleCopyLink = (link) => {
-    navigator.clipboard.writeText(link)
+    navigator.clipboard
+      .writeText(link)
       .then(() => {
         // A blocking window.alert() for a copy confirmation is jarring and is
         // the only modal dialog in the admin UI; use the same Snackbar the
@@ -233,8 +235,7 @@ const SurveyTouchpoints = () => {
     return touchpointData[selectedType] || [];
   };
 
-  const selectedTypeLabel =
-    TOUCHPOINT_TYPES.find((t) => t.value === selectedType)?.label || 'item';
+  const selectedTypeLabel = TOUCHPOINT_TYPES.find((t) => t.value === selectedType)?.label || 'item';
 
   return (
     <>
@@ -246,9 +247,7 @@ const SurveyTouchpoints = () => {
               <Title variant="h5" gutterBottom>
                 TOURISM PRODUCT MARKET SURVEY
               </Title>
-              <Subtitle variant="body1">
-                Scan the QR code below to access the survey.
-              </Subtitle>
+              <Subtitle variant="body1">Scan the QR code below to access the survey.</Subtitle>
               {generateQRCode(`${process.env.REACT_APP_SELF_URL}/survey/`)}
               <LinkContainer>
                 <StyledLink
@@ -279,9 +278,7 @@ const SurveyTouchpoints = () => {
               <Title variant="h6" gutterBottom>
                 Generate QR Code for Touchpoints
               </Title>
-              <Subtitle variant="body1">
-                Select a type and item to generate a QR code.
-              </Subtitle>
+              <Subtitle variant="body1">Select a type and item to generate a QR code.</Subtitle>
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                   <StyledSelect
@@ -295,14 +292,21 @@ const SurveyTouchpoints = () => {
                       Select Type
                     </MenuItem>
                     {TOUCHPOINT_TYPES.map(({ value, label }) => (
-                      <MenuItem key={value} value={value}>{label}</MenuItem>
+                      <MenuItem key={value} value={value}>
+                        {label}
+                      </MenuItem>
                     ))}
                   </StyledSelect>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   {loading ? (
                     <Box display="flex" alignItems="center" gap={1.5}>
-                      <CircularProgress size={24} thickness={4} sx={{ color: '#667eea' }} aria-label="Loading touchpoints" />
+                      <CircularProgress
+                        size={24}
+                        thickness={4}
+                        sx={{ color: '#667eea' }}
+                        aria-label="Loading touchpoints"
+                      />
                       <Skeleton variant="rectangular" width="100%" height={56} />
                     </Box>
                   ) : (
@@ -316,7 +320,9 @@ const SurveyTouchpoints = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          label={selectedType ? `Select ${selectedTypeLabel}` : 'Select a type first'}
+                          label={
+                            selectedType ? `Select ${selectedTypeLabel}` : 'Select a type first'
+                          }
                           variant="outlined"
                         />
                       )}
@@ -343,10 +349,7 @@ const SurveyTouchpoints = () => {
                       </IconButton>
                     </Tooltip>
                   </LinkContainer>
-                  <DownloadButton
-                    onClick={handleDownloadQRCode}
-                    startIcon={<Download />}
-                  >
+                  <DownloadButton onClick={handleDownloadQRCode} startIcon={<Download />}>
                     Download QR Code
                   </DownloadButton>
                 </>

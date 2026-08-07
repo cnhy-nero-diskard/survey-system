@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Skeleton, CircularProgress, Fade, Typography } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import styled from 'styled-components';
 import { ChartContainer, MainContent } from '../../shared/styledComponents';
 import { fetchEntityMetrics } from '../../../utils/getSurveyFeedbackApi';
@@ -53,21 +62,27 @@ const CustomTooltip = ({ active, payload, label }) => {
           padding: '12px',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
           fontFamily: fontFamily,
-          minWidth: '200px'
+          minWidth: '200px',
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 600, marginBottom: 1, color: '#2d3748' }}>
           {label}
         </Typography>
         {payload.map((item, index) => (
-          <Box key={index} display="flex" justifyContent="space-between" alignItems="center" mb={0.5}>
+          <Box
+            key={index}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={0.5}
+          >
             <Box display="flex" alignItems="center" gap={1}>
               <Box
                 sx={{
                   width: 12,
                   height: 12,
                   backgroundColor: item.color,
-                  borderRadius: '2px'
+                  borderRadius: '2px',
                 }}
               />
               <Typography variant="caption" sx={{ color: '#4a5568' }}>
@@ -100,15 +115,15 @@ const OverallOneBarangay = ({ year, quarter }) => {
       try {
         const metrics = await fetchEntityMetrics(year, quarter);
         const filteredData = Array.isArray(metrics)
-         ? metrics
-          .filter(metric => metric.touchpoint === "establishments")
-          .map(metric => ({
-            entity: metric.entity,
-            total_responses: parseInt(metric.total_responses, 10),
-            ...metric.rating
-          }))
-          .sort((a, b) => b.total_responses - a.total_responses)
-          .slice(0, 6)
+          ? metrics
+              .filter((metric) => metric.touchpoint === 'establishments')
+              .map((metric) => ({
+                entity: metric.entity,
+                total_responses: parseInt(metric.total_responses, 10),
+                ...metric.rating,
+              }))
+              .sort((a, b) => b.total_responses - a.total_responses)
+              .slice(0, 6)
           : [];
 
         setData(filteredData);
@@ -131,7 +146,12 @@ const OverallOneBarangay = ({ year, quarter }) => {
       <MainContent>
         <LoadingContainer>
           <Skeleton variant="text" width="60%" height={32} />
-          <CircularProgress size={28} thickness={4} sx={{ color: '#667eea', alignSelf: 'center' }} aria-label="Loading establishment analytics" />
+          <CircularProgress
+            size={28}
+            thickness={4}
+            sx={{ color: '#667eea', alignSelf: 'center' }}
+            aria-label="Loading establishment analytics"
+          />
           <Skeleton variant="rectangular" width="100%" height={280} />
           <Box display="flex" gap={2} mt={2}>
             <Skeleton variant="rectangular" width={100} height={20} />
@@ -147,9 +167,7 @@ const OverallOneBarangay = ({ year, quarter }) => {
     <MainContent>
       <Fade in={!loading} timeout={600}>
         <Box>
-          <ChartTitle>
-            Top 6 Establishments by Response Volume
-          </ChartTitle>
+          <ChartTitle>Top 6 Establishments by Response Volume</ChartTitle>
           <StyledChartContainer>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart
@@ -187,7 +205,7 @@ const OverallOneBarangay = ({ year, quarter }) => {
                   tick={{
                     fontSize: 10,
                     fontFamily: fontFamily,
-                    fill: '#4a5568'
+                    fill: '#4a5568',
                   }}
                   tickFormatter={(value) => truncateLabel(value, 12)}
                   angle={-45}
@@ -195,11 +213,11 @@ const OverallOneBarangay = ({ year, quarter }) => {
                   height={90}
                   stroke="#cbd5e0"
                 />
-                <YAxis 
-                  tick={{ 
-                    fontSize: 12, 
+                <YAxis
+                  tick={{
+                    fontSize: 12,
                     fontFamily: fontFamily,
-                    fill: '#4a5568'
+                    fill: '#4a5568',
                   }}
                   stroke="#cbd5e0"
                 />
@@ -208,30 +226,30 @@ const OverallOneBarangay = ({ year, quarter }) => {
                   wrapperStyle={{
                     fontFamily: fontFamily,
                     fontSize: '12px',
-                    paddingTop: '10px'
+                    paddingTop: '10px',
                   }}
                 />
-                <Bar 
-                  dataKey="VerySatisfied" 
-                  stackId="a" 
+                <Bar
+                  dataKey="VerySatisfied"
+                  stackId="a"
                   fill="url(#verySatisfiedEstGrad)"
                   radius={[0, 0, 0, 0]}
                 />
-                <Bar 
-                  dataKey="Satisfied" 
-                  stackId="a" 
+                <Bar
+                  dataKey="Satisfied"
+                  stackId="a"
                   fill="url(#satisfiedEstGrad)"
                   radius={[0, 0, 0, 0]}
                 />
-                <Bar 
-                  dataKey="Neutral" 
-                  stackId="a" 
+                <Bar
+                  dataKey="Neutral"
+                  stackId="a"
                   fill="url(#neutralEstGrad)"
                   radius={[0, 0, 0, 0]}
                 />
-                <Bar 
-                  dataKey="Dissatisfied" 
-                  stackId="a" 
+                <Bar
+                  dataKey="Dissatisfied"
+                  stackId="a"
                   fill="url(#dissatisfiedEstGrad)"
                   radius={[2, 2, 0, 0]}
                 />

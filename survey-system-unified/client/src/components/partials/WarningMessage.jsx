@@ -43,12 +43,7 @@ const WarningMessageContainer = styled.div`
 `;
 
 const WarningMessage = ({ message }) => {
-  return (
-        <WarningMessageContainer>
-          {message}
-        </WarningMessageContainer>
-    
-  );
+  return <WarningMessageContainer>{message}</WarningMessageContainer>;
 };
 
 export default WarningMessage;

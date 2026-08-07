@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Select,
-  FormControl,
-  MenuItem,
-  Typography
-} from '@mui/material';
+import { Box, Select, FormControl, MenuItem, Typography } from '@mui/material';
 import styled from 'styled-components';
 import { fontFamily } from '../../../config/fontConfig';
 import { CalendarToday as CalendarIcon } from '@mui/icons-material';
@@ -24,7 +18,7 @@ const SelectorContainer = styled(Box)`
   width: 100%;
   max-width: 100%;
   z-index: 1;
-  
+
   @media (max-width: 768px) {
     padding: 16px;
     gap: 12px;
@@ -35,7 +29,7 @@ const HeaderRow = styled(Box)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 12px;
@@ -52,7 +46,7 @@ const SelectorTitle = styled(Typography)`
   align-items: center;
   gap: 8px;
   color: white;
-  
+
   @media (max-width: 768px) {
     font-size: 18px;
   }
@@ -62,7 +56,7 @@ const FiltersContainer = styled(Box)`
   display: flex;
   gap: 16px;
   align-items: flex-start;
-  
+
   @media (max-width: 768px) {
     width: 100%;
     justify-content: flex-start;
@@ -87,25 +81,25 @@ const FilterLabel = styled(Typography)`
 
 const StyledFormControl = styled(FormControl)`
   min-width: 120px;
-  
+
   & .MuiOutlinedInput-root {
     background-color: rgba(255, 255, 255, 0.95);
     border-radius: 8px;
-    
+
     &:hover {
       background-color: rgba(255, 255, 255, 1);
     }
-    
+
     &.Mui-focused {
       background-color: rgba(255, 255, 255, 1);
     }
   }
-  
+
   & .MuiSelect-select {
     font-family: ${fontFamily};
     font-weight: 500;
   }
-  
+
   @media (max-width: 768px) {
     min-width: 100px;
   }
@@ -120,13 +114,13 @@ const SubtitleText = styled(Typography)`
   margin-top: 4px;
 `;
 
-const DateQuarterSelector = ({ 
-  year, 
-  quarter, 
-  onYearChange, 
-  onQuarterChange, 
-  title = "Data Filters",
-  subtitle = "Select time period for data analysis"
+const DateQuarterSelector = ({
+  year,
+  quarter,
+  onYearChange,
+  onQuarterChange,
+  title = 'Data Filters',
+  subtitle = 'Select time period for data analysis',
 }) => {
   // Generate years for dropdown (current year and previous 5 years)
   const generateYears = () => {
@@ -153,31 +147,25 @@ const DateQuarterSelector = ({
             {getCurrentDate()} • {subtitle}
           </SubtitleText>
         </Box>
-        
+
         <FiltersContainer>
           <FilterGroup>
             <FilterLabel>Year</FilterLabel>
             <StyledFormControl size="small" variant="outlined">
-              <Select
-                value={year}
-                onChange={onYearChange}
-                displayEmpty
-              >
+              <Select value={year} onChange={onYearChange} displayEmpty>
                 {generateYears().map((yr) => (
-                  <MenuItem key={yr} value={yr}>{yr}</MenuItem>
+                  <MenuItem key={yr} value={yr}>
+                    {yr}
+                  </MenuItem>
                 ))}
               </Select>
             </StyledFormControl>
           </FilterGroup>
-          
+
           <FilterGroup>
             <FilterLabel>Quarter</FilterLabel>
             <StyledFormControl size="small" variant="outlined">
-              <Select
-                value={quarter}
-                onChange={onQuarterChange}
-                displayEmpty
-              >
+              <Select value={quarter} onChange={onQuarterChange} displayEmpty>
                 <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
                 <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
                 <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>

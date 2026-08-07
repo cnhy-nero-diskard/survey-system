@@ -1,4 +1,3 @@
-
 // server.js
 import express from 'express';
 import cors from 'cors';
@@ -51,7 +50,7 @@ app.use(cors(corsOptions));
 // Rate limiting must be registered before routes so it applies to every request
 const limiter = rateLimit({
   windowMs: 3 * 60 * 1000, // 3 minutes
-  max: 10000 // limit each IP per windowMs
+  max: 10000, // limit each IP per windowMs
 });
 app.use(limiter);
 
@@ -99,10 +98,10 @@ app.use(authRoutes);
 
 // Health check endpoint for Docker and monitoring
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'healthy', 
+  res.status(200).json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
   });
 });
 
@@ -112,7 +111,7 @@ app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
-  
+
   const indexPath = path.join(clientBuildPath, 'index.html');
   res.sendFile(indexPath, (err) => {
     if (err) {
@@ -131,7 +130,7 @@ export default app;
 if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
   const PORT = env.PORT;
   app.listen(PORT, () => {
-      logger.info(`Server is running on port ${PORT}`); // Log the actual port being used
-      logger.info(`Serving static files from: ${clientBuildPath}`);
+    logger.info(`Server is running on port ${PORT}`); // Log the actual port being used
+    logger.info(`Serving static files from: ${clientBuildPath}`);
   });
 }

@@ -32,7 +32,7 @@ const AdminRoutes = () => {
   const { isAuthenticated, unauthorized, handleUnauthorized, login } = useAuth();
   const [loading, setLoading] = useState(true);
   const hasCheckedAuth = useRef(false); // Track if the auth check has been performed
-  
+
   // Safe loading store access with fallback
   let setFetchingData, clearGlobalLoading;
   try {
@@ -52,7 +52,7 @@ const AdminRoutes = () => {
     const checkAuth = async () => {
       // Show global loading during authentication check
       setFetchingData('Authenticating user access and verifying permissions');
-      
+
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_HOST}/api/auth/check`, {
           withCredentials: true,
@@ -83,7 +83,7 @@ const AdminRoutes = () => {
       <>
         <GlobalLoadingOverlay />
       </>
-    ); 
+    );
   }
 
   return (
@@ -95,9 +95,7 @@ const AdminRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route
           path="/"
-          element={
-            isAuthenticated ? <DashboardOutlet /> : <Navigate to="/login" replace />
-          }
+          element={isAuthenticated ? <DashboardOutlet /> : <Navigate to="/login" replace />}
         >
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -114,11 +112,14 @@ const AdminRoutes = () => {
           <Route path="barangaydashboard" element={<AreaDashboard />} />
           <Route path="attractiondashboard" element={<AttractionDashboard />} />
           <Route path="datamanager" element={<DataManager />} />
-          <Route path="stally" element={
-            <SurveyStatsErrorBoundary>
-              <SurveyTally />
-            </SurveyStatsErrorBoundary>
-          } />
+          <Route
+            path="stally"
+            element={
+              <SurveyStatsErrorBoundary>
+                <SurveyTally />
+              </SurveyStatsErrorBoundary>
+            }
+          />
           <Route path="sentimentgraphs" element={<HeatmapChart />} />
           <Route path="logstream" element={<LogStream />} />
         </Route>

@@ -1,6 +1,6 @@
 /**
  * Usage Examples for Global Loading System
- * 
+ *
  * This file demonstrates how to use the new global loading system
  * with "Fetching Data" messages and circular loading animations.
  */
@@ -11,16 +11,17 @@ import FetchingDataLoader from '../components/partials/FetchingDataLoader';
 
 // Example 1: Using Global Loading Overlay
 const ExampleGlobalLoading = () => {
-  const { setFetchingData, clearGlobalLoading, setProcessingData, setLoadingDashboard } = useGlobalLoadingStore();
+  const { setFetchingData, clearGlobalLoading, setProcessingData, setLoadingDashboard } =
+    useGlobalLoadingStore();
 
   const handleFetchData = async () => {
     // Show global overlay with "Fetching Data" message
     setFetchingData('Retrieving survey responses from the database...');
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
       // Clear loading when done
       clearGlobalLoading();
     } catch (error) {
@@ -31,9 +32,9 @@ const ExampleGlobalLoading = () => {
   const handleProcessData = async () => {
     // Show global overlay with "Processing Data" message
     setProcessingData('Analyzing survey responses and generating insights...');
-    
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      await new Promise((resolve) => setTimeout(resolve, 2500));
       clearGlobalLoading();
     } catch (error) {
       clearGlobalLoading();
@@ -43,9 +44,9 @@ const ExampleGlobalLoading = () => {
   const handleLoadDashboard = async () => {
     // Show global overlay with custom dashboard loading message
     setLoadingDashboard('Analytics Dashboard', 'Loading charts, metrics, and real-time data...');
-    
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       clearGlobalLoading();
     } catch (error) {
       clearGlobalLoading();
@@ -74,10 +75,10 @@ const ExampleComponentLoading = () => {
 
   const handleComponentLoad = async () => {
     setIsLoading(true);
-    
+
     try {
       // Simulate data fetching
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -106,9 +107,13 @@ const ExampleComponentLoading = () => {
   }
 
   return (
-    <div style={{ padding: '20px', minHeight: '400px', background: '#f6f8fa', borderRadius: '12px' }}>
+    <div
+      style={{ padding: '20px', minHeight: '400px', background: '#f6f8fa', borderRadius: '12px' }}
+    >
       <h3>Component Loaded Successfully!</h3>
-      <p>This component shows how to use the FetchingDataLoader for component-level loading states.</p>
+      <p>
+        This component shows how to use the FetchingDataLoader for component-level loading states.
+      </p>
       <button onClick={handleComponentLoad} style={{ padding: '10px 20px', marginTop: '20px' }}>
         Reload Component with Loading
       </button>
@@ -125,17 +130,17 @@ const ExampleDashboardIntegration = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       setIsLoading(true);
-      
+
       // Show global loading for initial page load
       setFetchingData('Loading dashboard analytics and survey metrics...');
 
       try {
         // Simulate API calls
-        await new Promise(resolve => setTimeout(resolve, 2500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+
         setData({
           metrics: { responses: 1250, rating: 4.2 },
-          charts: ['satisfaction', 'demographics', 'trends']
+          charts: ['satisfaction', 'demographics', 'trends'],
         });
       } catch (error) {
         console.error('Error loading dashboard:', error);
@@ -170,7 +175,9 @@ const ExampleDashboardIntegration = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h2>Dashboard Data Loaded!</h2>
-      <div style={{ background: '#f8f9fa', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
+      <div
+        style={{ background: '#f8f9fa', padding: '20px', borderRadius: '8px', marginTop: '20px' }}
+      >
         <h3>Survey Metrics</h3>
         <p>Total Responses: {data?.metrics?.responses}</p>
         <p>Average Rating: {data?.metrics?.rating}</p>
@@ -181,32 +188,28 @@ const ExampleDashboardIntegration = () => {
 };
 
 // Export examples for demonstration
-export {
-  ExampleGlobalLoading,
-  ExampleComponentLoading,
-  ExampleDashboardIntegration
-};
+export { ExampleGlobalLoading, ExampleComponentLoading, ExampleDashboardIntegration };
 
 /**
  * HOW TO USE IN YOUR COMPONENTS:
- * 
+ *
  * 1. Global Loading (Full Screen Overlay):
  *    ```jsx
  *    import useGlobalLoadingStore from '../utils/globalLoadingStore';
- *    
+ *
  *    const { setFetchingData, clearGlobalLoading } = useGlobalLoadingStore();
- *    
+ *
  *    // Show loading
  *    setFetchingData('Custom subtitle message here');
- *    
+ *
  *    // Clear loading
  *    clearGlobalLoading();
  *    ```
- * 
+ *
  * 2. Component Loading (Local to Component):
  *    ```jsx
  *    import FetchingDataLoader from '../components/partials/FetchingDataLoader';
- *    
+ *
  *    if (loading) {
  *      return (
  *        <FetchingDataLoader
@@ -219,7 +222,7 @@ export {
  *      );
  *    }
  *    ```
- * 
+ *
  * 3. Pre-built Loading Messages:
  *    - setFetchingData(subtitle)     // "Fetching Data" with circular loader
  *    - setProcessingData(subtitle)   // "Processing Data" with circular loader  

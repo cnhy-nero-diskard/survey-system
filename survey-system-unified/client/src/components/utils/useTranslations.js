@@ -15,25 +15,25 @@ import { getApiUrl } from '../../config/apiConfig.js';
  * console.log(translations.title); // Outputs the translated title for the Header component in English.
  */
 const useTranslations = (component, language) => {
-    const [translations, setTranslations] = useState({});
+  const [translations, setTranslations] = useState({});
 
-    useEffect(() => {
-        const fetchTranslations = async () => {
-            try {
-                const response = await axios.get(
-                    getApiUrl(`/api/texts?language=${language}&component=${component}`),
-                     { withCredentials: true }
-                );
-                setTranslations(response.data);
-            } catch (error) {
-                console.error('Error fetching translations:', error);
-            }
-        };
+  useEffect(() => {
+    const fetchTranslations = async () => {
+      try {
+        const response = await axios.get(
+          getApiUrl(`/api/texts?language=${language}&component=${component}`),
+          { withCredentials: true }
+        );
+        setTranslations(response.data);
+      } catch (error) {
+        console.error('Error fetching translations:', error);
+      }
+    };
 
-        fetchTranslations();
-    }, [component, language]);
+    fetchTranslations();
+  }, [component, language]);
 
-    return translations;
+  return translations;
 };
 
 export default useTranslations;

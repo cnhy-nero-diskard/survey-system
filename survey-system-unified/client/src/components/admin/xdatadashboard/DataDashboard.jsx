@@ -49,16 +49,24 @@ import {
 // Modern color palette for charts
 const MODERN_COLORS = {
   sentiment: {
-    'Dissatisfied': '#EF4444',      // Red
-    'Neutral': '#F59E0B',           // Amber
-    'Satisfied': '#34D399',         // Light emerald
-    'Very Satisfied': '#10B981',    // Emerald
+    Dissatisfied: '#EF4444', // Red
+    Neutral: '#F59E0B', // Amber
+    Satisfied: '#34D399', // Light emerald
+    'Very Satisfied': '#10B981', // Emerald
   },
-  language: '#8B5CF6',              // Purple
+  language: '#8B5CF6', // Purple
   proportion: [
-    '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#F97316',
-    '#06B6D4', '#EC4899', '#84CC16', '#6366F1', '#F43F5E',
-  ]
+    '#10B981',
+    '#F59E0B',
+    '#EF4444',
+    '#8B5CF6',
+    '#F97316',
+    '#06B6D4',
+    '#EC4899',
+    '#84CC16',
+    '#6366F1',
+    '#F43F5E',
+  ],
 };
 
 // Animations
@@ -101,12 +109,12 @@ const StyledPaper = styled(Paper)`
   position: relative;
   overflow: hidden;
   animation: ${fadeIn} 0.6s ease-out;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
   }
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -138,7 +146,7 @@ const HeaderContainer = styled(Box)`
   color: white;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -158,7 +166,7 @@ const HeaderContent = styled(Box)`
   align-items: center;
   position: relative;
   z-index: 1;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 16px;
@@ -174,7 +182,7 @@ const HeaderTitle = styled(Typography)`
   display: flex;
   align-items: center;
   gap: 12px;
-  
+
   @media (max-width: 768px) {
     font-size: 24px;
   }
@@ -184,16 +192,16 @@ const StyledAutocomplete = styled(Autocomplete)`
   & .MuiOutlinedInput-root {
     background-color: rgba(255, 255, 255, 0.95);
     border-radius: 8px;
-    
+
     &:hover {
       background-color: rgba(255, 255, 255, 1);
     }
-    
+
     &.Mui-focused {
       background-color: rgba(255, 255, 255, 1);
     }
   }
-  
+
   & .MuiInputLabel-root {
     color: rgba(0, 0, 0, 0.7);
     font-family: ${fontFamily};
@@ -203,20 +211,20 @@ const StyledAutocomplete = styled(Autocomplete)`
 
 const StyledFormControl = styled(FormControl)`
   min-width: 120px;
-  
+
   & .MuiOutlinedInput-root {
     background-color: rgba(255, 255, 255, 0.95);
     border-radius: 8px;
-    
+
     &:hover {
       background-color: rgba(255, 255, 255, 1);
     }
-    
+
     &.Mui-focused {
       background-color: rgba(255, 255, 255, 1);
     }
   }
-  
+
   & .MuiSelect-select {
     font-family: ${fontFamily};
     font-weight: 500;
@@ -228,7 +236,7 @@ const FilterContainer = styled(Box)`
   gap: 16px;
   align-items: flex-start;
   margin-top: 16px;
-  
+
   @media (max-width: 768px) {
     width: 100%;
     justify-content: flex-start;
@@ -272,7 +280,7 @@ const CardIcon = styled(Box)`
   justify-content: center;
   color: white;
   margin-bottom: 12px;
-  
+
   & svg {
     font-size: 20px;
   }
@@ -289,9 +297,9 @@ const CardTitle = styled(Typography)`
 const StatsCard = styled(StyledPaper)`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   color: white;
-  
+
   &::before {
-    background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
   }
 `;
 
@@ -323,14 +331,20 @@ const CustomTooltip = ({ active, payload, label }) => {
           </Typography>
         )}
         {payload.map((item, index) => (
-          <Box key={index} display="flex" justifyContent="space-between" alignItems="center" mb={0.5}>
+          <Box
+            key={index}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={0.5}
+          >
             <Box display="flex" alignItems="center" gap={1}>
               <Box
                 sx={{
                   width: 12,
                   height: 12,
                   backgroundColor: item.color,
-                  borderRadius: '2px'
+                  borderRadius: '2px',
                 }}
               />
               <Typography variant="caption" sx={{ color: '#4a5568' }}>
@@ -384,18 +398,18 @@ const CustomPieTooltip = ({ active, payload, total = 0 }) => {
 // Custom label function for pie charts
 const renderCustomPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
   if (percent < 0.05) return null; // Don't show labels for slices less than 5%
-  
+
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text 
-      x={x} 
-      y={y} 
-      fill="white" 
-      textAnchor={x > cx ? 'start' : 'end'} 
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > cx ? 'start' : 'end'}
       dominantBaseline="central"
       fontSize="12"
       fontWeight="600"
@@ -433,17 +447,17 @@ const modalStyle = {
  * @param {string} props.entityLabel - The label for the entity selector.
  * @param {string} props.entityKey - The default entity key to display data for.
  */
-const DataDashboard = ({ 
-  data, 
-  entities, 
-  entityLabel, 
+const DataDashboard = ({
+  data,
+  entities,
+  entityLabel,
   entityKey,
   // Date filter props
   showDateFilters = false,
   year,
   quarter,
   onYearChange,
-  onQuarterChange
+  onQuarterChange,
 }) => {
   // State to hold the currently selected entity key
   const [selectedEntity, setSelectedEntity] = useState(entityKey);
@@ -486,9 +500,7 @@ const DataDashboard = ({
     entities.reduce(
       (acc, entity) => {
         const entityTotal = data[entity.key]?.totalResponses || 0;
-        const percentage = totalResponsesAll > 0
-          ? (entityTotal / totalResponsesAll) * 100
-          : 0;
+        const percentage = totalResponsesAll > 0 ? (entityTotal / totalResponsesAll) * 100 : 0;
         // Keep the plotted values unrounded so stacked segments always total
         // exactly 100% for the axis calculation. Values are rounded only when
         // displayed in the tooltip and table.
@@ -512,13 +524,14 @@ const DataDashboard = ({
   const entityData = data[selectedEntity];
 
   // Prepare sentiment data with modern colors
-  const enhancedSentimentData = entityData?.sentimentData
-    ?.map(item => ({
-      ...item,
-      value: toSentimentCount(item.value),
-      color: MODERN_COLORS.sentiment[item.name] || '#8B5CF6'
-    }))
-    .filter(item => item.value > 0) || [];
+  const enhancedSentimentData =
+    entityData?.sentimentData
+      ?.map((item) => ({
+        ...item,
+        value: toSentimentCount(item.value),
+        color: MODERN_COLORS.sentiment[item.name] || '#8B5CF6',
+      }))
+      .filter((item) => item.value > 0) || [];
 
   const sentimentTotal = enhancedSentimentData.reduce((sum, item) => sum + (item.value || 0), 0);
 
@@ -536,12 +549,22 @@ const DataDashboard = ({
     return (
       <MainContainer>
         <LoadingContainer>
-          <CircularProgress size={32} thickness={4} sx={{ color: '#667eea' }} aria-label="Loading analytics dashboard" />
+          <CircularProgress
+            size={32}
+            thickness={4}
+            sx={{ color: '#667eea' }}
+            aria-label="Loading analytics dashboard"
+          />
           <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 2 }} />
           <Grid container spacing={3} sx={{ mt: 2 }}>
             {[1, 2, 3, 4].map((item) => (
               <Grid item xs={12} md={6} lg={3} key={item}>
-                <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 2 }} />
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height={300}
+                  sx={{ borderRadius: 2 }}
+                />
               </Grid>
             ))}
           </Grid>
@@ -570,15 +593,16 @@ const DataDashboard = ({
                       fontFamily: fontFamily,
                       opacity: 0.9,
                       fontWeight: 400,
-                      marginTop: '4px'
+                      marginTop: '4px',
                     }}
                   >
-                    {showDateFilters ? `${getCurrentDate()} • ` : ''}Comprehensive survey data analysis and insights
+                    {showDateFilters ? `${getCurrentDate()} • ` : ''}Comprehensive survey data
+                    analysis and insights
                   </Typography>
                 </Box>
-                
+
                 <Box display="flex" flexDirection="column" alignItems="flex-end" gap={2}>
-                  <Chip 
+                  <Chip
                     label={`${entities.length} ${entityLabel.toLowerCase()}s available`}
                     sx={{
                       backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -588,32 +612,26 @@ const DataDashboard = ({
                     }}
                     size="small"
                   />
-                  
+
                   {showDateFilters && (
                     <FilterContainer>
                       <FilterGroup>
                         <FilterLabel>Year</FilterLabel>
                         <StyledFormControl size="small" variant="outlined">
-                          <Select
-                            value={year}
-                            onChange={onYearChange}
-                            displayEmpty
-                          >
+                          <Select value={year} onChange={onYearChange} displayEmpty>
                             {generateYears().map((yr) => (
-                              <MenuItem key={yr} value={yr}>{yr}</MenuItem>
+                              <MenuItem key={yr} value={yr}>
+                                {yr}
+                              </MenuItem>
                             ))}
                           </Select>
                         </StyledFormControl>
                       </FilterGroup>
-                      
+
                       <FilterGroup>
                         <FilterLabel>Quarter</FilterLabel>
                         <StyledFormControl size="small" variant="outlined">
-                          <Select
-                            value={quarter}
-                            onChange={onQuarterChange}
-                            displayEmpty
-                          >
+                          <Select value={quarter} onChange={onQuarterChange} displayEmpty>
                             <MenuItem value={1}>Q1 (Jan-Mar)</MenuItem>
                             <MenuItem value={2}>Q2 (Apr-Jun)</MenuItem>
                             <MenuItem value={3}>Q3 (Jul-Sep)</MenuItem>
@@ -650,32 +668,30 @@ const DataDashboard = ({
                       '& .MuiInputLabel-root': {
                         fontFamily: fontFamily,
                         fontWeight: 500,
-                      }
+                      },
                     }}
                   />
                 )}
               />
             </Box>
           </Grid>
-      
+
           {/* Overview: KPI and distribution share a row on wider screens */}
           <Grid item xs={12} md={4} sx={{ mt: 2, pr: { md: 1.25 } }}>
             <StatsCard elevation={0} sx={{ height: '100%', minHeight: 220 }}>
-                <CardIcon>
-                  <TrendingUpIcon />
-                </CardIcon>
-                <CardTitle sx={{ color: 'white !important' }}>
-                  Total Survey Responses
-                </CardTitle>
-                <Typography variant="h3" sx={{ fontWeight: 700, fontFamily: fontFamily }}>
-                  {entityData?.totalResponses || 0}
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9, mt: 1 }}>
-                  From selected {entityLabel.toLowerCase()}
-                </Typography>
+              <CardIcon>
+                <TrendingUpIcon />
+              </CardIcon>
+              <CardTitle sx={{ color: 'white !important' }}>Total Survey Responses</CardTitle>
+              <Typography variant="h3" sx={{ fontWeight: 700, fontFamily: fontFamily }}>
+                {entityData?.totalResponses || 0}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9, mt: 1 }}>
+                From selected {entityLabel.toLowerCase()}
+              </Typography>
             </StatsCard>
           </Grid>
-      
+
           {/* Responses Proportion Bar */}
           <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1.25 } }}>
             <StyledPaper
@@ -687,67 +703,68 @@ const DataDashboard = ({
                 cursor: 'pointer',
                 '&:hover': {
                   transform: 'translateY(-4px)',
-                }
+                },
               }}
             >
-                <CardIcon>
-                  <BarChartIcon />
-                </CardIcon>
-                <CardTitle>
-                  Responses Distribution
-                </CardTitle>
-                <ResponsiveContainer width="100%" height={120}>
-                  <BarChart
-                    layout="vertical"
-                    data={stackedData}
-                    margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-                  >
-                    <defs>
-                      {MODERN_COLORS.proportion.map((color, index) => (
-                        <linearGradient key={index} id={`proportionGrad${index}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor={color} />
-                          <stop offset="100%" stopColor={color} stopOpacity="0.8" />
-                        </linearGradient>
-                      ))}
-                    </defs>
-                    <XAxis
-                      type="number"
-                      domain={[0, 100]}
-                      allowDataOverflow
-                      tickFormatter={(tick) => `${Math.round(tick * 100) / 100}%`}
-                      tick={{ fontSize: 12, fontFamily: fontFamily, fill: '#4a5568' }}
-                    />
-                    <YAxis
-                      dataKey="name"
-                      type="category"
-                      tick={false}
-                    />
-                    <Tooltip 
-                      content={<CustomTooltip />}
-                      formatter={(value) => [`${value.toFixed(2)}%`, '']} 
-                    />
-                    {entities.length <= 10 && (
-                      <Legend
-                        wrapperStyle={{
-                          fontFamily: fontFamily,
-                          fontSize: '12px',
-                        }}
-                      />
-                    )}
-                    {entities.map((entity, index) => (
-                      <Bar
-                        key={entity.key}
-                        dataKey={entity.name}
-                        stackId="allEntities"
-                        fill={`url(#proportionGrad${index % MODERN_COLORS.proportion.length})`}
-                        radius={index === entities.length - 1 ? [0, 4, 4, 0] : [0, 0, 0, 0]}
-                      />
+              <CardIcon>
+                <BarChartIcon />
+              </CardIcon>
+              <CardTitle>Responses Distribution</CardTitle>
+              <ResponsiveContainer width="100%" height={120}>
+                <BarChart
+                  layout="vertical"
+                  data={stackedData}
+                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                >
+                  <defs>
+                    {MODERN_COLORS.proportion.map((color, index) => (
+                      <linearGradient
+                        key={index}
+                        id={`proportionGrad${index}`}
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="0%"
+                      >
+                        <stop offset="0%" stopColor={color} />
+                        <stop offset="100%" stopColor={color} stopOpacity="0.8" />
+                      </linearGradient>
                     ))}
-                  </BarChart>
-                </ResponsiveContainer>
+                  </defs>
+                  <XAxis
+                    type="number"
+                    domain={[0, 100]}
+                    allowDataOverflow
+                    tickFormatter={(tick) => `${Math.round(tick * 100) / 100}%`}
+                    tick={{ fontSize: 12, fontFamily: fontFamily, fill: '#4a5568' }}
+                  />
+                  <YAxis dataKey="name" type="category" tick={false} />
+                  <Tooltip
+                    content={<CustomTooltip />}
+                    formatter={(value) => [`${value.toFixed(2)}%`, '']}
+                  />
+                  {entities.length <= 10 && (
+                    <Legend
+                      wrapperStyle={{
+                        fontFamily: fontFamily,
+                        fontSize: '12px',
+                      }}
+                    />
+                  )}
+                  {entities.map((entity, index) => (
+                    <Bar
+                      key={entity.key}
+                      dataKey={entity.name}
+                      stackId="allEntities"
+                      fill={`url(#proportionGrad${index % MODERN_COLORS.proportion.length})`}
+                      radius={index === entities.length - 1 ? [0, 4, 4, 0] : [0, 0, 0, 0]}
+                    />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
             </StyledPaper>
           </Grid>
-      
+
           {/* Charts Row - Horizontal Layout */}
           <Grid container item xs={12} spacing={2.5} sx={{ mt: 2 }}>
             {/* General Sentiment */}
@@ -757,14 +774,19 @@ const DataDashboard = ({
                   <CardIcon>
                     <PieChartIcon />
                   </CardIcon>
-                  <CardTitle>
-                    General Sentiment
-                  </CardTitle>
+                  <CardTitle>General Sentiment</CardTitle>
                   <ResponsiveContainer width="100%" height={245}>
                     <PieChart>
                       <defs>
                         {Object.entries(MODERN_COLORS.sentiment).map(([key, color], index) => (
-                          <linearGradient key={key} id={`sentimentGrad${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                          <linearGradient
+                            key={key}
+                            id={`sentimentGrad${index}`}
+                            x1="0%"
+                            y1="0%"
+                            x2="100%"
+                            y2="100%"
+                          >
                             <stop offset="0%" stopColor={color} />
                             <stop offset="100%" stopColor={color} stopOpacity="0.8" />
                           </linearGradient>
@@ -782,8 +804,8 @@ const DataDashboard = ({
                         label={renderCustomPieLabel}
                       >
                         {enhancedSentimentData.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
+                          <Cell
+                            key={`cell-${index}`}
                             fill={`url(#sentimentGrad${index})`}
                             stroke="#ffffff"
                             strokeWidth={2}
@@ -795,7 +817,7 @@ const DataDashboard = ({
                         wrapperStyle={{
                           fontFamily: fontFamily,
                           fontSize: '12px',
-                          paddingTop: '10px'
+                          paddingTop: '10px',
                         }}
                         iconType="circle"
                       />
@@ -804,7 +826,7 @@ const DataDashboard = ({
                 </StyledPaper>
               </Box>
             </Grid>
-      
+
             {/* Sentiment by Topic */}
             <Grid item xs={12} md={4}>
               <Box display="flex" height="100%">
@@ -812,16 +834,16 @@ const DataDashboard = ({
                   <CardIcon>
                     <AnalyticsIcon />
                   </CardIcon>
-                  <CardTitle>
-                    Sentiment by Topic
-                  </CardTitle>
+                  <CardTitle>Sentiment by Topic</CardTitle>
                   <Box width="100%" height={245}>
-                    <LocSpecificTopic short_id={entities.find((entity) => entity.key === selectedEntity)?.short_id} />
+                    <LocSpecificTopic
+                      short_id={entities.find((entity) => entity.key === selectedEntity)?.short_id}
+                    />
                   </Box>
                 </StyledPaper>
               </Box>
             </Grid>
-      
+
             {/* Language Distribution */}
             <Grid item xs={12} md={4}>
               <Box display="flex" height="100%">
@@ -829,24 +851,26 @@ const DataDashboard = ({
                   <CardIcon>
                     <LanguageIcon />
                   </CardIcon>
-                  <CardTitle>
-                    Language Distribution
-                  </CardTitle>
+                  <CardTitle>Language Distribution</CardTitle>
                   <ResponsiveContainer width="100%" height={245}>
                     <BarChart data={entityData?.languageDistribution || []}>
                       <defs>
                         <linearGradient id="languageGrad" x1="0%" y1="0%" x2="0%" y2="100%">
                           <stop offset="0%" stopColor={MODERN_COLORS.language} />
-                          <stop offset="100%" stopColor={MODERN_COLORS.language} stopOpacity="0.6" />
+                          <stop
+                            offset="100%"
+                            stopColor={MODERN_COLORS.language}
+                            stopOpacity="0.6"
+                          />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f4f8" strokeWidth={1} />
-                      <XAxis 
-                        dataKey="language" 
+                      <XAxis
+                        dataKey="language"
                         tick={{ fontSize: 12, fontFamily: fontFamily, fill: '#4a5568' }}
                         stroke="#cbd5e0"
                       />
-                      <YAxis 
+                      <YAxis
                         tick={{ fontSize: 12, fontFamily: fontFamily, fill: '#4a5568' }}
                         stroke="#cbd5e0"
                       />
@@ -857,18 +881,14 @@ const DataDashboard = ({
                           fontSize: '12px',
                         }}
                       />
-                      <Bar 
-                        dataKey="count" 
-                        fill="url(#languageGrad)"
-                        radius={[4, 4, 0, 0]}
-                      />
+                      <Bar dataKey="count" fill="url(#languageGrad)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </StyledPaper>
               </Box>
             </Grid>
           </Grid>
-      
+
           {/* Modal for Detailed Breakdown */}
           <Modal
             open={modalOpen}
@@ -877,38 +897,56 @@ const DataDashboard = ({
             aria-describedby="modal-modal-description"
           >
             <Box sx={{ ...modalStyle, overflow: 'auto' }}>
-              <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ fontFamily: fontFamily, fontWeight: 600, mb: 2 }}>
+              <Typography
+                id="modal-modal-title"
+                variant="h6"
+                component="h2"
+                sx={{ fontFamily: fontFamily, fontWeight: 600, mb: 2 }}
+              >
                 Detailed Breakdown of Responses
               </Typography>
-              <TableContainer style={{
-                overflowY: 'auto',
-                maxHeight: '500px',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0'
-              }}>
+              <TableContainer
+                style={{
+                  overflowY: 'auto',
+                  maxHeight: '500px',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0',
+                }}
+              >
                 <Table>
-                  <TableHead style={{
-                    position: 'sticky',
-                    top: 0,
-                    backgroundColor: '#f7fafc'
-                  }}>
+                  <TableHead
+                    style={{
+                      position: 'sticky',
+                      top: 0,
+                      backgroundColor: '#f7fafc',
+                    }}
+                  >
                     <TableRow>
                       <TableCell sx={{ fontFamily: fontFamily, fontWeight: 600 }}>Entity</TableCell>
-                      <TableCell align="right" sx={{ fontFamily: fontFamily, fontWeight: 600 }}>Responses</TableCell>
-                      <TableCell align="right" sx={{ fontFamily: fontFamily, fontWeight: 600 }}>Percentage</TableCell>
+                      <TableCell align="right" sx={{ fontFamily: fontFamily, fontWeight: 600 }}>
+                        Responses
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontFamily: fontFamily, fontWeight: 600 }}>
+                        Percentage
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {entities.map((entity) => {
                       const entityTotal = data[entity.key]?.totalResponses || 0;
-                      const percentage = totalResponsesAll > 0
-                        ? ((entityTotal / totalResponsesAll) * 100).toFixed(2)
-                        : 0;
+                      const percentage =
+                        totalResponsesAll > 0
+                          ? ((entityTotal / totalResponsesAll) * 100).toFixed(2)
+                          : 0;
                       return (
                         <TableRow key={entity.key} hover>
                           <TableCell sx={{ fontFamily: fontFamily }}>{entity.name}</TableCell>
-                          <TableCell align="right" sx={{ fontFamily: fontFamily, fontWeight: 500 }}>{entityTotal}</TableCell>
-                          <TableCell align="right" sx={{ fontFamily: fontFamily, fontWeight: 500 }}>{percentage}%</TableCell>
+                          <TableCell align="right" sx={{ fontFamily: fontFamily, fontWeight: 500 }}>
+                            {entityTotal}
+                          </TableCell>
+                          <TableCell align="right" sx={{ fontFamily: fontFamily, fontWeight: 500 }}>
+                            {percentage}%
+                          </TableCell>
                         </TableRow>
                       );
                     })}

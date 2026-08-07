@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgOverlay from "../../../components/img/venue.png";
+import imgOverlay from '../../../components/img/venue.png';
 import useTranslations from '../../../components/utils/useTranslations';
 import { submitSurveyResponses } from '../../../components/utils/sendInputUtils';
 import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
@@ -48,7 +48,9 @@ const ListItem = styled(motion.li)`
   color: #555;
   margin-bottom: 10px;
   cursor: pointer;
-  transition: color 0.3s ease, background-color 0.3s ease;
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease;
   padding: 10px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -203,10 +205,12 @@ const SurveyVenue = () => {
    * @param {string} responseValue - The response value to be submitted.
    */
   const submitResponse = (responseValue) => {
-    const surveyResponses = [{
-      surveyquestion_ref: 'VENUE',
-      response_value: responseValue,
-    }];
+    const surveyResponses = [
+      {
+        surveyquestion_ref: 'VENUE',
+        response_value: responseValue,
+      },
+    ];
 
     submitSurveyResponses(surveyResponses)
       .then(() => {
@@ -220,7 +224,12 @@ const SurveyVenue = () => {
   return (
     <>
       <BodyPartial />
-      <GradientBackground overlayImage={imgOverlay} opacity={0.05} blendMode='darken' buttonAppear={false}>
+      <GradientBackground
+        overlayImage={imgOverlay}
+        opacity={0.05}
+        blendMode="darken"
+        buttonAppear={false}
+      >
         <Container
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

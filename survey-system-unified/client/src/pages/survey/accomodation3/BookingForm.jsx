@@ -80,7 +80,7 @@ const BookingForm = () => {
       // Set isDropdownOpen based on the loaded bookingMethod
       setIsDropdownOpen(
         savedData.bookingMethod !== 'Others (specify)' &&
-        savedData.bookingMethod !== 'Your Operator'
+          savedData.bookingMethod !== 'Your Operator'
       );
     }
   }, []);
@@ -188,9 +188,7 @@ const BookingForm = () => {
           <FormGroup>
             <Label>{translations.bookingFormBookingMethodLabel}</Label>
             <ModernDropdown value={bookingMethod} onChange={handleBookingMethodChange}>
-              <ModernOption value="">
-                {translations.bookingFormSelectBookingMethod}
-              </ModernOption>
+              <ModernOption value="">{translations.bookingFormSelectBookingMethod}</ModernOption>
               {bookingMethods.map((method) => (
                 <ModernOption key={method.value} value={method.value}>
                   {method.label}
@@ -199,32 +197,30 @@ const BookingForm = () => {
             </ModernDropdown>
           </FormGroup>
 
-          {bookingMethod && bookingMethod !== 'Others (specify)' && bookingMethod !== 'Your Operator' && (
-            <FormGroup>
-              <Label>{translations.bookingFormBookingPlatformLabel}</Label>
-              <animated.div style={dropdownAnimation}>
-                <ModernDropdown value={bookingPlatform} onChange={handleBookingPlatformChange}>
-                  <ModernOption value="">
-                    {translations.bookingFormSelectBookingPlatform}
-                  </ModernOption>
-                  {bookingPlatforms[bookingMethod]?.map((platform) => (
-                    <ModernOption key={platform.value} value={platform.value}>
-                      {platform.label}
+          {bookingMethod &&
+            bookingMethod !== 'Others (specify)' &&
+            bookingMethod !== 'Your Operator' && (
+              <FormGroup>
+                <Label>{translations.bookingFormBookingPlatformLabel}</Label>
+                <animated.div style={dropdownAnimation}>
+                  <ModernDropdown value={bookingPlatform} onChange={handleBookingPlatformChange}>
+                    <ModernOption value="">
+                      {translations.bookingFormSelectBookingPlatform}
                     </ModernOption>
-                  ))}
-                </ModernDropdown>
-              </animated.div>
-            </FormGroup>
-          )}
+                    {bookingPlatforms[bookingMethod]?.map((platform) => (
+                      <ModernOption key={platform.value} value={platform.value}>
+                        {platform.label}
+                      </ModernOption>
+                    ))}
+                  </ModernDropdown>
+                </animated.div>
+              </FormGroup>
+            )}
 
           {bookingMethod === 'Others (specify)' && (
             <FormGroup>
               <Label>{translations.bookingFormOthersSpecifyLabel}</Label>
-              <Input
-                type="text"
-                value={bookingPlatform}
-                onChange={handleOthersSpecifyChange}
-              />
+              <Input type="text" value={bookingPlatform} onChange={handleOthersSpecifyChange} />
             </FormGroup>
           )}
 

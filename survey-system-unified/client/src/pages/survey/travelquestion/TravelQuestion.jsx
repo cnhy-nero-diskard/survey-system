@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';
 import BodyPartial from '../../../components/partials/BodyPartial';
 import GradientBackground from '../../../components/partials/GradientBackground';
-import imgoverlay from "../../../components/img/persons.png";
+import imgoverlay from '../../../components/img/persons.png';
 import { useNavigate } from 'react-router-dom';
 import useTranslations from '../../../components/utils/useTranslations';
 import { Container, Input, NextButtonU } from '../../../components/utils/styles1';
@@ -12,7 +12,6 @@ import { useCurrentStepIndex } from '../../../components/utils/useCurrentIndex';
 import { UnifiedContext } from '../../../routes/UnifiedContext';
 import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
-
 
 const QuestionContainer = styled.div`
   padding: 20px;
@@ -122,7 +121,7 @@ const TravelQuestion = () => {
     const inputValue = e.target.value;
     setValue(inputValue);
     saveToLocalStorage('travelQuestionValue', inputValue);
-    setError('');  // Clear any existing error when user starts typing
+    setError(''); // Clear any existing error when user starts typing
   };
 
   return (

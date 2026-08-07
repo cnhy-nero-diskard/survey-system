@@ -13,9 +13,8 @@ import { goToNextStep } from '../../../components/utils/navigationUtils';
 import { saveToLocalStorage, loadFromLocalStorage } from '../../../components/utils/storageUtils';
 
 // ---------- Toast for Warnings (You may use react-toastify or any library) ---------- //
-import { toast } from 'react-toastify'; 
+import { toast } from 'react-toastify';
 // Remember to install and configure react-toastify, then import "react-toastify/dist/ReactToastify.css" in your app.
-
 
 // ---------- Styled Components ---------- //
 
@@ -69,7 +68,10 @@ const Button = styled(motion.button)`
   border-radius: 6px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
   box-shadow: 0 3px 6px rgba(0, 123, 255, 0.2);
 
   &:hover {
@@ -96,7 +98,7 @@ const TableWrapper = styled.div`
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  background-color: rgb(0,0,0,0);
+  background-color: rgb(0, 0, 0, 0);
   border: 1px solid #ddd;
 
   @media (max-width: 600px) {
@@ -119,15 +121,15 @@ const TableRow = styled.tr`
   border: 1px solid rgb(25, 105, 255);
   text-align: left;
   &:hover {
-    background-color: rgba(0,0,0,0);
+    background-color: rgba(0, 0, 0, 0);
   }
 
   @media (max-width: 600px) {
     border: none;
     display: block;
     margin-bottom: 15px;
-    background-color: rgb(0,0,0,0);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    background-color: rgb(0, 0, 0, 0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
     border-radius: 6px;
   }
 `;
@@ -172,7 +174,9 @@ const RatingButton = styled.button`
   justify-content: center;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.2s, transform 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
   border: 1px solid transparent;
 
   &.selected {
@@ -444,8 +448,8 @@ const AccommodationForm = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
-                appendActiveBlocks(["yesaccom"]);
-                appendActiveBlocks(["noaccom"]);
+                appendActiveBlocks(['yesaccom']);
+                appendActiveBlocks(['noaccom']);
                 removeActiveBlocks('noaccom');
                 handleCommercialResponse('YES');
                 setIsCommercial(true);
@@ -457,8 +461,8 @@ const AccommodationForm = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
-                appendActiveBlocks(["yesaccom"]);
-                appendActiveBlocks(["noaccom"]);
+                appendActiveBlocks(['yesaccom']);
+                appendActiveBlocks(['noaccom']);
                 removeActiveBlocks('yesaccom');
                 handleNoButtonClick();
               }}

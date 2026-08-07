@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './SurveyEvaluationb.css';
 import GradientBackground from '../../../components/partials/GradientBackground';
 import BodyPartial from '../../../components/partials/BodyPartial';
-import imgoverlay from "../../../components/img/commentsbg.png";
+import imgoverlay from '../../../components/img/commentsbg.png';
 import { Container, EmojiButton, TextField } from '../../../components/utils/styles1';
 import useTranslations from '../../../components/utils/useTranslations';
 
@@ -65,7 +65,9 @@ const SurveyEvaluationb = () => {
                   ))}
                 </div>
               </label>
-              <TextField placeholder={translations.surveyEvaluationbFeedbackPlaceholder}></TextField>
+              <TextField
+                placeholder={translations.surveyEvaluationbFeedbackPlaceholder}
+              ></TextField>
             </div>
 
             <div className="form-section">
@@ -112,9 +114,10 @@ const SurveyEvaluationb = () => {
               </label>
             </div>
 
-            <button type="submit" className="submit-button">{translations.surveyEvaluationbSubmitButton}</button>
+            <button type="submit" className="submit-button">
+              {translations.surveyEvaluationbSubmitButton}
+            </button>
           </form>
-
         </Container>
       </GradientBackground>
     </>
