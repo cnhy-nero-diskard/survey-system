@@ -20,7 +20,6 @@ export const getTextsFromDB = async (language, component) => {
 };
 
 export const getTourismAttractionLocalizations = async (languageCode) => {
-  try {
     // 1. Get the language_id from the languages table using the languageCode
     const languageQuery = 'SELECT id FROM languages WHERE code = $1';
     const languageResult = await pool.query(languageQuery, [languageCode]);
@@ -100,10 +99,6 @@ export const getTourismAttractionLocalizations = async (languageCode) => {
       { act: resultact },
       { att: resultatt }
     ];
-
-  } catch (err) {
-    throw err;
-  }
 };
 
 

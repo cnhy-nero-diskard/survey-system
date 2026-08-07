@@ -296,8 +296,8 @@ export const fetchUnfinishedSurveys = async () => {
         const result = await pool.query(query);
         return result.rows[0];
     } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
+        logger.error({ error: error.message });
+        throw error;
 
     }
 }
@@ -370,8 +370,8 @@ export const fetchByTimeOfDay = async () => {
         const result = await pool.query(query);
         return restructureData(result.rows);
     } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
+        logger.error({ error: error.message });
+        throw error;
     }
 }
 
@@ -398,8 +398,8 @@ export const fetchByCountryResidence = async () => {
         return restructureData(result.rows);
 
     } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
+        logger.error({ error: error.message });
+        throw error;
 
     }
 }
@@ -426,8 +426,8 @@ export const fetchByNationality = async () => {
         return restructureData(result.rows);
 
     } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
+        logger.error({ error: error.message });
+        throw error;
 
     }
 }
@@ -471,7 +471,7 @@ export const fetchByAgeGroup = async () => {
         return restructureData(result.rows)
     } catch (error) {
         logger.error({ error: error.message });
-        throw err;
+        throw error;
 
     }
 }
@@ -502,8 +502,8 @@ export const fetchByGender = async () => {
 
         return restructureData(result.rows)
     } catch (error) {
-        logger.error({ error: err.message });
-        throw err;
+        logger.error({ error: error.message });
+        throw error;
 
     }
 }

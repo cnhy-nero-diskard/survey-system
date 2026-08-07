@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Unified survey system with React frontend and Node.js backend",
   "main": "server/server.js",
+  "type": "module",
   "scripts": {
     "dev": "concurrently --names \"server,client\" --prefix-colors \"yellow,cyan\" \"npm run server:dev\" \"npm run client:dev\"",
     "dev:server": "cd server && npm start",
@@ -18,7 +19,11 @@
     "install:all": "npm run client:install && npm run server:install",
     "test": "cd server && npm test",
     "docker:build": "docker build -t survey-system-unified .",
-    "docker:run": "docker run -p 5000:5000 --env-file .env survey-system-unified"
+    "docker:run": "docker run -p 5000:5000 --env-file .env survey-system-unified",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [
     "survey",
@@ -30,7 +35,14 @@
   "author": "Survey System Team",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "@eslint/js": "^9.19.0",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2"
   },
   "engines": {
     "node": ">=18.0.0",
