@@ -2,15 +2,12 @@
 
 A unified React frontend and Node.js backend application for conducting tourism surveys, merged into a single deployable unit to reduce cloud infrastructure costs.
 
-## 🏗️ Architecture
+This is the actively developed package. For the project's overall feature
+list, deployment architecture options, and contribution process, see the
+[root README](../README.md). For operating guidelines and safety
+constraints when changing this codebase, see
+[docs/AI_AGENT_GUIDE.md](docs/AI_AGENT_GUIDE.md).
 
-### Original Structure (Separate Deployments)
-```
-surveymockup1/          → React frontend (separate deployment)
-surveymockup1_backend/  → Node.js backend (separate deployment)
-```
-
-### New Unified Structure
 ```
 survey-system-unified/
 ├── client/             → React frontend
@@ -94,8 +91,8 @@ docker run -p 5000:5000 --env-file .env survey-system-unified
 
 # Run with environment variables
 docker run -p 5000:5000 \
-  -e DB_HOST=your_db_host \
-  -e DB_PASSWORD=your_password \
+  -e PG_HOST=your_db_host \
+  -e PG_PASSWORD=your_password \
   survey-system-unified
 ```
 
@@ -137,13 +134,15 @@ disclosed and rotated. `docker-compose up` now requires a populated `.env`.
 |----------|-------------|----------|---------|
 | `NODE_ENV` | Environment (development/production) | No | production |
 | `PORT` | Server port | No | 5000 |
-| `DB_HOST` | Database host | Yes | - |
-| `DB_PORT` | Database port | No | 5432 |
-| `DB_NAME` | Database name | Yes | - |
-| `DB_USER` | Database user | Yes | - |
-| `DB_PASSWORD` | Database password | Yes | - |
+| `PG_HOST` | Database host | Yes | - |
+| `PG_PORT` | Database port | No | 5432 |
+| `PG_DATABASE` | Database name | Yes | - |
+| `PG_USER` | Database user | Yes | - |
+| `PG_PASSWORD` | Database password | Yes | - |
 | `SESSION_SECRET` | Session encryption key | Yes | - |
 | `FRONTEND_URL` | External frontend URL (optional) | No | - |
+
+See `.env.example` for the full, authoritative list.
 
 ### API Configuration Modes
 
@@ -307,16 +306,6 @@ git push heroku main
 - Regular security updates for dependencies
 - Database connection encryption
 
-## 🤝 Migration from Separate Deployments
-
-If migrating from separate frontend/backend deployments:
-
-1. Update environment variables in both deployments
-2. Test the unified version thoroughly
-3. Switch DNS/load balancer to unified deployment
-4. Monitor for any issues
-5. Decommission old separate deployments
-
 ## 📊 Monitoring
 
 ### Health Checks
@@ -331,23 +320,6 @@ If migrating from separate frontend/backend deployments:
 
 ---
 
-## 📝 Development Notes
-
-### Key Changes Made During Migration
-
-1. **Server Configuration**
-   - Added static file serving for React build
-   - Updated CORS to handle unified deployment
-   - Added catch-all route for client-side routing
-
-2. **Frontend Configuration**
-   - Created `apiConfig.js` for dynamic API URL handling
-   - Updated all API calls to use `getApiUrl()`
-   - Conditional logic for development vs production
-
-3. **Build Process**
-   - Multi-stage Dockerfile for efficient builds
-   - Combined package.json scripts
-   - Automated dependency installation
-
-This unified approach reduces deployment complexity and costs while maintaining all the functionality of the original separate deployments.
+For the history of how this package was unified from separate frontend/backend
+deployments, see [docs/AI_AGENT_GUIDE.md](docs/AI_AGENT_GUIDE.md) and the root
+README's [Architecture](../README.md#-architecture) section.

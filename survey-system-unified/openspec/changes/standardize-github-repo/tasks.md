@@ -73,12 +73,12 @@ Paths below are relative to the **true repo root** (`D:\Codez\Projects\survey-sy
 
 ## 7. survey-system-unified: documentation reorganization
 
-- [ ] 7.1 `git mv survey-system-unified/AI_AGENT_README.md survey-system-unified/docs/AI_AGENT_GUIDE.md`, content preserved byte-for-byte
-- [ ] 7.2 Add `survey-system-unified/docs/README.md` indexing `AI_AGENT_GUIDE.md`, `admin-provisioning.md`, `audit-2026-08-05-phase-1-verification.md`, and `refurbish-prompts.md`, each with a one-line description
-- [ ] 7.3 Trim `survey-system-unified/README.md` to a package-level README: what this directory is (the unified deployment), quick local setup, link to the true-root README for project-wide context (features, architecture options, contribution process), link to `docs/AI_AGENT_GUIDE.md`
-- [ ] 7.4 Rewrite `server/README.md` to describe the actual `server` package (remove the `surveymockup1_backend` name and the `yourusername` placeholder clone URL), linking back to the true root and `survey-system-unified/README.md`
-- [ ] 7.5 Rewrite `client/README.md` to describe this client instead of unmodified CRA boilerplate, linking back the same way
-- [ ] 7.6 Verify every npm script and file path referenced across all four README layers (true root, `survey-system-unified`, `client`, `server`) exists
+- [x] 7.1 `git mv survey-system-unified/AI_AGENT_README.md survey-system-unified/docs/AI_AGENT_GUIDE.md`, content preserved byte-for-byte
+- [x] 7.2 Added `survey-system-unified/docs/README.md` indexing all four existing docs
+- [x] 7.3 Trimmed `survey-system-unified/README.md`: dropped the "Original Structure" diagram (now covered, more accurately, at the true root), the historical "Migration from Separate Deployments" and "Key Changes Made During Migration" sections; added links to the root README and `docs/AI_AGENT_GUIDE.md` up top; fixed a stale `DB_HOST`/`DB_PASSWORD` docker-run example and the config table's `DB_*` names to `PG_*`. Kept the secret-rotation table, troubleshooting, and deployment-option content — genuinely specific, not duplicated elsewhere.
+- [x] 7.4 Rewrote `server/README.md` — it was 100% boilerplate for a project called "SurveyMockup1 Backend" with a `yourusername` clone URL, a wrong default port, and fabricated generic CRUD endpoints (`/api/surveys`, `/api/questions`, `/api/responses`) that don't exist in this API. Replaced with an accurate stack/running/testing/config summary that defers to the root README for the real endpoint list.
+- [x] 7.5 Rewrote `client/README.md` — kept the one genuinely project-specific section already there (`REACT_APP_*` secret-safety warning) and replaced the rest of the unmodified CRA boilerplate with an accurate stack/running/testing summary.
+- [x] 7.6 Verified: no `DB_HOST`/`DB_USER`/`DB_NAME`/`DB_PASSWORD`/`surveymockup1_backend`/`yourusername` remain across any of the four READMEs; cross-checked every relative link's target file and heading-anchor exists.
 - [ ] 7.7 Commit as `docs: reorganize survey-system-unified documentation and trim package READMEs`
 
 ## 8. survey-system-unified: developer tooling baseline
