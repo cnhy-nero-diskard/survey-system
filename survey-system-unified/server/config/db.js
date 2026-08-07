@@ -1,48 +1,25 @@
 
 // config/db.js
 import pg from 'pg';
-import dotenv from 'dotenv';
 import logger from '../middleware/logger.js';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Get __dirname equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load environment variables from parent directory
-dotenv.config({ path: path.join(__dirname, '../../.env') });
-
-const requiredEnvVars = ['PG_USER', 'PG_HOST', 'PG_DATABASE', 'PG_PASSWORD', 'PG_PORT', 'JWT_SECRET', 'CRYPTO_SECRET'];
-
-// Check for required environment variables
-try {
-  for (const envVar of requiredEnvVars) {
-    if (!process.env[envVar]) {
-      throw new Error(`Environment variable ${envVar} is not set`);
-    }
-  }
-} catch (err) {
-  console.error('Missing environment variables:', err.message);
-  process.exit(1); // Exit with error code
-}
+import { env } from './env.js';
 
 let pool;
 
 try {
   const config = {
-    user: process.env.PG_USER,
-    host: process.env.PG_HOST,
-    database: process.env.PG_DATABASE,
-    password: process.env.PG_PASSWORD,
-    port: process.env.PG_PORT,
+    user: env.PG_USER,
+    host: env.PG_HOST,
+    database: env.PG_DATABASE,
+    password: env.PG_PASSWORD,
+    port: env.PG_PORT,
     max: 10,
     connectionTimeoutMillis: 5000,
   };
   
   // Add SSL configuration only in production mode
-  if (process.env.NODE_ENV === 'production') {
+  if (env.NODE_ENV === 'production') {
     config.ssl = {
       rejectUnauthorized: true,
       ca: fs.readFileSync('./certs/server-ca.pem').toString(),
@@ -52,7 +29,7 @@ try {
   pool = new pg.Pool(config);
   // Handle connection errors
   pool.on('error', (err, client) => {
-    console.error('Unexpected error on idle client', err);
+    logger.error('Unexpected error on idle client', err);
   });
 
   // Optional: Handle successful connection
@@ -61,7 +38,7 @@ try {
   });
 
 } catch (err) {
-  console.error('Failed to create database pool:', err);
+  logger.error('Failed to create database pool:', err);
   process.exit(1); // Exit with error code
 }
 

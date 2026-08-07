@@ -1,20 +1,18 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Domain: tourism survey data collection and analysis for a thesis.
+  Stack (declared versions): Node.js >=18.0.0, npm >=8.0.0, PostgreSQL 16.10; Node ES modules with Express ^4.21.2, pg ^8.13.1, and Winston ^3.17.0; React ^18.3.1 via Create React App/react-scripts 5.0.1, React Router DOM ^7.0.2, Material UI ^6.4.1, and Axios ^1.7.9. Root scripts orchestrate the unified app; `client/` is the CRA frontend and `server/` is the Express backend. Client conventions: `src/components/` reusable UI, `src/pages/` pages, `src/routes/` routing, `src/config/` API config, `src/utils/` utilities. Server conventions: `routes/` endpoints, `controllers/` request handling, `services/` business logic, `middleware/` cross-cutting behavior, `config/` infrastructure.
+  Auth mechanisms coexist: admin authentication is a JWT `token` cookie, verified with `JWT_SECRET`; anonymous survey identity is an express-session persisted in PostgreSQL table `anonymous_session` through connect-pg-simple, with a server-generated UUID. Preserve both unless a change explicitly plans their migration.
+  Deployment: a unified Docker-capable frontend/backend app, never deployed and with no live users or data; schema changes have no migration constraint, but still preserve API contracts and test changes.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - Use Why, What Changes, Capabilities (New and Modified), and Impact sections.
+    - Name affected paths and state API, schema, dependency, and compatibility impact explicitly.
+  design:
+    - Use Context, Goals / Non-Goals, Decisions, and Risks / Trade-offs; add Migration Plan and Open Questions when relevant.
+  tasks:
+    - Group work under numbered headings and use numbered `- [ ]` subtasks, ending with verification.
+  spec:
+    - Use ADDED or MODIFIED Requirements, SHALL language, and concrete WHEN/THEN scenarios.

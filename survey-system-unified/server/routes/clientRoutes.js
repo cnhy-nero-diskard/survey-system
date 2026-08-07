@@ -2,6 +2,7 @@
 import express from 'express';
 import { getMunicipalities, getLanguageSelect, getTexts, getSurveyProgress, updateSurveyProgress, getTourismAttractionNames, submitEstablishmentSurveyResponse, appendNewFeedback, getUserFeedback, insertSurveyFeedback } from '../controllers/clientController.js';
 import { submitSurveyResponseController, fetchSurveyResponsesController } from '../controllers/surveyController.js';
+import { fetchAllTouchpointsController, fetchTranslatedTouchpointController } from '../controllers/adminController.js';
 import { handleAnonymousUser } from '../middleware/anonymousUserMiddleware.js';
 import logger from '../middleware/logger.js';
 import { validateSurveyStep } from '../middleware/authMiddleware.js';
@@ -19,6 +20,8 @@ router.get('/api/survey/progress', getSurveyProgress);
 router.get('/api/survey/attraction', getTourismAttractionNames);
 router.post('/api/survey/progress', updateSurveyProgress);
 router.post('/api/survey/establishment', submitEstablishmentSurveyResponse);
+router.get('/api/surveytouchpoints', fetchAllTouchpointsController);
+router.post('/api/touchpointlocal', fetchTranslatedTouchpointController);
 
 router.post('/api/survey/submit', submitSurveyResponseController);
 router.get('/api/survey/responses/:user_id', fetchSurveyResponsesController);

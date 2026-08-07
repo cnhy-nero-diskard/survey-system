@@ -1,9 +1,7 @@
 import CryptoJS from 'crypto-js';
 import logger from './logger.js';
-import dotenv from 'dotenv';
 import crypto from 'crypto';
-
-dotenv.config();
+import { env } from '../config/env.js';
 
 const timingSafeEqual = (a, b) => {
     const aBuffer = Buffer.from(a, 'hex');
@@ -21,7 +19,7 @@ export const verifyHMAC = (req, res, next) => {
 
     try {
         // Recalculate the HMAC signature using CryptoJS
-        const expectedHmac = CryptoJS.HmacSHA256(payload, process.env.HMAC_SECRET).toString(CryptoJS.enc.Hex);
+        const expectedHmac = CryptoJS.HmacSHA256(payload, env.HMAC_SECRET).toString(CryptoJS.enc.Hex);
 
         // Compare the HMAC signatures using a timing-safe function
         if (!timingSafeEqual(hmac, expectedHmac)) {

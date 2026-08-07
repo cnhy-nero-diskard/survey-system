@@ -10,7 +10,7 @@ This document provides essential context for AI agents working on this survey sy
 - **Tourism Survey Platform** - Collects visitor feedback and analytics
 - **Unified Full-Stack Application** - React frontend + Node.js backend in single deployment
 - **PostgreSQL Database** - Complex relational schema with localization support
-- **Production MVP** - Currently serving real users with live data
+- **Pre-deployment** - Not yet deployed to production; no live users or live data (confirmed 2026-08-05). Schema changes are cheap; no migration constraint.
 
 ### Architecture
 ```
@@ -26,7 +26,7 @@ survey-system-unified/
 ### 1. Database Operations
 **⚠️ NEVER ALTER DATABASE SCHEMA WITHOUT EXPLICIT APPROVAL**
 - The system uses complex PostgreSQL schemas with foreign key relationships
-- Production data exists - schema changes could cause data loss
+- No production data exists yet (pre-deployment); schema changes are cheap but should still be tested
 - Migrations must be carefully planned and tested
 - Always backup before schema modifications
 
@@ -273,7 +273,7 @@ node -e "import('./server/config/db.js').then(pool => pool.query('SELECT NOW()')
 
 ## 📝 Final Notes for AI Agents
 
-This codebase is **production-critical** with **real users** and **live data**. Every change should be:
+This codebase is **pre-deployment** (no live users or live data yet, confirmed 2026-08-05). Every change should be:
 
 - **Incremental** - Small, testable changes
 - **Backward compatible** - Don't break existing functionality

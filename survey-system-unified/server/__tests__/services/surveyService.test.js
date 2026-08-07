@@ -1,8 +1,20 @@
 // __tests__/services/surveyService.test.js
-import { submitSurveyResponse } from '../../services/surveyService.js';
-import pool from '../../config/db.js';
+import { jest } from '@jest/globals';
 
-jest.mock('../../config/db.js'); // Mock the database pool
+jest.unstable_mockModule('../../config/db.js', () => ({
+  default: {
+    query: jest.fn(),
+  },
+}));
+jest.unstable_mockModule('../../middleware/logger.js', () => ({
+  default: {
+    database: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
+const { submitSurveyResponse } = await import('../../services/surveyService.js');
+const { default: pool } = await import('../../config/db.js');
 
 describe('submitSurveyResponse', () => {
   it('should insert a survey response into the database', async () => {

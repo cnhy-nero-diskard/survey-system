@@ -52,15 +52,16 @@ import pool from "../config/db.js";
 import logger from "../middleware/logger.js";
 import { getTourismAttractionLocalizations, submitSurveyFeedback } from "../services/clientService.js";
 import { submitSurveyResponse } from "../services/surveyService.js";
+import { env } from '../config/env.js';
 
 
 export const getMunicipalities = async (req, res, next) => {
     logger.info("GET /api/municipalities");
-    if (!process.env.PG_MUNICIPALITIES) {
+    if (!env.PG_MUNICIPALITIES) {
         return next(new Error('PG_MUNICIPALITIES environment variable is not set')); // Pass error to error handler
     }
     try {
-        const tablemunquery = `SELECT * FROM ${process.env.PG_MUNICIPALITIES}`;
+        const tablemunquery = `SELECT * FROM ${env.PG_MUNICIPALITIES}`;
         const result = await pool.query(tablemunquery);
         res.json(result.rows);
     } catch (err) {
@@ -85,7 +86,7 @@ export const getTexts = async (req, res, next) => {
     try {
         const query = `
       SELECT key, textcontent 
-      FROM ${process.env.PG_LOCALIZATION} 
+      FROM ${env.PG_LOCALIZATION}
       WHERE language_code = $1 AND component = $2
     `;
         const result = await pool.query(query, [language, component]);

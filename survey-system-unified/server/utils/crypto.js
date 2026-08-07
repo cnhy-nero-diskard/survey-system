@@ -1,7 +1,8 @@
 // utils/crypto.js
 import CryptoJS from 'crypto-js';
+import { env } from '../config/env.js';
 
-const SECRET_KEY = process.env.CRYPTO_SECRET;
+const SECRET_KEY = env.CRYPTO_SECRET;
 
 export const encrypt = (text) => {
   return CryptoJS.AES.encrypt(text, SECRET_KEY).toString();

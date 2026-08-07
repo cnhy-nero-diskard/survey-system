@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import logger from './logger.js';
 import pool from '../config/db.js';
+import { env } from '../config/env.js';
 
 export const authenticate = (req, res, next) => {
     const token = req.cookies?.token;
@@ -11,7 +12,7 @@ export const authenticate = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, env.JWT_SECRET);
         req.user = decoded; // Attach the decoded user to the request object
         logger.admin('Token found in cookie. AUTHENTICATED');
         return next();
@@ -54,7 +55,7 @@ export const validateSurveyStep = async (req, res, next) => {
         res.status(404).json({ message: "User progress not found" });
       }
     } catch (err) {
-      console.error(err.message);
+      logger.error(err.message);
       res.status(500).send("Server error");
     }
   };

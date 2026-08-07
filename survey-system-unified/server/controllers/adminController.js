@@ -6,10 +6,9 @@ import pool from '../config/db.js';
 import { addHFToken, getHFTokenByLabel, getHFTokens } from '../services/hfTokenService.js';
 import { queryHuggingFace } from '../services/huggingFaceService.js';
 import { logEmitter } from '../middleware/logger.js';
-import dotenv from 'dotenv';
+import { env } from '../config/env.js';
 import { createEstablishmentService, createLocalizationService, createSentimentAnalysisService, createSurveyFeedbackService, createSurveyResponseService, createTourismAttractionService, deleteEstablishmentService, deleteLocalizationService, deleteSentimentAnalysisService, deleteSurveyFeedbackService, deleteSurveyResponseService, deleteTourismAttractionService, fetchAllTouchpointsService, fetchEstablishmentsService, fetchEstTypes, fetchLocalizationsService, fetchLocationsWithFilterService, fetchSentimentAnalysisService, fetchSurveyFeedbackService, fetchSurveyResponsesService, fetchTourismAttractionsService, fetchTranslatedTouchpointService, insertTopicDataService, updateEstablishmentService, updateLocalizationService, updateSentimentAnalysisService, updateSurveyFeedbackService, updateSurveyResponseService, updateTourismAttractionService } from '../services/adminCRUD.js';
 import { calculateAverageCompletionTimeService, fetchAllFinishedRows, fetchAndGroupFinishedSurveyResponsesByMonthService, fetchByAgeGroup, fetchByCountryResidence, fetchByGender, fetchByNationality, fetchByTimeOfDay, fetchEntityinSurveyFeedbackService, fetchTouchpointsService, fetchUnfinishedSurveys, getAllSurveyTally, getAllSurveyTallyPaginated, getSentimentAnalysis, getSentimentLocation, getSurveyResponseByTopic, groupByLikertRatingService } from '../services/analyticsCRUD.js';
-dotenv.config();
 
 export const getAdminData = async (req, res, next) => {
   logger.info("GET /api/admin/data");
@@ -60,7 +59,7 @@ export const addTourismAttractionController = async (req, res, next) => {
 //     const result = await submitSurveyResponse(response);
 //     res.status(201).json(result);
 //   } catch (err) {
-//     console.error('Error submitting survey response:', err);
+//     logger.error('Error submitting survey response:', err);
 //     res.status(500).json({ error: 'Failed to submit survey response' });
 //   }
 // };
@@ -125,12 +124,12 @@ export const analyzeSentiment = async (req, res) => {
     }
 
     // Call the Hugging Face API
-    const analysisResult = await queryHuggingFace(text, apiToken, process.env.BERTSENT_ENDPOINT);
+    const analysisResult = await queryHuggingFace(text, apiToken, env.BERTSENT_ENDPOINT);
 
     // Return the analysis result to the frontend
     res.json(analysisResult);
   } catch (err) {
-    console.error('Error during analysis:', err);
+    logger.error('Error during analysis:', err);
     res.status(500).json({ error: 'Failed to analyze text' });
   }
 };
@@ -141,7 +140,7 @@ export const analyzeTopics = async (req, res) => {
   const tokenLabel = req.body.tokenLabel;
   logger.info(`Analyzing topics: ${text}`);
   logger.info(`Using API token label: ${tokenLabel}`);
-  logger.info(`Using endpoint: ${process.env.BERTOPIC_ENDPOINT}`)
+  logger.info(`Using endpoint: ${env.BERTOPIC_ENDPOINT}`)
   try {
     // Fetch the decrypted API token from the database using the label
     const apiToken = await getHFTokenByLabel(tokenLabel); // Ensure this function is implemented in hfTokenService.js
@@ -150,12 +149,12 @@ export const analyzeTopics = async (req, res) => {
       return res.status(400).json({ error: 'Invalid API token label' });
     }
 
-    const analysisResult = await queryHuggingFace(text, apiToken, process.env.BERTOPIC_ENDPOINT);
+    const analysisResult = await queryHuggingFace(text, apiToken, env.BERTOPIC_ENDPOINT);
 
     // Return the analysis result to the frontend
     res.json(analysisResult);
   } catch (err) {
-    console.error('Error during topic analysis:', err);
+    logger.error('Error during topic analysis:', err);
     res.status(500).json({ error: 'Failed to analyze topics' });
   }
 };
@@ -187,11 +186,11 @@ export const autoAnalyzeSentimentController = async (req, res) => {
     const combinedText = relevantFeedback.rows.map(row => row.response_value).join('\n');
     logger.info(`Analyzing sentiment for ${relevantFeedback.rows.length} responses`);
 
-    if (!process.env.BERTSENT_ENDPOINT) {
+    if (!env.BERTSENT_ENDPOINT) {
       throw new Error('BERT sentiment analysis endpoint not configured');
     }
 
-    const analysisResults = await queryHuggingFace(combinedText, apiToken, process.env.BERTSENT_ENDPOINT);
+    const analysisResults = await queryHuggingFace(combinedText, apiToken, env.BERTSENT_ENDPOINT);
 
     if (!Array.isArray(analysisResults)) {
       throw new Error(`Unexpected API response format: ${JSON.stringify(analysisResults)}`);
@@ -247,11 +246,11 @@ export const autoAnalyzeSentimentController = async (req, res) => {
       results: analysisResults
     });
   } catch (err) {
-    console.error('Error during sentiment analysis:', err);
+    logger.error('Error during sentiment analysis:', err);
     res.status(500).json({ 
       error: 'Failed to analyze sentiment', 
       details: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      stack: env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
 };
@@ -283,7 +282,7 @@ export const autoClassifyRelevanceController = async (req, res) => {
     logger.info(`Classifying relevance for ${unknownFeedback.rows.length} responses`);
 
     // Send to Hugging Face
-    const analysisResults = await queryHuggingFace(combinedText, apiToken, process.env.BERTRCLS_ENDPOINT);
+    const analysisResults = await queryHuggingFace(combinedText, apiToken, env.BERTRCLS_ENDPOINT);
 
     // Verify we got the same number of results back
     if (analysisResults.length !== unknownFeedback.rows.length) {
@@ -307,7 +306,7 @@ export const autoClassifyRelevanceController = async (req, res) => {
       results: analysisResults
     });
   } catch (err) {
-    console.error('Error during relevance classification:', err);
+    logger.error('Error during relevance classification:', err);
     res.status(500).json({ error: 'Failed to classify relevance', details: err.message });
   }
 }
@@ -321,11 +320,11 @@ export const fetchAnonymousUsersController = async (req, res, next) => {
   }
 };
 export const logstream = async (req, res, next) => {
-  console.log("EVENT SOURCE LOGSTREAM");
+  logger.info("EVENT SOURCE LOGSTREAM");
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL); // Explicitly allow your React app's origin
+  res.setHeader('Access-Control-Allow-Origin', env.FRONTEND_URL); // Explicitly allow your React app's origin
   res.setHeader('Access-Control-Allow-Credentials', 'true'); // Allow credentials (if needed)
 
   const sendLog = (log) => {
@@ -358,7 +357,7 @@ export const getOpenEndedSurveyResponses = async (req, res, next) => {
     // logger.info(JSON.stringify(responses));
     res.json(responses);
   } catch (err) {
-    next(`ERROR ON SENDING A RESPONSE: ${err}`); // Pass error to error handler
+    next(new Error(`ERROR ON SENDING A RESPONSE: ${err}`)); // Pass error to error handler
   }
 };
 
@@ -382,7 +381,7 @@ export const createLocalization = async (req, res, next) => {
     const result = await createLocalizationService(key, languagecode, textcontent, component);
     res.status(201).json(`SUCCESSFULLY INSERTED ROW`);
   } catch (err) {
-    next(`ERROR ON CREATING A ROW on LOCALIZATION: ${err}`);
+    next(new Error(`ERROR ON CREATING A ROW on LOCALIZATION: ${err}`));
   }
 };
 
@@ -392,7 +391,7 @@ export const fetchLocalization = async (req, res, next) => {
     const result = await fetchLocalizationsService({});
     res.json(result);
   } catch (err) {
-    next(`ERROR ON FETCHING FROM LOCALIZATION: ${err}`);
+    next(new Error(`ERROR ON FETCHING FROM LOCALIZATION: ${err}`));
   }
 };
 
@@ -418,7 +417,7 @@ export const updateLocalization = async (req, res, next) => {
     // Implementation will be in service layer
     res.json({ message: `Localization ${id} updated successfully` });
   } catch (err) {
-    next(`ERROR ON UPDATING ROW IN LOCALIZATION: ${err}`);
+    next(new Error(`ERROR ON UPDATING ROW IN LOCALIZATION: ${err}`));
   }
 };
 
@@ -437,7 +436,7 @@ export const deleteLocalization = async (req, res, next) => {
     // Implementation will be in service layer
     res.json({ message: `Localization ${id} deleted successfully` });
   } catch (err) {
-    next(`ERROR ON DELETING ROW FROM LOCALIZATION: ${err}`);
+    next(new Error(`ERROR ON DELETING ROW FROM LOCALIZATION: ${err}`));
   }
 };
 
@@ -470,7 +469,7 @@ export const createEstablishment = async (req, res, next) => {
 
     res.status(201).json(result);
   } catch (err) {
-    next(`ERROR ON CREATING A ROW IN ESTABLISHMENTS: ${err}`);
+    next(new Error(`ERROR ON CREATING A ROW IN ESTABLISHMENTS: ${err}`));
   }
 };
 
@@ -487,7 +486,7 @@ export const fetchEstablishments = async (req, res, next) => {
     const establishments = await fetchEstablishmentsService(filters);
     res.json(establishments);
   } catch (err) {
-    next(`ERROR ON FETCHING FROM ESTABLISHMENTS: ${err}`);
+    next(new Error(`ERROR ON FETCHING FROM ESTABLISHMENTS: ${err}`));
   }
 };
 export const updateEstablishment = async (req, res, next) => {
@@ -511,7 +510,7 @@ export const updateEstablishment = async (req, res, next) => {
 
     res.json({ message: `Establishment ${id} updated successfully`, establishment: result });
   } catch (err) {
-    next(`ERROR ON UPDATING ROW IN ESTABLISHMENTS: ${err}`);
+    next(new Error(`ERROR ON UPDATING ROW IN ESTABLISHMENTS: ${err}`));
   }
 }
 
@@ -527,7 +526,7 @@ export const deleteEstablishment = async (req, res, next) => {
     const result = await deleteEstablishmentService(id);
     res.json({ message: `Establishment ${id} deleted successfully`, establishment: result });
   } catch (err) {
-    next(`ERROR ON DELETING ROW FROM ESTABLISHMENTS: ${err}`);
+    next(new Error(`ERROR ON DELETING ROW FROM ESTABLISHMENTS: ${err}`));
   }
 };
 export const createTourismAttractionController = async (req, res, next) => {
@@ -558,7 +557,7 @@ export const createTourismAttractionController = async (req, res, next) => {
 
     res.status(201).json(result);
   } catch (err) {
-    next(`ERROR ON CREATING TOURISM ATTRACTION: ${err}`);
+    next(new Error(`ERROR ON CREATING TOURISM ATTRACTION: ${err}`));
   }
 };
 export const fetchTourismAttractionController = async (req, res, next) => {
@@ -576,7 +575,7 @@ export const fetchTourismAttractionController = async (req, res, next) => {
     const attractions = await fetchTourismAttractionsService(filters);
     res.json(attractions);
   } catch (err) {
-    next(`ERROR ON FETCHING TOURISM ATTRACTIONS: ${err}`);
+    next(new Error(`ERROR ON FETCHING TOURISM ATTRACTIONS: ${err}`));
   }
 };
 export const updateTourismAttractionController = async (req, res, next) => {
@@ -598,7 +597,7 @@ export const updateTourismAttractionController = async (req, res, next) => {
 
     res.json({ message: `Tourism attraction ${id} updated successfully`, attraction: result });
   } catch (err) {
-    next(`ERROR ON UPDATING TOURISM ATTRACTION: ${err}`);
+    next(new Error(`ERROR ON UPDATING TOURISM ATTRACTION: ${err}`));
   }
 };
 
@@ -614,7 +613,7 @@ export const deleteTourismAttractionController = async (req, res, next) => {
     const result = await deleteTourismAttractionService(id);
     res.json({ message: `Tourism attraction ${id} deleted successfully`, attraction: result });
   } catch (err) {
-    next(`ERROR ON DELETING TOURISM ATTRACTION: ${err}`);
+    next(new Error(`ERROR ON DELETING TOURISM ATTRACTION: ${err}`));
   }
 };
 
@@ -643,7 +642,7 @@ export const fetchSurveyResponsesController = async (req, res, next) => {
     const responses = await fetchSurveyResponsesService(anonid);
     res.json(responses);
   } catch (err) {
-    next(`ERROR ON FETCHING SURVEY RESPONSES: ${err}`);
+    next(new Error(`ERROR ON FETCHING SURVEY RESPONSES: ${err}`));
   }
 };
 
@@ -659,7 +658,7 @@ export const updateSurveyResponseController = async (req, res, next) => {
     const result = await updateSurveyResponseService(response_id, response_value);
     res.json({ message: `Survey response ${response_id} updated successfully`, response: result });
   } catch (err) {
-    next(`ERROR ON UPDATING SURVEY RESPONSE: ${err}`);
+    next(new Error(`ERROR ON UPDATING SURVEY RESPONSE: ${err}`));
   }
 };
 
@@ -675,7 +674,7 @@ export const deleteSurveyResponseController = async (req, res, next) => {
     const result = await deleteSurveyResponseService(anonymous_user_id);
     res.json({ message: `Survey response ${anonymous_user_id} deleted successfully`, response: result });
   } catch (err) {
-    next(`ERROR ON DELETING SURVEY RESPONSE: ${err}`);
+    next(new Error(`ERROR ON DELETING SURVEY RESPONSE: ${err}`));
   }
 };
 
@@ -685,7 +684,7 @@ export const fetchSurveyQuestionsController = async (req, res, next) => {
     const questions = await fetchSurveyQuestionsService();
     res.json(questions);
   } catch (err) {
-    next(`ERROR ON FETCHING SURVEY QUESTIONS: ${err}`);
+    next(new Error(`ERROR ON FETCHING SURVEY QUESTIONS: ${err}`));
   }
 };
 
@@ -721,7 +720,7 @@ export const createSentimentAnalysisController = async (req, res, next) => {
     res.status(201).json(createdResults);
   } catch (err) {
     // Pass any errors to the error-handling middleware
-    next(`ERROR ON CREATING SENTIMENT ANALYSIS: ${err}`);
+    next(new Error(`ERROR ON CREATING SENTIMENT ANALYSIS: ${err}`));
   }
 };
 
@@ -737,7 +736,7 @@ export const fetchSentimentAnalysisController = async (req, res, next) => {
     const result = await fetchSentimentAnalysisService(filters);
     res.json(result);
   } catch (err) {
-    next(`ERROR ON FETCHING SENTIMENT ANALYSIS: ${err}`);
+    next(new Error(`ERROR ON FETCHING SENTIMENT ANALYSIS: ${err}`));
   }
 };
 
@@ -753,7 +752,7 @@ export const updateSentimentAnalysisController = async (req, res, next) => {
     const result = await updateSentimentAnalysisService(id, user_id, review_date, rating, sqref, sentiment, confidence);
     res.json({ message: `Sentiment analysis ${id} updated successfully`, analysis: result });
   } catch (err) {
-    next(`ERROR ON UPDATING SENTIMENT ANALYSIS: ${err}`);
+    next(new Error(`ERROR ON UPDATING SENTIMENT ANALYSIS: ${err}`));
   }
 };
 
@@ -769,7 +768,7 @@ export const deleteSentimentAnalysisController = async (req, res, next) => {
     const result = await deleteSentimentAnalysisService(id);
     res.json({ message: `Sentiment analysis ${id} deleted successfully`, analysis: result });
   } catch (err) {
-    next(`ERROR ON DELETING SENTIMENT ANALYSIS: ${err}`);
+    next(new Error(`ERROR ON DELETING SENTIMENT ANALYSIS: ${err}`));
   }
 };
 export const insertTopicDataController = async (req, res, next) => {
@@ -807,7 +806,7 @@ export const fetchAllTouchpointsController = async (req, res, next) => {
     const result = await fetchAllTouchpointsService();
     res.json(result);
   } catch (err) {
-    next(`ERROR ON FETCHING ALL TOUCHPOINTS: ${err}`);
+    next(new Error(`ERROR ON FETCHING ALL TOUCHPOINTS: ${err}`));
   }
 };
 
@@ -825,7 +824,7 @@ export const fetchTranslatedTouchpointController = async (req, res, next) => {
     logger.warn(`TRANSLATED NAAMMMEEEE --- ${translatedName}`);
     res.json({ translatedName });
   } catch (err) {
-    next(`ERROR ON FETCHING TRANSLATED TOUCHPOINT: ${err}`);
+    next(new Error(`ERROR ON FETCHING TRANSLATED TOUCHPOINT: ${err}`));
   }
 };
 
@@ -851,7 +850,7 @@ export const groupByLikertRatingController = async (req, res) => {
       data: formattedResponse,
     });
   } catch (error) {
-    console.error('Error in controller:', error);
+    logger.error('Error in controller:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -940,7 +939,7 @@ export const getSurveyFeedbackController = async (req, res) => {
 
       res.status(200).json(result);
   } catch (error) {
-      console.error('Error in controller:', error);
+      logger.error('Error in controller:', error);
       res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -952,7 +951,7 @@ export const getAllByTallyController = async (req, res) => {
       // Send the response back to the client
       res.status(200).json(surveyResponses);
   } catch (error) {
-      console.error('Error in surveyResponsesController:', error);
+      logger.error('Error in surveyResponsesController:', error);
       res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -971,7 +970,7 @@ export const getAllByTallyPaginatedController = async (req, res) => {
       // Send the response back to the client
       res.status(200).json(surveyResponses);
   } catch (error) {
-      console.error('Error in getAllByTallyPaginatedController:', error);
+      logger.error('Error in getAllByTallyPaginatedController:', error);
       res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -1022,7 +1021,7 @@ export const getSurveyByTopicController = async (req, res) => {
     // Return the stats as a JSON response
     res.status(200).json(stats);
   } catch (error) {
-    console.error('Error in survey-stats controller:', error);
+    logger.error('Error in survey-stats controller:', error);
 
     // Return an error response
     res.status(500).json({
@@ -1058,7 +1057,7 @@ export const createSurveyFeedbackController = async (req, res, next) => {
     const result = await createSurveyFeedbackService(feedbackData);
     res.status(201).json(result);
   } catch (err) {
-    next(`ERROR ON CREATING SURVEY FEEDBACK: ${err}`);
+    next(new Error(`ERROR ON CREATING SURVEY FEEDBACK: ${err}`));
   }
 };
 
@@ -1075,7 +1074,7 @@ export const fetchSurveyFeedbackController = async (req, res, next) => {
     const feedback = await fetchSurveyFeedbackService(filters);
     res.json(feedback);
   } catch (err) {
-    next(`ERROR ON FETCHING SURVEY FEEDBACK: ${err}`);
+    next(new Error(`ERROR ON FETCHING SURVEY FEEDBACK: ${err}`));
   }
 };
 
@@ -1092,7 +1091,7 @@ export const updateSurveyFeedbackController = async (req, res, next) => {
     const result = await updateSurveyFeedbackService(id, updateData);
     res.json({ message: `Survey feedback ${id} updated successfully`, feedback: result });
   } catch (err) {
-    next(`ERROR ON UPDATING SURVEY FEEDBACK: ${err}`);
+    next(new Error(`ERROR ON UPDATING SURVEY FEEDBACK: ${err}`));
   }
 };
 
@@ -1108,7 +1107,7 @@ export const deleteSurveyFeedbackController = async (req, res, next) => {
     const result = await deleteSurveyFeedbackService(response_id);
     res.json({ message: `Survey feedback ${response_id} deleted successfully`, feedback: result });
   } catch (err) {
-    next(`ERROR ON DELETING SURVEY FEEDBACK: ${err}`);
+    next(new Error(`ERROR ON DELETING SURVEY FEEDBACK: ${err}`));
   }
 };
 
@@ -1121,7 +1120,7 @@ export const obtainSpamAnonymousUsersController = async (req, res) => {
     logger.database(`SPAM ANON USERS: ${JSON.stringify(result.rows)}`);
     res.status(200).json(result.rows);
   } catch (err) {
-    console.error('Error fetching spam anonymous users:', err);
+    logger.error('Error fetching spam anonymous users:', err);
     res.status(500).json({ error: 'Failed to fetch spam anonymous users', details: err.message });
   }
 }
@@ -1137,7 +1136,7 @@ export const fetchLocationsWithFilterController = async (req, res, next) => {
     const locations = await fetchLocationsWithFilterService(filters);
     res.json(locations);
   } catch (err) {
-    next(`ERROR ON FETCHING LOCATIONS WITH FILTER: ${err}`);
+    next(new Error(`ERROR ON FETCHING LOCATIONS WITH FILTER: ${err}`));
   }
 };
 
@@ -1147,6 +1146,6 @@ export const fetchEstTypesController = async (req, res, next) => {
     const types = await fetchEstTypes();
     res.json(types);
   } catch (err) {
-    next(`ERROR ON FETCHING ESTABLISHMENT TYPES: ${err}`);
+    next(new Error(`ERROR ON FETCHING ESTABLISHMENT TYPES: ${err}`));
   }
 };

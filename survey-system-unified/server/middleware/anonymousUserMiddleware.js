@@ -19,34 +19,20 @@ export const handleAnonymousUser = async (req, res, next) => {
 
       // Insert the anonymous user into the databas
       await pool.query(
-        'INSERT INTO anonymous_users (anonymous_user_id, is_active) VALUES ($1, $2)',
-        [req.session.anonymousUserId, false] // Set is_active to true and provide a default nickname
+        'INSERT INTO anonymous_users (anonymous_user_id, is_active, last_active_at) VALUES ($1, TRUE, NOW())',
+        [req.session.anonymousUserId]
       );
 
       logger.info(`Created new anonymous user ID: ${req.session.anonymousUserId}`);
     } else {
-      // If the anonymous user ID exists, update is_active to true
+      // Track activity for the existing anonymous user.
       await pool.query(
-        'UPDATE anonymous_users SET is_active = TRUE WHERE anonymous_user_id = $1',
+        'UPDATE anonymous_users SET last_active_at = NOW() WHERE anonymous_user_id = $1',
         [req.session.anonymousUserId]
       );
 
-      logger.info(`Updated anonymous user ID ${req.session.anonymousUserId} to active`);
+      logger.info(`Updated activity for anonymous user ID ${req.session.anonymousUserId}`);
     }
-
-    // Schedule a task to mark the user as inactive after 1 minute
-    const userId = req.session.anonymousUserId;
-    setTimeout(async () => {
-      try {
-        await pool.query(
-          'UPDATE anonymous_users SET is_active = FALSE WHERE anonymous_user_id = $1',
-          [userId]
-        );
-
-      } catch (error) {
-        logger.error(`Error marking anonymous user ID ${userId} as inactive:`, error);
-      }
-    }, 60000); // 1 minute
 
     next(); // Proceed to the next middleware or route handler
   } catch (err) {

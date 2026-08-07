@@ -3,8 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import pool from '../config/db.js';
 import logger from '../middleware/logger.js';
-import dotenv from 'dotenv';
-dotenv.config();
+import { env } from '../config/env.js';
 export const login = async (req, res, next) => {
     const { username, password } = req.body;
     logger.info(`POST /api/auth/login for username: ${username}`);
@@ -23,7 +22,7 @@ export const login = async (req, res, next) => {
             return res.status(400).json({ error: 'Invalid username or password.' });
         }
 
-        const token = jwt.sign({ username: admin.username, role: 'admin' }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ username: admin.username, role: 'admin' }, env.JWT_SECRET, {
             expiresIn: '3h',
         });
 
@@ -31,7 +30,7 @@ export const login = async (req, res, next) => {
 
         const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // HTTPS-only in production
+            secure: env.NODE_ENV === 'production', // HTTPS-only in production
             sameSite: 'lax',
             maxAge: 18000000, // 5 hours expiration
             path: '/',
@@ -59,7 +58,7 @@ export const logout = async (req, res, next) => {
         // otherwise some browsers will not remove it.
         res.clearCookie('token', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: env.NODE_ENV === 'production',
             sameSite: 'lax',
             path: '/',
         }).status(200).send('Logged out successfully');
@@ -107,7 +106,7 @@ export const checkAuth = async (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, env.JWT_SECRET);
         res.status(200).json({ message: 'Authenticated', user: decoded });
     } catch (err) {
         if (err.name === 'TokenExpiredError') {

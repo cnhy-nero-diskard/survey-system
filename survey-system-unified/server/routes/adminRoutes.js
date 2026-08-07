@@ -18,7 +18,7 @@ router.get('/api/admin/data', authenticate, getAdminData);
 
 router.post('/api/admin/add', authenticate, validateTourismAttraction, addTourismAttractionController);
 router.get('/api/admin/session-data', authenticate, getAdminSessionData);
-router.get('/metrics', getMetrics);
+router.get('/metrics', authenticate, authorizeAdmin, getMetrics);
 router.get('/api/admin/establishments', authenticate, getEstablishmentEnglishNamesController);
 router.get('/api/admin/survey-responses/open-ended', authenticate, getOpenEndedSurveyResponses);
 
@@ -65,9 +65,6 @@ router.get('/api/admin/survey-questions', authenticate, fetchSurveyQuestionsCont
 
 router.get('/api/admin/anonymous-users', authenticate, fetchAnonymousUsersController);
 router.delete('/api/admin/all-anonymous-users', authenticate, purgeAnonymousUsers);
-
-router.get('/api/surveytouchpoints', fetchAllTouchpointsController);
-router.post('/api/touchpointlocal', fetchTranslatedTouchpointController);
 
 router.get('/api/admin/getsurveymetrics', authenticate, getSurveyMetricsAnalyticsController);
 router.get('/api/admin/getEntityMetrics', authenticate, getSurveyFeedbackController )

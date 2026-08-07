@@ -103,6 +103,36 @@ docker run -p 5000:5000 \
 
 ### Environment Variables
 
+### Secret generation and rotation
+
+Generate four separate values for `JWT_SECRET`, `SESSION_SECRET`,
+`CRYPTO_SECRET`, and `HMAC_SECRET`:
+
+```bash
+openssl rand -base64 32
+```
+
+Each value must be at least 32 characters and must be placed in the untracked
+`.env` (or supplied through the corresponding `*_FILE` mount). Never commit
+secret values. `SESSION_SECRET` rotation invalidates live sessions;
+`JWT_SECRET` rotation invalidates issued admin tokens; neither requires a data
+migration. `HMAC_SECRET` rotation requires any external admin-provisioning
+caller to be re-keyed at the same time. `CRYPTO_SECRET` protects encrypted
+`HF_TOKENS.apitoken` values: decrypt rows with the old secret and re-encrypt
+them with the new one, or re-enter the tokens through the admin UI, before
+switching secrets. Changing `CRYPTO_SECRET` alone makes existing tokens
+undecryptable.
+
+Any value ever used from a committed configuration must be treated as
+disclosed and rotated. `docker-compose up` now requires a populated `.env`.
+
+| Secret | Protects | Rotation effect | Data migration |
+|---|---|---|---|
+| `SESSION_SECRET` | Anonymous session cookies | Live sessions expire | No |
+| `JWT_SECRET` | Admin JWTs | Issued admin tokens expire | No |
+| `CRYPTO_SECRET` | AES-encrypted `HF_TOKENS.apitoken` values | Stored tokens must be re-encrypted or re-entered | Yes |
+| `HMAC_SECRET` | Admin-provisioning request signatures | External callers must be re-keyed | No |
+
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | `NODE_ENV` | Environment (development/production) | No | production |

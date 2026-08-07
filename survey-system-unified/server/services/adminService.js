@@ -69,8 +69,13 @@ export const updateTourismAttraction = async (id, updatedAttraction) => {
 export const fetchAnonymousUsers = async () => {
 
   const query = `
-        SELECT * FROM anonymous_users
-        ORDER BY is_Active DESC, created_at DESC;
+        SELECT
+          anonymous_user_id,
+          created_at,
+          (COALESCE(last_active_at, created_at) >= NOW() - INTERVAL '1 minute') AS is_active,
+          nickname
+        FROM anonymous_users
+        ORDER BY is_active DESC, created_at DESC;
     `;
   const result = await pool.query(query);
   return result.rows;

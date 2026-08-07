@@ -1,5 +1,12 @@
 # Getting Started with Create React App
 
+## Client environment safety
+
+Every `REACT_APP_*` value is compiled into the published browser bundle and
+can be read by end users. Never put secrets, tokens, passwords, private keys,
+credentials, or API keys in `client/.env` or any other client environment file.
+The prebuild and prestart checks reject secret-like variable names.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
