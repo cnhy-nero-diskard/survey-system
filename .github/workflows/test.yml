@@ -86,7 +86,7 @@ jobs:
         CI: false
 
     - name: Upload coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v7
       if: always()
       with:
         files: ./survey-system-unified/coverage/coverage-final.json
